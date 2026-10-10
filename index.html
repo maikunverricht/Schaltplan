@@ -1,0 +1,881 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Schaltplan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Werkbank-Auftritt wie im Kontor — Glasleiste oben, kurze Kopfzeile, Einlage-Karte, Reiter als Pills, Arbeitsfläche aus Glastafeln */
+:root{
+  color-scheme:dark;
+  --void:#06090E;
+  --bg-grad:linear-gradient(175deg,#070B11 0%,#0A121B 38%,#0C1620 68%,#080C12 100%);
+  --glass:rgba(16,22,31,.55); --film:rgba(255,255,255,.045); --surface:rgba(12,17,24,.86); --surface-solid:#0E151E;
+  --glass-edge:rgba(255,255,255,.10);
+  --text:#EDF0F3; --text-2:#9BA6B2; --text-3:#6B7683;
+  --line:rgba(255,255,255,.09); --line-strong:rgba(255,255,255,.17); --line-hi:rgba(242,179,61,.38);
+  --amber:#F2B33D; --amber-soft:rgba(242,179,61,.14); --ink:#12171F;
+  --free:#63D9C4; --free-ink:#63D9C4; --over:#EE8E6A; --red-ink:#E8646E; --info:#7FA9F5;
+  --em-1:#F2B33D; --em-2:#F7D68C; --em-3:#63D9C4;
+  --glow-a:rgba(242,179,61,.10); --glow-t:rgba(99,217,196,.08);
+  --shadow:0 18px 46px -22px rgba(0,0,0,.75); --shadow-lg:0 30px 80px -30px rgba(0,0,0,.85);
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --max:1120px; --pad:22px; --t-s:.25s; --t-m:.45s; --kurve:cubic-bezier(.2,.8,.2,1);
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --void:#EEF1F6;
+  --bg-grad:linear-gradient(175deg,#F5F7FA 0%,#EAEEF4 38%,#E6EBF2 68%,#F2F4F8 100%);
+  --glass:rgba(255,255,255,.62); --film:rgba(255,255,255,.55); --surface:rgba(250,251,253,.92); --surface-solid:#F8FAFC;
+  --glass-edge:rgba(17,25,35,.10);
+  --text:#111923; --text-2:#4A5563; --text-3:#7A8493;
+  --line:rgba(17,28,44,.10); --line-strong:rgba(17,28,44,.20); --line-hi:rgba(224,162,31,.55);
+  --amber:#E0A21F; --amber-soft:rgba(224,162,31,.16);
+  --free:#2FA894; --free-ink:#17806D; --over:#D2704A; --red-ink:#C6404E; --info:#3F6FCB;
+  --em-1:#B8791A; --em-2:#8E7A26; --em-3:#14796A;
+  --glow-a:rgba(224,162,31,.13); --glow-t:rgba(47,168,148,.10);
+  --shadow:0 20px 44px -24px rgba(20,36,60,.38); --shadow-lg:0 30px 70px -34px rgba(30,40,60,.42);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --void:#EEF1F6;
+  --bg-grad:linear-gradient(175deg,#F5F7FA 0%,#EAEEF4 38%,#E6EBF2 68%,#F2F4F8 100%);
+  --glass:rgba(255,255,255,.62); --film:rgba(255,255,255,.55); --surface:rgba(250,251,253,.92); --surface-solid:#F8FAFC;
+  --glass-edge:rgba(17,25,35,.10);
+  --text:#111923; --text-2:#4A5563; --text-3:#7A8493;
+  --line:rgba(17,28,44,.10); --line-strong:rgba(17,28,44,.20); --line-hi:rgba(224,162,31,.55);
+  --amber:#E0A21F; --amber-soft:rgba(224,162,31,.16);
+  --free:#2FA894; --free-ink:#17806D; --over:#D2704A; --red-ink:#C6404E; --info:#3F6FCB;
+  --em-1:#B8791A; --em-2:#8E7A26; --em-3:#14796A;
+  --glow-a:rgba(224,162,31,.13); --glow-t:rgba(47,168,148,.10);
+  --shadow:0 20px 44px -24px rgba(20,36,60,.38); --shadow-lg:0 30px 70px -34px rgba(30,40,60,.42);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--void);color:var(--text);font-family:var(--display);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;transition:background-color .35s ease,color .35s ease}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.mono{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere}
+code{font-family:var(--mono);font-size:12px;background:var(--film);border:1px solid var(--line);padding:0 5px;border-radius:5px}
+
+/* Hintergrund wie im Kontor */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:var(--bg-grad)}
+.bg i{position:absolute;border-radius:50%;filter:blur(60px)}
+.bg .g1{width:620px;height:620px;left:-180px;top:-220px;background:radial-gradient(circle,var(--glow-a),transparent 70%)}
+.bg .g2{width:720px;height:720px;right:-260px;top:38%;background:radial-gradient(circle,var(--glow-t),transparent 70%)}
+.bg::after{content:"";position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 62%);mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 62%)}
+
+/* Leiste */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;padding:12px var(--pad) 0}
+.nav-in{max-width:var(--max);margin:0 auto;display:flex;align-items:center;gap:14px;height:52px;padding:0 8px 0 18px;
+  border-radius:100px;border:1px solid var(--glass-edge);background:var(--glass);box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(15px) saturate(1.3);backdrop-filter:blur(15px) saturate(1.3)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:500;letter-spacing:-.01em;white-space:nowrap;min-width:0}
+.brand b{font-weight:800;font-variation-settings:'wdth' 112;overflow:hidden;text-overflow:ellipsis}
+.brand small{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+.mark{display:inline-flex;width:21px;height:21px;flex:none;color:var(--text)}
+.mark svg{width:100%;height:100%;display:block;overflow:visible}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:100px;border:1px solid var(--glass-edge);
+  background:transparent;text-decoration:none;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;
+  transition:background var(--t-s),border-color var(--t-s)}
+.pill:hover{background:var(--glass);border-color:var(--line-hi)}
+.pill.primary{background:var(--amber);color:var(--ink);border-color:transparent;font-weight:600}
+.pill.primary:hover{background:var(--amber);filter:brightness(1.06)}
+.icon-btn{width:36px;padding:0;justify-content:center}
+.pill svg{width:16px;height:16px;flex:none}
+.sun{display:none}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .sun{display:block}:root:not([data-theme="dark"]) .moon{display:none}}
+:root[data-theme="light"] .sun{display:block}
+:root[data-theme="light"] .moon{display:none}
+
+/* Inhalt */
+.wrap{position:relative;z-index:1;max-width:var(--max);margin:0 auto;padding-inline:var(--pad);padding-block:0 24px;display:flex;flex-direction:column;gap:16px}
+.hero{padding-block:clamp(34px,6vw,60px) 4px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--amber)}
+h1{font-size:clamp(28px,4.4vw,48px);line-height:1.02;letter-spacing:-.04em;margin:16px 0 0;font-weight:700;text-wrap:balance}
+h1 span{font-variation-settings:'wdth' 116,'wght' 800}
+h1 em{font-style:italic;font-weight:600;background:linear-gradient(94deg,var(--em-1),var(--em-2) 52%,var(--em-3));-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.06em}
+.lead{max-width:600px;color:var(--text-2);font-size:clamp(15px,1.7vw,17px);margin:14px 0 0}
+.stats{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:20px;font-family:var(--mono);font-size:12.5px;color:var(--text-3);align-items:center;font-variant-numeric:tabular-nums}
+.stat b{color:var(--text);font-weight:500}
+.badge{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);border:1px solid var(--line-hi);border-radius:100px;padding:2px 9px}
+
+/* Glastafeln */
+.card,.sheet{position:relative;border:1px solid var(--line);border-radius:15px;background:var(--glass);box-shadow:var(--shadow-lg);
+  -webkit-backdrop-filter:blur(15px) saturate(1.3);backdrop-filter:blur(15px) saturate(1.3);padding:14px 16px;min-width:0}
+.t-idx{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-3)}
+h2{margin:1px 0 0;font-size:17px;letter-spacing:-.02em;font-weight:700;font-variation-settings:'wdth' 108;line-height:1.25;text-wrap:balance}
+h3{margin:0;font-size:15px;letter-spacing:-.01em;font-weight:700;font-variation-settings:'wdth' 106}
+.lede{color:var(--text-2);margin:4px 0 0;max-width:68ch;font-size:13.5px;line-height:1.5}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* Einlage */
+.drop{border:1px dashed var(--line-strong);border-radius:13px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;transition:background var(--t-s),border-color var(--t-s)}
+.drop.over{background:var(--amber-soft);border-color:var(--amber)}
+.drop strong{display:block;font-size:16px;font-weight:700;font-variation-settings:'wdth' 108;letter-spacing:-.01em}
+.drop small{display:block;color:var(--text-3);font-size:13px;margin-top:2px}
+
+/* Reiter */
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{display:inline-flex;align-items:center;gap:9px;height:38px;padding:0 15px;border-radius:100px;border:1px solid var(--glass-edge);
+  background:var(--glass);-webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px);cursor:pointer;font-size:14px;font-weight:600;
+  font-variation-settings:'wdth' 106;color:var(--text-2);transition:border-color var(--t-s),color var(--t-s),background var(--t-s)}
+.tab::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:none;transition:background var(--t-s)}
+.tab:hover{border-color:var(--line-hi);color:var(--text)}
+.tab[aria-selected="true"]{color:var(--text);border-color:var(--line-hi);background:var(--amber-soft)}
+.tab[aria-selected="true"]::before{background:var(--amber)}
+.tab .n{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text-3)}
+
+.panel{display:flex;flex-direction:column;gap:14px;min-width:0}
+
+/* Architektur */
+.archgrid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:start}
+#cy{height:min(64vh,600px);min-height:380px;border:1px solid var(--line);border-radius:13px;background-color:var(--film);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:11.5px;color:var(--text-3);margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.ln{width:18px;height:0;border-top:2px solid var(--free);flex:none}
+.ln.unused{border-top:2px dashed var(--text-3)}.ln.undecl{border-top-color:var(--over)}.ln.call{border-top:2px dotted var(--info)}
+.toggle{display:inline-flex;gap:7px;align-items:center;font-size:13.5px;cursor:pointer;color:var(--text-2)}
+.toggle input{accent-color:var(--amber)}
+.detail{max-height:min(64vh,600px);overflow:auto}
+.detail h3 + .sub{margin-top:2px}
+.detail h3:not(:first-child){margin-top:14px}
+.empty{color:var(--text-3);font-size:13.5px;margin:0}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:11px;overflow:hidden;margin:10px 0}
+.kv dt,.kv dd{background:var(--surface);padding:7px 10px;margin:0}
+.kv dt{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);display:flex;align-items:center}
+.kv dd{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere}
+.msgl{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column}
+.msgl li{border-top:1px solid var(--line);padding:7px 0}
+.sub{color:var(--text-3);font-size:12.5px;line-height:1.5}
+.st{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;border-radius:100px;padding:0 7px;vertical-align:1px;margin-left:4px}
+.st.ok{color:var(--free-ink)}.st.unused{color:var(--text-3);border-style:dashed}.st.undecl{color:var(--over)}.st.multi{color:var(--red-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{font-family:var(--mono);font-size:11.5px;padding:1px 9px;border-radius:100px;background:var(--film);border:1px solid var(--line)}
+.chip.w{border-color:var(--line-hi)}
+
+/* Tabelle */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:640px}
+th{font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.13em;text-transform:uppercase;text-align:left;color:var(--text-3);border-bottom:1px solid var(--line-strong);padding:8px}
+td{border-bottom:1px solid var(--line);padding:8px;vertical-align:top}
+td.c{text-align:center;font-family:var(--mono)}
+.yes{color:var(--free-ink)}.no{color:var(--text-3)}
+.filter{height:36px;flex:1 1 200px;max-width:320px;padding:0 14px;border:1px solid var(--glass-edge);border-radius:100px;background:var(--glass)}
+select.filter{max-width:220px}
+.filter::placeholder{color:var(--text-3)}
+
+/* Aufrufketten */
+.proc{border:1px solid var(--line);border-radius:13px;padding:11px 13px;background:var(--film)}
+.proc + .proc{margin-top:10px}
+.tree,.tree ul{list-style:none;margin:0;padding-left:16px;font-family:var(--mono);font-size:12px}
+.tree{padding-left:0;margin-top:6px}
+.tree li{position:relative;padding-left:12px;line-height:1.7}
+.tree li::before{content:"";position:absolute;left:0;top:.85em;width:8px;border-top:1px solid var(--line-strong)}
+.tree ul{border-left:1px solid var(--line-strong);margin-left:3px}
+.fn.ext{color:var(--info)}.fn.rec{color:var(--over)}
+.acc{color:var(--text-3)}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+summary{cursor:pointer}
+
+/* Dateien */
+.flist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column}
+.flist li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;align-items:center;border-top:1px solid var(--line);padding:8px 0}
+.kind{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line-strong);border-radius:100px;padding:1px 8px;color:var(--text-2)}
+.kind.pv{border-color:var(--line-hi);color:var(--amber)}
+.x{cursor:pointer;width:26px;height:26px;border:1px solid var(--line);background:transparent;border-radius:100px;color:var(--text-3)}
+.x:hover{border-color:var(--line-hi);color:var(--text)}
+.note{font-size:13.5px;color:var(--text-2)}
+.note p{max-width:75ch;margin:8px 0 0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;
+  background:var(--surface);border:1px solid var(--glass-edge);color:var(--text);padding:9px 16px;border-radius:100px;font-size:13px;box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px)}
+.cyfail{padding:20px;color:var(--text-3)}
+
+footer.foot{position:relative;z-index:1;max-width:var(--max);margin:0 auto;padding:20px var(--pad) calc(32px + env(safe-area-inset-bottom,0px));
+  display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:space-between;border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--text-3)}
+footer.foot a{text-decoration:none}
+footer.foot a:hover{color:var(--text)}
+
+@media (max-width:980px){.archgrid{grid-template-columns:minmax(0,1fr)}.detail{max-height:none}}
+@media (max-width:720px){
+  :root{--pad:16px}
+  .hide-sm{display:none!important}
+  .nav-in{padding-left:14px}
+  .brand small{display:none}
+  .tab{height:34px;padding:0 12px;font-size:13.5px}
+  #cy{height:56vh}
+}
+@media (max-width:820px),(pointer:coarse){.bg i{filter:blur(38px)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="bg" aria-hidden="true"><i class="g1"></i><i class="g2"></i></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true"><svg viewBox="15 5 90 102"><path d="M26,16 V62 A34,34 0 0 0 94,62 V16" fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="64" r="18.5" fill="var(--amber)"/></svg></span><b>Schaltplan</b><small>Werkstatt</small></a>
+    <div class="nav-r">
+      <a class="pill hide-sm" href="https://maikunverricht.github.io/WerkbankUnverricht/" target="_blank" rel="noopener">Werkbank ↗</a>
+      <button class="pill icon-btn" id="themeBtn" type="button" aria-label="Hell/Dunkel umschalten">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <section class="hero">
+    <div class="eyebrow">Werkstatt · Architektur</div>
+    <h1><span>Schnittstellen</span> <em>aus Code und PaVaSt.</em></h1>
+    <p class="lead">C-Dateien und PaVaSt einlegen: Imports und Exports werden statisch abgeglichen, Aufrufketten verfolgt und die Architektur als Graph gezeichnet. Keine Datei verlässt den Browser.</p>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="card" aria-label="Dateien einlegen">
+    <div class="drop" id="drop">
+      <div><strong>Dateien einlegen</strong><small><code>.c</code> <code>.h</code> und PaVaSt (<code>.xml</code>, <code>.pavast</code>) hierher ziehen</small></div>
+      <div class="btns">
+        <label class="pill primary" for="fin">Dateien wählen</label>
+        <label class="pill" for="din">Ordner</label>
+        <button class="pill" id="bSample" type="button">Beispiel</button>
+        <button class="pill" id="bClear" type="button">Leeren</button>
+      </div>
+      <input type="file" id="fin" multiple hidden accept=".c,.h,.xml,.pavast,.pvs,.txt">
+      <input type="file" id="din" multiple hidden webkitdirectory>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Ansichten">
+    <button class="tab" role="tab" data-tab="arch" id="t-arch" aria-selected="true">Architektur <span class="n" id="c-arch"></span></button>
+    <button class="tab" role="tab" data-tab="if" id="t-if" aria-selected="false">Schnittstellen <span class="n" id="c-if"></span></button>
+    <button class="tab" role="tab" data-tab="dyn" id="t-dyn" aria-selected="false">Aufrufketten <span class="n" id="c-dyn"></span></button>
+    <button class="tab" role="tab" data-tab="files" id="t-files" aria-selected="false">Dateien <span class="n" id="c-files"></span></button>
+  </nav>
+
+  <section class="panel" id="p-arch" role="tabpanel" aria-labelledby="t-arch">
+    <div class="archgrid">
+      <div class="sheet">
+        <div class="row">
+          <div><span class="t-idx">Statisch + Aufrufketten</span><h2>Komponentengraph</h2></div>
+          <div class="btns">
+            <label class="toggle"><input type="checkbox" id="calls" checked> Funktionsaufrufe</label>
+            <button class="pill" id="bFit" type="button">Einpassen</button>
+            <button class="pill" id="bMer" type="button">Mermaid kopieren</button>
+          </div>
+        </div>
+        <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Knoten oder Pfeil antippen für Details.</p>
+        <div id="cy" style="margin-top:12px" aria-label="Komponentengraph"></div>
+        <div class="legend">
+          <span><i class="ln"></i>deklariert und genutzt</span>
+          <span><i class="ln unused"></i>deklariert, nicht gelesen</span>
+          <span><i class="ln undecl"></i>gelesen, nicht deklariert</span>
+          <span><i class="ln call"></i>Funktionsaufruf</span>
+          <span>gestrichelter Knoten: Umgebung</span>
+        </div>
+      </div>
+      <aside class="sheet detail" id="detail"><p class="empty">Wähle eine Komponente oder einen Pfeil.</p></aside>
+    </div>
+  </section>
+
+  <section class="panel" id="p-if" role="tabpanel" aria-labelledby="t-if" hidden>
+    <div class="sheet">
+      <div class="row">
+        <div><span class="t-idx">Statisch</span><h2>Schnittstellen je Komponente</h2></div>
+        <div class="btns" style="flex:1 1 300px;justify-content:flex-end">
+          <select id="ifComp" class="filter" aria-label="Komponente"></select>
+          <input id="ifQ" class="filter" placeholder="Message filtern" aria-label="Message filtern">
+        </div>
+      </div>
+      <p class="lede">PaVaSt liefert die Deklaration, der C-Code die tatsächlichen Lese- und Schreibzugriffe.</p>
+      <div class="tbl-wrap" id="ifTbl" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-dyn" role="tabpanel" aria-labelledby="t-dyn" hidden>
+    <div class="sheet"><span class="t-idx">Dynamisch</span><h2>Aufrufketten je Prozess</h2><p class="lede">Prozesse sind Funktionen, die kein anderer Code aufruft oder deren Name auf <code>_Proc…</code>, <code>_Ini</code> oder <code>…ms</code> endet. Gelesene und geschriebene Messages werden über die ganze Kette gesammelt.</p></div>
+    <div id="dyn" class="panel"></div>
+  </section>
+
+  <section class="panel" id="p-files" role="tabpanel" aria-labelledby="t-files" hidden>
+    <div class="sheet">
+      <span class="t-idx">Eingelegt</span><h2>Dateien</h2>
+      <p class="lede">C-Dateien landen bei der Komponente mit gleichem Namen. <code>SCRDos_Calc.c</code> gehört zu <code>SCRDos</code>, wenn es dafür eine PaVaSt gibt.</p>
+      <ul class="flist" id="flist"></ul>
+    </div>
+    <div class="sheet note">
+      <h3>Was erkannt wird</h3>
+      <p>PaVaSt: <code>SW-FEATURE</code> mit <code>SHORT-NAME</code>, alle <code>*-REF</code> unterhalb von <code>…IMPORT…</code> bzw. <code>…EXPORT…</code>. C: globale Definitionen (Export), <code>extern</code> (Import), direkte Zugriffe auf bekannte Messages, <code>Msg_Get/Msg_Set</code>-artige Makros und AUTOSAR <code>Rte_Read_/Rte_Write_</code>. Schreibzugriff heißt Zuweisung, <code>++/--</code> oder Übergabe per <code>&amp;</code>.</p>
+      <p>Grenzen: Der Präprozessor wird nicht ausgewertet (Makros, <code>#if</code>-Varianten). Funktionszeiger und lokale Variablen mit dem Namen einer Message werden nicht aufgelöst.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>© <span id="yr"></span> Maik Unverricht</span>
+  <span><a href="https://maikunverricht.github.io/WerkbankUnverricht/" target="_blank" rel="noopener">Werkbank</a></span>
+</footer>
+
+<script>
+/* Aussehen wie auf der ganzen Werkbank: wb-theme lesen, beide Schlüssel schreiben, über den Kanal melden */
+(function(){
+  var r=document.documentElement,K=['wb-theme','wb-cockpit-theme'],t=null,me=Math.random().toString(36).slice(2);
+  try{t=localStorage.getItem('wb-theme')||localStorage.getItem('wb-cockpit-theme')}catch(e){}
+  if(t==='light'||t==='dark')r.setAttribute('data-theme',t);
+  var bc=null;try{bc=new BroadcastChannel('werkbank')}catch(e){}
+  function eff(){var a=r.getAttribute('data-theme');return a==='light'||a==='dark'?a:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}
+  document.getElementById('themeBtn').addEventListener('click',function(){
+    var t=eff()==='light'?'dark':'light';r.setAttribute('data-theme',t);
+    K.forEach(function(k){try{localStorage.setItem(k,t)}catch(e){}});
+    var n={thema:'theme',theme:t,von:me,zeit:Date.now()};
+    if(bc){try{bc.postMessage(n)}catch(e){}}
+    try{localStorage.setItem('wb-signal',JSON.stringify(n))}catch(e){}
+  });
+  function hoeren(n){if(n&&n.thema==='theme'&&n.von!==me&&(n.theme==='light'||n.theme==='dark'))r.setAttribute('data-theme',n.theme)}
+  if(bc)bc.onmessage=function(e){hoeren(e.data)};
+  addEventListener('storage',function(e){if(e.key==='wb-signal'&&e.newValue){try{hoeren(JSON.parse(e.newValue))}catch(x){}}});
+  document.getElementById('yr').textContent=new Date().getFullYear();
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+
+<script id="core">
+/* ===== Analyse-Kern (ohne DOM, außer DOMParser für PaVaSt) ===== */
+const KW=new Set("if else while for do switch case default return sizeof break continue goto typedef struct union enum static extern const volatile register auto inline void char short int long float double signed unsigned _Bool bool uint8 uint16 uint32 uint64 sint8 sint16 sint32 sint64 int8 int16 int32 boolean float32 float64 uint8_t uint16_t uint32_t uint64_t int8_t int16_t int32_t int64_t size_t NULL TRUE FALSE true false defined".split(" "));
+const PROC_RE=/(_Proc\w*|_Ini\w*|_Init\w*|_Process\w*|_Main|_Task\w*|\d+ms)$/i;
+const GET_RE=/\b(?:Msg_Get|MSG_GET|GET_MSG|GetMsg|Message_Get|Mes_Get)\s*\(\s*&?\s*([A-Za-z_]\w*)/g;
+const SET_RE=/\b(?:Msg_Set|MSG_SET|SET_MSG|SetMsg|Message_Set|Mes_Set)\s*\(\s*&?\s*([A-Za-z_]\w*)/g;
+const RTE_R=/\bRte_I?Read_(\w+)\s*\(/g, RTE_W=/\bRte_I?Write_(\w+)\s*\(/g;
+
+function baseName(n){return n.split(/[\\/]/).pop().replace(/\.[^.]+$/,"")}
+function blank(m){return m.replace(/[^\n]/g," ")}
+function stripC(src){
+  src=src.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/g,m=>m[0]==="/"?blank(m):'""');
+  return src.replace(/^[ \t]*#(?:[^\n]*\\\n)*[^\n]*/gm,blank);
+}
+function splitTop(s,sep){const out=[];let d=0,st=0;for(let i=0;i<s.length;i++){const c=s[i];if(c==="("||c==="[")d++;else if(c===")"||c==="]")d--;else if(c===sep&&d===0){out.push(s.slice(st,i));st=i+1}}out.push(s.slice(st));return out}
+
+function parseC(name,text){
+  const src=stripC(text), n=src.length;
+  const nl=[];for(let i=0;i<n;i++)if(src[i]==="\n")nl.push(i);
+  const lineOf=p=>{let lo=0,hi=nl.length;while(lo<hi){const m=(lo+hi)>>1;if(nl[m]<p)lo=m+1;else hi=m}return lo+1};
+  const funcs=[],top=[];let depth=0,seg=0,i=0;
+  while(i<n){
+    const ch=src[i];
+    if(ch==="{"){
+      if(depth===0){
+        const header=src.slice(seg,i);
+        const m=header.match(/([A-Za-z_]\w*)\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)\s*$/);
+        if(m&&!KW.has(m[1])&&header.indexOf("=")<0){
+          let d=1,j=i+1;while(j<n&&d){if(src[j]==="{")d++;else if(src[j]==="}")d--;j++}
+          funcs.push({name:m[1],file:name,line:lineOf(i),isStatic:/\bstatic\b/.test(header),body:src.slice(i+1,j-1)});
+          i=j;seg=j;continue;
+        }
+      }
+      depth++;
+    }else if(ch==="}")depth=Math.max(0,depth-1);
+    else if(ch===";"&&depth===0){top.push(src.slice(seg,i));seg=i+1}
+    i++;
+  }
+  const defs=new Set(),statics=new Set(),externs=new Set(),protos=new Set();
+  for(let s of top){
+    s=s.replace(/\s+/g," ").trim();
+    if(!s||/^typedef\b/.test(s)||/^(struct|union|enum)\s+\w+$/.test(s))continue;
+    let prev;do{prev=s;s=s.replace(/\{[^{}]*\}/g,"")}while(s!==prev);
+    const isExt=/\bextern\b/.test(s),isSt=/\bstatic\b/.test(s);
+    const parts=splitTop(s,",");
+    const head=splitTop(parts[0],"=")[0];
+    if(/\(/.test(head)&&!/\(\s*\*/.test(head)){const m=head.match(/([A-Za-z_]\w*)\s*\(/);if(m)protos.add(m[1]);continue}
+    for(const p of parts){
+      const lhs=splitTop(p,"=")[0];
+      const m=lhs.match(/([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*$/);
+      if(!m||KW.has(m[1]))continue;
+      (isExt?externs:isSt?statics:defs).add(m[1]);
+    }
+  }
+  for(const f of funcs)analyseBody(f);
+  return {file:name,funcs,defs,statics,externs,protos};
+}
+
+function analyseBody(f){
+  const b=f.body;f.calls=new Set();f.occ=new Map();f.mR=new Set();f.mW=new Set();
+  const re=/\b[A-Za-z_]\w*\b/g;let m;
+  while((m=re.exec(b))){
+    const id=m[0];if(KW.has(id)||/^\d/.test(id))continue;
+    let after=b.slice(re.lastIndex,re.lastIndex+60);
+    const before=b.slice(Math.max(0,m.index-4),m.index);
+    if(/^\s*\(/.test(after)){if(!/^(Msg_|MSG_|GET_MSG|SET_MSG|Rte_)/.test(id))f.calls.add(id);continue}
+    if(/(\.|->)\s*$/.test(before))continue;
+    let a=after,p;do{p=a;a=a.replace(/^\s*(?:\[[^\]]*\]|\.\s*\w+|->\s*\w+)/,"")}while(a!==p);
+    const w=/^\s*(?:=(?!=)|[+\-*\/%&|^]=|<<=|>>=|\+\+|--)/.test(a)||/(\+\+|--)\s*$/.test(before)||/(?:^|[^&])&\s*$/.test(before);
+    const o=f.occ.get(id)||{r:false,w:false};if(w)o.w=true;else o.r=true;f.occ.set(id,o);
+  }
+  for(const [rx,set] of [[GET_RE,f.mR],[SET_RE,f.mW],[RTE_R,f.mR],[RTE_W,f.mW]]){rx.lastIndex=0;let k;while((k=rx.exec(b)))set.add(k[1])}
+}
+
+function parsePavast(name,text){
+  const doc=new DOMParser().parseFromString(text,"application/xml");
+  if(doc.getElementsByTagName("parsererror").length)return {file:name,error:"XML nicht lesbar",features:[]};
+  const all=[...doc.getElementsByTagName("*")];
+  const ln=e=>(e.localName||e.tagName).toUpperCase();
+  const shortName=e=>{for(const c of e.children)if(ln(c)==="SHORT-NAME")return c.textContent.trim();return null};
+  let feats=all.filter(e=>ln(e)==="SW-FEATURE"&&shortName(e));
+  if(!feats.length)feats=all.filter(e=>(ln(e)==="SW-COMPONENT"||ln(e)==="SW-MODULE")&&shortName(e));
+  const roots=feats.length?feats:[doc.documentElement];
+  const features=roots.map(fe=>{
+    const nm=feats.length?shortName(fe):(shortName(doc.documentElement)||baseName(name));
+    const imports=new Set(),exports=new Set();
+    for(const r of fe.getElementsByTagName("*")){
+      if(!/-REF$/.test(ln(r))||r.children.length)continue;
+      let near=r.parentElement,dir=null;
+      while(near&&near!==fe.parentElement){const t=ln(near);if(t==="SW-FEATURE"&&near!==fe){dir="skip";break}if(!dir&&/IMPORT/.test(t))dir="i";else if(!dir&&/EXPORT/.test(t))dir="e";if(near===fe)break;near=near.parentElement}
+      if(dir!=="i"&&dir!=="e")continue;
+      const v=r.textContent.trim().split("/").pop();if(!v)continue;
+      (dir==="i"?imports:exports).add(v);
+    }
+    return {name:nm,imports,exports};
+  });
+  return {file:name,features};
+}
+
+function classify(name,text){
+  if(/\.(c|h)$/i.test(name))return "c";
+  if(/\.(xml|pavast|pvs)$/i.test(name)||/^\s*</.test(text))return /<(MSRSW|SW-|PAVAST)/i.test(text)?"pv":/\.(pavast|pvs)$/i.test(name)?"pv":null;
+  return null;
+}
+
+function compForC(base,pvNames){
+  const lb=base.toLowerCase();
+  for(const p of pvNames)if(p.toLowerCase()===lb)return p;
+  let best=null;for(const p of pvNames){const lp=p.toLowerCase();if(lb.startsWith(lp+"_")&&(!best||p.length>best.length))best=p}
+  if(best)return best;
+  return base.replace(/_(priv|pub|inl|cfg|types?|int|ext)$/i,"");
+}
+
+const ENV="⟨Umgebung⟩";
+function analyze(files){
+  const pv=[],cs=[];
+  for(const f of files){try{if(f.kind==="pv")pv.push(parsePavast(f.name,f.text));else if(f.kind==="c")cs.push(parseC(f.name,f.text))}catch(e){f.err=String(e)}}
+  const comps=new Map();
+  const C=n=>{if(!comps.has(n))comps.set(n,{name:n,pvFiles:[],cFiles:[],hasPV:false,hasC:false,imp:new Set(),exp:new Set(),defs:new Set(),ext:new Set(),reads:new Set(),writes:new Set(),funcs:[],procs:[]});return comps.get(n)};
+  for(const p of pv)for(const ft of p.features){const c=C(ft.name);c.hasPV=true;c.pvFiles.push(p.file);ft.imports.forEach(x=>c.imp.add(x));ft.exports.forEach(x=>c.exp.add(x))}
+  const pvNames=[...comps.keys()];
+  const fileComp={};
+  for(const p of pv)fileComp[p.file]=p.features.map(f=>f.name).join(", ")||"—";
+  for(const r of cs){
+    const c=C(compForC(baseName(r.file),pvNames));c.hasC=true;c.cFiles.push(r.file);fileComp[r.file]=c.name;
+    r.defs.forEach(x=>c.defs.add(x));r.externs.forEach(x=>c.ext.add(x));
+    for(const f of r.funcs){f.comp=c.name;c.funcs.push(f)}
+  }
+  for(const c of comps.values())c.ext=new Set([...c.ext].filter(x=>!c.defs.has(x)));
+  // bekannte Messages
+  const M=new Set();
+  for(const c of comps.values()){c.imp.forEach(x=>M.add(x));c.exp.forEach(x=>M.add(x));c.defs.forEach(x=>M.add(x));c.ext.forEach(x=>M.add(x));for(const f of c.funcs){f.mR.forEach(x=>M.add(x));f.mW.forEach(x=>M.add(x))}}
+  // Funktionsindex
+  const fnBy=new Map(),called=new Set();
+  for(const c of comps.values())for(const f of c.funcs){if(!fnBy.has(f.name)||!f.isStatic)fnBy.set(f.name,f);f.calls.forEach(x=>called.add(x))}
+  for(const f of fnBy.values()){
+    f.R=new Set(f.mR);f.W=new Set(f.mW);
+    for(const [id,o] of f.occ)if(M.has(id)&&!fnBy.has(id)){if(o.r)f.R.add(id);if(o.w)f.W.add(id)}
+  }
+  for(const c of comps.values())for(const f of c.funcs){if(!f.R){f.R=new Set(f.mR);f.W=new Set(f.mW);for(const [id,o] of f.occ)if(M.has(id)){if(o.r)f.R.add(id);if(o.w)f.W.add(id)}}f.R.forEach(x=>c.reads.add(x));f.W.forEach(x=>c.writes.add(x))}
+  // transitiv (Aufrufkette)
+  const memo=new Map();
+  function trans(name,stack){
+    if(memo.has(name))return memo.get(name);
+    const f=fnBy.get(name);if(!f||stack.has(name))return {R:new Set(),W:new Set()};
+    stack.add(name);const R=new Set(f.R),W=new Set(f.W);
+    for(const c of f.calls){const t=trans(c,stack);t.R.forEach(x=>R.add(x));t.W.forEach(x=>W.add(x))}
+    stack.delete(name);const res={R,W};memo.set(name,res);return res;
+  }
+  function tree(name,stack,depth){
+    const f=fnBy.get(name);const node={name,def:!!f,comp:f?f.comp:null,line:f?f.line:null,file:f?f.file:null,kids:[],rec:false,R:f?[...f.R]:[],W:f?[...f.W]:[]};
+    if(!f)return node;if(stack.has(name)){node.rec=true;return node}
+    if(depth>14)return node;
+    stack.add(name);for(const c of [...f.calls].sort())if(fnBy.has(c))node.kids.push(tree(c,stack,depth+1));stack.delete(name);
+    node.extCalls=[...f.calls].filter(c=>!fnBy.has(c)).sort();
+    return node;
+  }
+  const procW=new Map(),procR=new Map();const push=(mp,k,v)=>{if(!mp.has(k))mp.set(k,[]);mp.get(k).push(v)};
+  for(const c of comps.values()){
+    const entries=c.funcs.filter(f=>!f.isStatic&&(!called.has(f.name)||PROC_RE.test(f.name))||PROC_RE.test(f.name));
+    const uniq=[...new Map(entries.map(f=>[f.name,f])).values()];
+    c.procs=uniq.map(f=>{const t=trans(f.name,new Set());return {name:f.name,file:f.file,line:f.line,R:[...t.R].sort(),W:[...t.W].sort(),tree:tree(f.name,new Set(),0)}});
+    for(const p of c.procs){p.W.forEach(m=>push(procW,m,{comp:c.name,proc:p.name}));p.R.forEach(m=>push(procR,m,{comp:c.name,proc:p.name}))}
+  }
+  // Producer / Consumer
+  const prov=new Map();
+  for(const m of M){
+    let ps=[...comps.values()].filter(c=>c.exp.has(m)).map(c=>c.name);
+    if(!ps.length)ps=[...comps.values()].filter(c=>c.defs.has(m)).map(c=>c.name);
+    if(!ps.length)ps=[...comps.values()].filter(c=>c.writes.has(m)).map(c=>c.name);
+    prov.set(m,ps);
+  }
+  const flows=[];const issues=[];
+  for(const m of M){
+    let ps=prov.get(m);
+    for(const c of comps.values()){
+      if(ps.includes(c.name))continue;
+      const touches=c.imp.has(m)||c.reads.has(m)||c.ext.has(m);
+      if(c.writes.has(m)&&ps.length)issues.push({m,comp:c.name,kind:"Fremdschreiber"});
+      if(!touches)continue;
+      const use=c.hasC?c.reads.has(m):true;
+      const decl=c.hasPV?c.imp.has(m):(c.ext.has(m)||use);
+      const st=decl&&use?"ok":decl?"unused":"undecl";
+      const from=ps.length?ps:[ENV];
+      for(const p of from)flows.push({m,from:p,to:c.name,st,multi:ps.length>1});
+    }
+  }
+  // Aufrufe über Komponentengrenzen
+  const calls=new Map();
+  for(const c of comps.values())for(const f of c.funcs)for(const k of f.calls){const g=fnBy.get(k);if(g&&g.comp!==c.name){const key=c.name+"→"+g.comp;if(!calls.has(key))calls.set(key,{from:c.name,to:g.comp,fns:new Set()});calls.get(key).fns.add(k)}}
+  // Exporte ohne Abnehmer
+  const consumed=new Set(flows.map(f=>f.m));
+  for(const c of comps.values())for(const m of c.exp)if(!consumed.has(m))issues.push({m,comp:c.name,kind:"ohne Abnehmer"});
+  return {comps,M,prov,flows,calls:[...calls.values()],procW,procR,issues,fileComp};
+}
+</script>
+
+<script>
+/* ===== Oberfläche ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const S={files:[],model:null,cy:null,sel:null};
+
+/* ---- Beispieldaten (Abgasnachbehandlung, frei erfunden) ---- */
+function pvXml(name,ex,im){
+  const refs=a=>a.map(x=>`            <SW-VARIABLE-REF>${x}</SW-VARIABLE-REF>`).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<MSRSW>
+  <SHORT-NAME>${name}</SHORT-NAME>
+  <SW-SYSTEMS><SW-SYSTEM><SHORT-NAME>Beispiel</SHORT-NAME>
+  <SW-COMPONENT-SPEC><SW-COMPONENTS>
+    <SW-FEATURE>
+      <SHORT-NAME>${name}</SHORT-NAME>
+      <SW-FEATURE-INTERFACES><SW-FEATURE-INTERFACE>
+        <SW-INTERFACE-EXPORTS><SW-INTERFACE-EXPORT><SW-INTERFACE-EXPORT-SCOPE>
+          <SW-VARIABLE-REFS>
+${refs(ex)}
+          </SW-VARIABLE-REFS>
+        </SW-INTERFACE-EXPORT-SCOPE></SW-INTERFACE-EXPORT></SW-INTERFACE-EXPORTS>
+        <SW-INTERFACE-IMPORTS><SW-INTERFACE-IMPORT>
+          <SW-VARIABLE-REFS>
+${refs(im)}
+          </SW-VARIABLE-REFS>
+        </SW-INTERFACE-IMPORT></SW-INTERFACE-IMPORTS>
+      </SW-FEATURE-INTERFACE></SW-FEATURE-INTERFACES>
+    </SW-FEATURE>
+  </SW-COMPONENTS></SW-COMPONENT-SPEC>
+  </SW-SYSTEM></SW-SYSTEMS>
+</MSRSW>`;
+}
+const SAMPLE=[
+ {name:"ExhTSens.c",text:`/* Beispiel: Abgastemperatur */
+#include "ExhTSens.h"
+
+uint16 ExhTSens_tUs;          /* vor Kat [0.1 K] */
+uint16 ExhTSens_tDs;          /* nach Kat [0.1 K] */
+static uint16 ExhTSens_tFlt;
+extern uint16 Epm_nEng;
+
+static uint16 ExhTSens_Filter(uint16 raw)
+{
+    ExhTSens_tFlt = (ExhTSens_tFlt * 3u + raw) / 4u;
+    return ExhTSens_tFlt;
+}
+
+static void ExhTSens_Plaus(void)
+{
+    if (Epm_nEng < 500u) { ExhTSens_tDs = ExhTSens_tUs; }
+}
+
+uint16 ExhTSens_GetTMax(void)
+{
+    return (ExhTSens_tUs > ExhTSens_tDs) ? ExhTSens_tUs : ExhTSens_tDs;
+}
+
+void ExhTSens_Proc10ms(void)
+{
+    ExhTSens_tUs = ExhTSens_Filter(Adc_Get(3u));
+    ExhTSens_tDs = ExhTSens_Filter(Adc_Get(4u));
+    ExhTSens_Plaus();
+}
+
+void ExhTSens_Ini(void)
+{
+    ExhTSens_tUs = 2930u;
+    ExhTSens_tDs = 2930u;
+}
+`},
+ {name:"SCRDos.c",text:`/* Beispiel: Harnstoffdosierung */
+#include "SCRDos.h"
+
+uint16 SCRDos_mfDosDes;       /* Soll-Dosiermenge [mg/s] */
+extern uint16 ExhTSens_tDs;
+extern uint16 ExhTSens_tUs;
+extern uint16 NOxSens_rNOxUs;
+extern uint8  DosVlv_stVlv;
+
+static uint16 SCRDos_CalcEff(void)
+{
+    return (uint16)((ExhTSens_tDs > 4730u) ? 900u : 400u);
+}
+
+static uint16 SCRDos_CalcDem(uint16 eff)
+{
+    uint16 dem = (NOxSens_rNOxUs * eff) / 1000u;
+    if (ExhTSens_tUs < 4230u) { dem = 0u; }   /* nicht in PaVaSt importiert */
+    return dem;
+}
+
+void SCRDos_Proc100ms(void)
+{
+    uint16 eff = SCRDos_CalcEff();
+    if (DosVlv_stVlv == 0u) {
+        SCRDos_mfDosDes = SCRDos_CalcDem(eff);
+    } else {
+        SCRDos_mfDosDes = 0u;
+    }
+}
+`},
+ {name:"DosVlv.c",text:`/* Beispiel: Dosierventil */
+#include "DosVlv.h"
+
+uint8 DosVlv_stVlv;           /* 0 = ok, 1 = Fehler */
+extern uint16 SCRDos_mfDosDes;
+
+static void DosVlv_Drive(uint16 duty)
+{
+    Pwm_Set(7u, duty);
+}
+
+static void DosVlv_Protect(void)
+{
+    if (ExhTSens_GetTMax() > 9730u) { DosVlv_stVlv = 1u; }
+}
+
+void DosVlv_Proc10ms(void)
+{
+    DosVlv_stVlv = Dio_Get(12u) ? 1u : 0u;
+    DosVlv_Protect();
+    DosVlv_Drive(SCRDos_mfDosDes * 4u);
+}
+`},
+ {name:"ExhTSens_pavast.xml",text:pvXml("ExhTSens",["ExhTSens_tUs","ExhTSens_tDs"],["Epm_nEng"])},
+ {name:"SCRDos_pavast.xml",text:pvXml("SCRDos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs","DosVlv_stVlv"])},
+ {name:"DosVlv_pavast.xml",text:pvXml("DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs"])},
+ {name:"Epm_pavast.xml",text:pvXml("Epm",["Epm_nEng"],[])}
+];
+
+/* ---- Dateien ---- */
+function loadSample(){S.files=SAMPLE.map(f=>({name:f.name,text:f.text,kind:classify(f.name,f.text),sample:true}));run()}
+async function addFiles(list){
+  if(S.files.some(f=>f.sample))S.files=[];
+  let skipped=0;
+  for(const file of list){
+    if(file.size>8e6){skipped++;continue}
+    const text=await file.text();const kind=classify(file.name,text);
+    if(!kind){skipped++;continue}
+    const name=file.webkitRelativePath||file.name;
+    S.files=S.files.filter(f=>f.name!==name);S.files.push({name,text,kind,sample:false});
+  }
+  run();toast(`${list.length-skipped} Dateien eingelegt`+(skipped?`, ${skipped} übersprungen (kein C/PaVaSt)`:""));
+}
+$("#fin").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
+$("#din").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
+const drop=$("#drop");
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>{const fs=[...(e.dataTransfer.files||[])];if(fs.length)addFiles(fs)});
+$("#bSample").onclick=loadSample;
+$("#bClear").onclick=()=>{S.files=[];run()};
+
+/* ---- Tabs ---- */
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>openTab(b.dataset.tab)));
+function openTab(t){
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+  ["arch","if","dyn","files"].forEach(k=>$("#p-"+k).hidden=k!==t);
+  try{localStorage.setItem("ap-tab",t)}catch(e){}
+  if(t==="arch"&&S.cy){S.cy.resize();S.cy.fit(undefined,30)}
+}
+
+/* ---- Lauf ---- */
+function run(){
+  S.model=analyze(S.files);S.sel=null;
+  renderStats();renderGraph();renderIf();renderDyn();renderFiles();
+  $("#detail").innerHTML=S.files.length?'<p class="empty">Wähle eine Komponente oder einen Pfeil.</p>':'<p class="empty">Noch keine Dateien eingelegt.</p>';
+}
+function renderStats(){
+  const m=S.model,nc=[...m.comps.values()].length,np=[...m.comps.values()].reduce((a,c)=>a+c.procs.length,0);
+  const und=m.flows.filter(f=>f.st==="undecl").length,unu=m.flows.filter(f=>f.st==="unused").length;
+  const sample=S.files.some(f=>f.sample);
+  $("#stats").innerHTML=(sample?'<span class="badge">Beispieldaten</span>':"")+
+   `<span class="stat"><b>${nc}</b> Komponenten</span><span class="stat"><b>${m.M.size}</b> Messages</span><span class="stat"><b>${np}</b> Prozesse</span>`+
+   (und?`<span class="stat" style="color:var(--over)"><b>${und}</b> undeklariert</span>`:"")+(unu?`<span class="stat"><b>${unu}</b> ungenutzt</span>`:"");
+  $("#c-arch").textContent=nc||"";$("#c-if").textContent=m.M.size||"";$("#c-dyn").textContent=np||"";$("#c-files").textContent=S.files.length||"";
+}
+
+/* ---- Graph ---- */
+function tok(){const cs=getComputedStyle(document.documentElement);const g=k=>cs.getPropertyValue(k).trim();return {surface:g("--surface-solid"),void:g("--void"),text:g("--text"),text2:g("--text-2"),text3:g("--text-3"),line:g("--line-strong"),amber:g("--amber"),free:g("--free"),over:g("--over"),info:g("--info")}}
+function edgeGroups(){
+  const g=new Map();
+  for(const f of S.model.flows){const k=f.from+"→"+f.to;if(!g.has(k))g.set(k,{from:f.from,to:f.to,items:[]});g.get(k).items.push(f)}
+  return [...g.values()];
+}
+function renderGraph(){
+  const box=$("#cy");
+  if(typeof cytoscape==="undefined"){box.innerHTML='<p class="cyfail">Die Grafik-Bibliothek konnte nicht geladen werden. Tabellen und Aufrufketten funktionieren trotzdem.</p>';return}
+  try{if(window.cytoscapeDagre)cytoscape.use(window.cytoscapeDagre)}catch(e){}
+  const m=S.model,T=tok(),els=[];
+  const groups=edgeGroups();
+  const needEnv=groups.some(g=>g.from===ENV);
+  for(const c of m.comps.values()){
+    const cls=!c.hasC?"pvonly":"";
+    els.push({data:{id:c.name,label:c.name+"\n"+(c.hasPV?"PaVaSt":"—")+" · "+(c.hasC?c.cFiles.length+" C":"kein C")},classes:cls});
+  }
+  if(needEnv)els.push({data:{id:ENV,label:"Umgebung\n(Producer fehlt)"},classes:"env"});
+  for(const g of groups){
+    const st=g.items.some(i=>i.st==="undecl")?"undecl":g.items.every(i=>i.st==="unused")?"unused":"ok";
+    els.push({data:{id:"f:"+g.from+"→"+g.to,source:g.from,target:g.to,label:String(g.items.length)},classes:st});
+  }
+  if($("#calls").checked)for(const c of m.calls)els.push({data:{id:"c:"+c.from+"→"+c.to,source:c.from,target:c.to,label:"ƒ "+c.fns.size},classes:"call"});
+  if(S.cy){S.cy.destroy();S.cy=null}
+  if(!els.length){box.innerHTML='<p class="cyfail">Lege C- und PaVaSt-Dateien ein oder lade das Beispiel.</p>';return}
+  box.innerHTML="";
+  const font='"JetBrains Mono", ui-monospace, Menlo, monospace';
+  S.cy=cytoscape({container:box,elements:els,wheelSensitivity:.25,minZoom:.25,maxZoom:3,
+    style:[
+      {selector:"node",style:{shape:"round-rectangle","background-color":T.surface,"border-width":1.5,"border-color":T.line,label:"data(label)","text-wrap":"wrap","text-valign":"center","text-halign":"center",color:T.text,"font-family":font,"font-size":12,width:"label",height:"label",padding:"14px","line-height":1.45}},
+      {selector:"node.pvonly",style:{"border-style":"dashed",color:T.text2}},
+      {selector:"node.env",style:{"border-style":"dashed","background-opacity":.4,color:T.text3}},
+      {selector:"node:selected",style:{"border-color":T.amber,"border-width":2.5}},
+      {selector:"edge",style:{"curve-style":"bezier","target-arrow-shape":"triangle",width:1.6,"line-color":T.free,"target-arrow-color":T.free,label:"data(label)","font-family":font,"font-size":11,color:T.text2,"text-background-color":T.void,"text-background-opacity":1,"text-background-padding":"3px","text-background-shape":"roundrectangle","arrow-scale":1}},
+      {selector:"edge.unused",style:{"line-style":"dashed","line-color":T.text3,"target-arrow-color":T.text3,"line-dash-pattern":[6,5]}},
+      {selector:"edge.undecl",style:{"line-color":T.over,"target-arrow-color":T.over,color:T.over}},
+      {selector:"edge.call",style:{"line-style":"dotted","line-color":T.info,"target-arrow-color":T.info,"target-arrow-shape":"vee",color:T.info}},
+      {selector:"edge:selected",style:{"line-color":T.amber,"target-arrow-color":T.amber,width:2.6}}
+    ],
+    layout:window.cytoscapeDagre||(typeof dagre!=="undefined")?{name:"dagre",rankDir:"LR",nodeSep:40,rankSep:110,edgeSep:20,padding:30}:{name:"breadthfirst",directed:true,padding:30}
+  });
+  S.cy.on("tap","node",e=>showComp(e.target.id()));
+  S.cy.on("tap","edge",e=>{const id=e.target.id();const k=id.slice(2);const [a,b]=k.split("→");id[0]==="c"?showCall(a,b):showFlow(a,b)});
+  S.cy.on("tap",e=>{if(e.target===S.cy)$("#detail").innerHTML='<p class="empty">Wähle eine Komponente oder einen Pfeil.</p>'});
+}
+$("#calls").addEventListener("change",renderGraph);
+$("#bFit").onclick=()=>S.cy&&S.cy.fit(undefined,30);
+const reTheme=()=>{if(S.model)renderGraph()};
+try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",reTheme)}catch(e){}
+new MutationObserver(reTheme).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+const pill=st=>({ok:'<span class="st ok">ok</span>',unused:'<span class="st unused">ungenutzt</span>',undecl:'<span class="st undecl">undeklariert</span>'}[st]);
+const procsOf=(mp,m,comp)=>(mp.get(m)||[]).filter(x=>x.comp===comp).map(x=>x.proc);
+function showFlow(a,b){
+  const items=S.model.flows.filter(f=>f.from===a&&f.to===b).sort((x,y)=>x.m.localeCompare(y.m));
+  $("#detail").innerHTML=`<h3>${esc(a)} → ${esc(b)}</h3><p class="sub">${items.length} Message${items.length>1?"s":""}</p><ul class="msgl">`+
+   items.map(f=>{const w=procsOf(S.model.procW,f.m,a),r=procsOf(S.model.procR,f.m,b);
+    return `<li><div class="mono">${esc(f.m)} ${pill(f.st)}${f.multi?' <span class="st multi">mehrere Producer</span>':""}</div>
+     <div class="sub">${w.length?"geschrieben in "+w.map(esc).join(", "):a===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`}).join("")+"</ul>";
+}
+function showCall(a,b){
+  const c=S.model.calls.find(x=>x.from===a&&x.to===b);
+  $("#detail").innerHTML=`<h3>${esc(a)} ruft ${esc(b)}</h3><p class="sub">Funktionsaufrufe über die Komponentengrenze. Solche Aufrufe tauchen in der PaVaSt-Message-Schnittstelle nicht auf.</p><div class="chips">${[...c.fns].map(f=>`<span class="chip">${esc(f)}()</span>`).join("")}</div>`;
+}
+function showComp(n){
+  if(n===ENV){const ms=S.model.flows.filter(f=>f.from===ENV);$("#detail").innerHTML=`<h3>Umgebung</h3><p class="sub">Messages, die importiert oder gelesen werden, aber von keiner geladenen Komponente stammen.</p><div class="chips">${[...new Set(ms.map(f=>f.m))].map(m=>`<span class="chip">${esc(m)}</span>`).join("")}</div>`;return}
+  const c=S.model.comps.get(n);
+  const out=S.model.flows.filter(f=>f.from===n),inn=S.model.flows.filter(f=>f.to===n);
+  const iss=S.model.issues.filter(i=>i.comp===n);
+  $("#detail").innerHTML=`<h3>${esc(n)}</h3>
+   <dl class="kv"><dt>PaVaSt</dt><dd>${c.pvFiles.map(esc).join(", ")||"—"}</dd><dt>C</dt><dd>${c.cFiles.map(esc).join(", ")||"—"}</dd>
+   <dt>Prozesse</dt><dd>${c.procs.map(p=>esc(p.name)).join(", ")||"—"}</dd></dl>
+   <h3>Exporte</h3><div class="chips">${[...new Set([...c.exp,...out.map(f=>f.m)])].sort().map(m=>`<span class="chip w">${esc(m)}</span>`).join("")||'<span class="sub">keine</span>'}</div>
+   <h3 style="margin-top:10px">Importe</h3><ul class="msgl">${inn.sort((x,y)=>x.m.localeCompare(y.m)).map(f=>`<li class="mono">${esc(f.m)} <span class="sub">von ${esc(f.from)}</span> ${pill(f.st)}</li>`).join("")||'<li class="sub">keine</li>'}</ul>
+   ${iss.length?`<h3 style="margin-top:10px">Auffällig</h3><ul class="msgl">${iss.map(i=>`<li class="mono">${esc(i.m)} <span class="sub">${esc(i.kind)}</span></li>`).join("")}</ul>`:""}
+   <p style="margin-top:12px"><button class="pill" type="button" onclick="gotoDyn('${esc(n).replace(/'/g,"\\'")}')">Aufrufketten ansehen</button></p>`;
+}
+function gotoDyn(n){openTab("dyn");const el=document.getElementById("dyn-"+n);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})}
+
+$("#bMer").onclick=async()=>{
+  if(!S.model||!S.model.comps.size)return toast("Nichts zu kopieren");
+  const id=s=>"n_"+s.replace(/\W/g,"_");const L=["flowchart LR"];
+  const names=new Set([...S.model.comps.keys()]);if(S.model.flows.some(f=>f.from===ENV))names.add(ENV);
+  for(const n of names)L.push(`  ${id(n)}["${n===ENV?"Umgebung":n}"]`);
+  for(const g of edgeGroups()){const st=g.items.some(i=>i.st==="undecl")?" undeklariert":"";L.push(`  ${id(g.from)} ${g.items.every(i=>i.st==="unused")?"-.->":"-->"}|"${g.items.length}${st}"| ${id(g.to)}`)}
+  if($("#calls").checked)for(const c of S.model.calls)L.push(`  ${id(c.from)} -. "ƒ ${[...c.fns].join(", ")}" .-> ${id(c.to)}`);
+  const txt=L.join("\n");
+  try{await navigator.clipboard.writeText(txt);toast("Mermaid-Code kopiert")}catch(e){showCopyFallback(txt)}
+};
+function showCopyFallback(txt){$("#detail").innerHTML='<h3>Mermaid-Code</h3><p class="sub">Kopieren war nicht möglich. Text markieren und kopieren:</p><textarea id="merTxt" rows="12" style="width:100%;font-family:var(--mono);font-size:12px;color:var(--text);background:var(--film);border:1px solid var(--line);border-radius:11px;padding:8px">'+esc(txt)+"</textarea>";$("#merTxt").select()}
+
+/* ---- Schnittstellen ---- */
+function renderIf(){
+  const sel=$("#ifComp"),cur=sel.value;
+  const names=[...S.model.comps.keys()].sort();
+  sel.innerHTML='<option value="">Alle Komponenten</option>'+names.map(n=>`<option${n===cur?" selected":""}>${esc(n)}</option>`).join("");
+  drawIf();
+}
+function drawIf(){
+  const q=$("#ifQ").value.trim().toLowerCase(),only=$("#ifComp").value,rows=[];
+  for(const c of [...S.model.comps.values()].sort((a,b)=>a.name.localeCompare(b.name))){
+    if(only&&c.name!==only)continue;
+    const exp=new Set([...c.exp,...[...c.defs].filter(x=>S.model.M.has(x))]);
+    for(const m of [...exp].sort())rows.push({c,m,dir:"Export",pv:c.exp.has(m),cd:c.writes.has(m)||c.defs.has(m),partner:S.model.flows.filter(f=>f.from===c.name&&f.m===m).map(f=>f.to)});
+    const imp=new Set([...c.imp,...S.model.flows.filter(f=>f.to===c.name).map(f=>f.m)]);
+    for(const m of [...imp].sort()){const f=S.model.flows.find(x=>x.to===c.name&&x.m===m);rows.push({c,m,dir:"Import",pv:c.imp.has(m),cd:c.reads.has(m),partner:f?[f.from]:[],st:f&&f.st})}
+  }
+  const filt=rows.filter(r=>!q||r.m.toLowerCase().includes(q));
+  const yn=(b,has)=>!has?'<span class="no">n/a</span>':b?'<span class="yes">✓</span>':'<span class="no">–</span>';
+  $("#ifTbl").innerHTML=filt.length?`<table><thead><tr><th>Komponente</th><th>Message</th><th>Richtung</th><th>PaVaSt</th><th>C-Code</th><th>Partner</th><th>Status</th></tr></thead><tbody>`+
+   filt.map(r=>{const st=r.dir==="Import"?r.st:(r.c.hasPV&&!r.pv?"undecl":r.c.hasC&&!r.cd?"unused":"ok");
+    return `<tr><td>${esc(r.c.name)}</td><td class="mono">${esc(r.m)}</td><td>${r.dir}</td><td class="c">${yn(r.pv,r.c.hasPV)}</td><td class="c">${yn(r.cd,r.c.hasC)}</td><td class="mono">${r.partner.map(p=>esc(p===ENV?"Umgebung":p)).join(", ")||"—"}</td><td>${st?pill(st):""}</td></tr>`}).join("")+"</tbody></table>"
+   :'<p class="sub">Keine Schnittstellen gefunden.</p>';
+}
+$("#ifQ").addEventListener("input",drawIf);$("#ifComp").addEventListener("change",drawIf);
+
+/* ---- Aufrufketten ---- */
+function srcOf(m){const p=S.model.prov.get(m);return p&&p.length?p.join(", "):"Umgebung"}
+function treeHtml(n){
+  const acc=[...n.R.map(x=>"r:"+x),...n.W.map(x=>"w:"+x)];
+  const label=`<span class="fn${!n.def?" ext":""}${n.rec?" rec":""}">${esc(n.name)}()</span>${n.rec?' <span class="acc">↺ rekursiv</span>':""}`+
+    (acc.length?` <span class="acc">${n.W.length?"schreibt "+n.W.map(esc).join(", "):""}${n.W.length&&n.R.length?" · ":""}${n.R.length?"liest "+n.R.map(esc).join(", "):""}</span>`:"");
+  const kids=n.kids.map(treeHtml).join("");
+  return `<li>${label}${kids?`<ul>${kids}</ul>`:""}</li>`;
+}
+function renderDyn(){
+  const comps=[...S.model.comps.values()].sort((a,b)=>a.name.localeCompare(b.name));
+  if(!comps.length){$("#dyn").innerHTML='<div class="sheet sub">Noch keine Dateien eingelegt.</div>';return}
+  $("#dyn").innerHTML=comps.map(c=>{
+    if(!c.hasC)return `<div class="sheet" id="dyn-${esc(c.name)}"><h3>${esc(c.name)}</h3><p class="sub">Nur PaVaSt geladen, kein C-Code. Aufrufketten brauchen die .c-Dateien.</p></div>`;
+    const procs=c.procs.map(p=>`<div class="proc"><div class="row"><h3 class="mono" style="font-size:14px">${esc(p.name)}()</h3><span class="sub">${esc(p.file)}:${p.line}</span></div>
+      <div class="cols2" style="margin-top:6px"><div><div class="sub">schreibt (über ganze Kette)</div><div class="chips">${p.W.map(m=>`<span class="chip w">${esc(m)}</span>`).join("")||'<span class="sub">nichts</span>'}</div></div>
+      <div><div class="sub">liest</div><div class="chips">${p.R.map(m=>`<span class="chip" title="Producer: ${esc(srcOf(m))}">${esc(m)} <span class="acc">← ${esc(srcOf(m))}</span></span>`).join("")||'<span class="sub">nichts</span>'}</div></div></div>
+      <details style="margin-top:8px" open><summary class="sub" style="cursor:pointer">Aufrufbaum</summary><ul class="tree">${treeHtml(p.tree)}</ul>
+      ${p.tree.extCalls&&p.tree.extCalls.length?`<p class="sub">Externe Aufrufe direkt: ${p.tree.extCalls.map(esc).join(", ")}</p>`:""}</details></div>`).join("");
+    return `<div class="sheet" id="dyn-${esc(c.name)}"><div class="row"><h3>${esc(c.name)}</h3><span class="sub">${c.funcs.length} Funktionen · ${c.procs.length} Prozesse</span></div><div style="margin-top:8px">${procs||'<p class="sub">Keine Prozesse erkannt.</p>'}</div></div>`;
+  }).join("");
+}
+
+/* ---- Dateien ---- */
+function renderFiles(){
+  const fc=S.model.fileComp;
+  $("#flist").innerHTML=S.files.length?S.files.map((f,i)=>`<li><span class="kind ${f.kind}">${f.kind==="pv"?"PAVAST":"C"}</span><span class="mono">${esc(f.name)}${f.err?` <span style="color:var(--over)">${esc(f.err)}</span>`:""}</span><span class="sub">${esc(fc[f.name]||"—")}</span><button class="x" type="button" aria-label="${esc(f.name)} entfernen" data-i="${i}">×</button></li>`).join(""):'<li class="sub">Keine Dateien.</li>';
+  document.querySelectorAll("#flist .x").forEach(b=>b.onclick=()=>{S.files.splice(+b.dataset.i,1);run()});
+}
+
+let tt;function toast(t){let el=$(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=t;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,2400)}
+
+loadSample();
+try{const t=localStorage.getItem("ap-tab");if(t&&t!=="arch")openTab(t)}catch(e){}
+</script>
+
+</body></html>
