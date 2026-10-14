@@ -201,7 +201,7 @@ html.gfull .wrap{z-index:90}
 /* Konfiguration */
 .cfgbar{display:flex;flex-direction:column;gap:8px}
 .cfgbar .filter{flex:0 0 auto;height:36px;max-width:none;width:100%}
-.fb-pre{flex:0 1 140px}
+.fb-pre{flex:1 1 220px;max-width:300px}
 .cfg-btns{flex:1 1 auto;justify-content:flex-end;align-self:flex-end}
 #cfgInfo{margin:0}#cfgInfo:empty{display:none}
 .warnt{color:var(--over);font-weight:600}
@@ -422,7 +422,7 @@ footer.foot a:hover{color:var(--text)}
     <div class="fb-row">
       <div class="fb-g"><label class="t-idx" for="cfgMode">Konfiguration</label>
         <select id="cfgMode" class="filter"><option value="all">Alle Varianten</option><option value="cfg">Konkrete Konfiguration</option></select></div>
-      <div class="fb-g fb-pre"><label class="t-idx" for="sycPre">SyC-Präfix</label><input id="sycPre" class="filter" value="SY_" spellcheck="false" autocomplete="off"></div>
+      <div class="fb-g fb-pre"><label class="t-idx" for="sycPre">SyC-Muster</label><input id="sycPre" class="filter" value="SY_*, Sy_*, *_SY, *_SC" spellcheck="false" autocomplete="off" title="Namensmuster der Systemkonstanten, mit Komma getrennt. * steht für einen beliebigen Namensteil."></div>
       <div class="btns cfg-btns">
         <label class="pill" for="cfgFile">Werte laden</label><input type="file" id="cfgFile" hidden accept=".h,.txt,.csv,.syc,.cfg,.ini,.xml">
         <button class="pill" id="cfgReset" type="button">Vorgaben</button>
@@ -4887,17 +4887,25 @@ function ppEval(expr,ctx){
 }
 /* Werte: erst die eingestellte Konfiguration, dann #define aus der Datei, dann aus allen Headern bzw. SW-SYSTEMCONST */
 function sycCtx(cfg,globals,local){
-  const pre=(cfg&&cfg.prefix)||"SY_",isS=id=>id.startsWith(pre);
+  const isS=sycTest(cfg);
   const raw=id=>{const v=cfg&&cfg.values?cfg.values[id]:null;if(isS(id)&&v!=null&&String(v).trim()!=="")return String(v);if(local&&local.has(id))return local.get(id);if(globals&&globals.has(id))return globals.get(id);return null};
   function val(id,d){if(d>8)return null;const r=raw(id);if(r==null)return null;const n=ppNum(r);if(n!==null)return n;const t=r.trim();if(/^[A-Za-z_]\w*$/.test(t))return val(t,d+1);return ppEval(t,{val:x=>val(x,d+1),def})}
   function def(id){if(raw(id)!=null)return true;return isS(id)?null:null}
   return {val:id=>val(id,0),def,raw};
 }
-function sycIds(e,pre){return e?(e.match(new RegExp("\\b"+reEsc(pre)+"\\w*","g"))||[]):[]}
+/* Systemkonstanten erkennt das Tool an Namensmustern, * steht für einen beliebigen Namensteil */
+const SYC_DEF="SY_*, Sy_*, *_SY, *_SC",sycCache=new Map();
+function sycTest(cfg){
+  const pat=String((cfg&&cfg.prefix)||SYC_DEF).trim()||SYC_DEF;if(sycCache.has(pat))return sycCache.get(pat);
+  const parts=pat.split(/[\s,;|]+/).filter(Boolean).map(x=>x.includes("*")?x:x+"*");
+  const re=new RegExp("^(?:"+parts.map(x=>x.split("*").map(reEsc).join("\\w*")).join("|")+")$");
+  const t=id=>re.test(id);sycCache.set(pat,t);return t;
+}
+function sycIds(e,test){return e?(e.match(/[A-Za-z_]\w*/g)||[]).filter(test):[]}
 /* Bedingung je Zeile; in einer konkreten Konfiguration werden inaktive Zeilen ausgeblendet */
 function ppScan(src,cfg,globals){
   const lines=src.split("\n"),N=lines.length,active=new Array(N).fill(true),syc=new Array(N).fill(null),used=new Map();
-  const pre=(cfg&&cfg.prefix)||"SY_",doEval=!!(cfg&&cfg.mode==="cfg"),local=new Map(),ctx=sycCtx(cfg,globals,local),st=[];
+  const pre=sycTest(cfg),doEval=!!(cfg&&cfg.mode==="cfg"),local=new Map(),ctx=sycCtx(cfg,globals,local),st=[];
   const hasS=e=>sycIds(e,pre).length>0,note=e=>sycIds(e,pre).forEach(x=>used.set(x,(used.get(x)||0)+1));
   const branch=(f,e)=>{const v=doEval?ppEval(e,ctx):null;
     if(f.taken==="yes")f.act=false;else if(v===0)f.act=false;else if(v===null)f.act=null;else f.act=f.taken==="maybe"?null:true;
@@ -4937,8 +4945,8 @@ function stmtEnd(s,p){
   let d=0;for(;p<s.length;p++){const ch=s[p];if(ch==="("||ch==="[")d++;else if(ch===")"||ch==="]")d--;else if(ch===";"&&d===0)return p+1;else if(ch==="}"&&d<=0)return p}
   return s.length;
 }
-function pruneRtIf(s,ctx,pre){
-  const re=/\bif\s*\(/g;let m;const isS=id=>id.startsWith(pre);
+function pruneRtIf(s,ctx,isS){
+  const re=/\bif\s*\(/g;let m;
   const blankR=(a,b)=>{s=s.slice(0,a)+blank(s.slice(a,b))+s.slice(b)};
   while((m=re.exec(s))){
     const po=m.index+m[0].length-1,pc=matchClose(s,po,"(",")");if(pc<0)continue;
@@ -4951,7 +4959,7 @@ function pruneRtIf(s,ctx,pre){
   return s;
 }
 function prepC(text,cfg,globals){
-  const pre=(cfg&&cfg.prefix)||"SY_";
+  const pre=sycTest(cfg);
   const cmt=stripComments(text),pp=ppScan(cmt,cfg,globals);
   let src=cmt.replace(/^[ \t]*#(?:[^\n]*\\\n)*[^\n]*/gm,blank);
   if(cfg&&cfg.mode==="cfg"){
@@ -5102,7 +5110,7 @@ function compForC(base,pvNames){
 
 const ENV="⟨Umgebung⟩";
 function analyze(files,cfg){
-  cfg=cfg||{mode:"all",prefix:"SY_",values:{}};const pre=cfg.prefix||"SY_";
+  cfg=cfg||{mode:"all",prefix:SYC_DEF,values:{}};const pre=sycTest(cfg);
   const pv=[],cs=[],globals=new Map(),gFrom=new Map();
   for(const f of files){try{if(f.kind==="pv")pv.push(parsePavast(f.name,f.text))}catch(e){f.err=String(e)}}
   for(const f of files)if(f.kind==="c"){const re=/^[ \t]*#[ \t]*define[ \t]+([A-Za-z_]\w*)(?![\w(])[ \t]*([^\n]*)/gm;let m;const t=stripComments(f.text);while((m=re.exec(t)))if(!globals.has(m[1])){globals.set(m[1],m[2].trim()||"1");gFrom.set(m[1],f.name)}}
@@ -5123,7 +5131,7 @@ function analyze(files,cfg){
   const fileComp={};
   for(const p of pv)fileComp[p.file]=p.features.map(f=>f.name).join(", ")||"—";
   for(const r of cs){
-    if(!r.funcs.length&&!r.defs.size&&!r.externs.size){fileComp[r.file]=[...r.used.keys()].length||[...globals.keys()].some(k=>k.startsWith(pre)&&gFrom.get(k)===r.file)?"Konfiguration":"—";continue}
+    if(!r.funcs.length&&!r.defs.size&&!r.externs.size){fileComp[r.file]=[...r.used.keys()].length||[...globals.keys()].some(k=>pre(k)&&gFrom.get(k)===r.file)?"Konfiguration":"—";continue}
     const c=C(compForC(baseName(r.file),pvNames));c.hasC=true;c.cFiles.push(r.file);fileComp[r.file]=c.name;
     r.defs.forEach(x=>c.defs.add(x));r.externs.forEach(x=>c.ext.add(x));
     c.defInfo=c.defInfo||new Map();for(const [k,v] of r.defInfo)if(!v.isStatic&&!c.defInfo.has(k))c.defInfo.set(k,v);
@@ -5257,7 +5265,7 @@ function uniqBy(a,k){const s=new Set();return a.filter(x=>{const v=k(x);if(s.has
 /* ===== Oberfläche ===== */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const S={files:[],model:null,cy:null,sel:null,cfg:{mode:"all",prefix:"SY_",values:{}},cfgA:null};
+const S={files:[],model:null,cy:null,sel:null,cfg:{mode:"all",prefix:SYC_DEF,values:{}},cfgA:null};
 
 /* ---- Beispieldaten (Abgasnachbehandlung, frei erfunden) ---- */
 function pvXml(name,ex,im,vars){
@@ -5345,7 +5353,7 @@ void ExhTSens_Ini(void)
 uint16 SCRDos_mfDosDes;       /* Soll-Dosiermenge [mg/s] */
 extern uint16 ExhTSens_tDs;
 extern uint16 ExhTSens_tUs;
-#if (SY_SCRVAR == 2)
+#if (SY_SCRVAR == 2) && (NOXSENS_SC == 1)
 extern uint16 NOxSens_rNOxUs;
 #endif
 extern uint8  DosVlv_stVlv;
@@ -5358,7 +5366,7 @@ static uint16 SCRDos_CalcEff(void)
 static uint16 SCRDos_CalcDem(uint16 eff)
 {
     uint16 dem;
-#if (SY_SCRVAR == 2)
+#if (SY_SCRVAR == 2) && (NOXSENS_SC == 1)
     dem = (NOxSens_rNOxUs * eff) / 1000u;   /* NOx-geregelt */
 #else
     dem = eff / 4u;                          /* gesteuert */
@@ -5405,7 +5413,7 @@ void DosVlv_Proc10ms(void)
  {name:"Sensorik/ExhTSens_pavast.xml",text:pvXml("ExhTSens",["ExhTSens_tUs","ExhTSens_tDs|SY_SCRVAR > 0"],["Epm_nEng"],[
    {n:"ExhTSens_tUs",lang:"Abgastemperatur vor SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"},
    {n:"ExhTSens_tDs",lang:"Abgastemperatur nach SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"}])},
- {name:"SCR/SCRDos_pavast.xml",text:pvXml("SCRDos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs|SY_SCRVAR == 2","DosVlv_stVlv"],[
+ {name:"SCR/SCRDos_pavast.xml",text:pvXml("SCRDos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs|(SY_SCRVAR == 2) && (NOXSENS_SC == 1)","DosVlv_stVlv"],[
    {n:"SCRDos_mfDosDes",lang:"Soll-Dosiermenge Harnstoff",typ:"uint16",cm:"Ident",unit:"mg/s",min:"0",max:"4000"}])},
  {name:"SCR/DosVlv_pavast.xml",text:pvXml("DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs|SY_DOSVLVDIAG == SY_ON"],[
    {n:"DosVlv_stVlv",lang:"Status Dosierventil (0 = ok, 1 = Fehler)",typ:"uint8",cm:"Ident",unit:"-",min:"0",max:"1"}])},
@@ -5414,6 +5422,7 @@ void DosVlv_Proc10ms(void)
 #define SY_ON          1
 #define SY_SCRVAR      2        /* 1 = gesteuert, 2 = NOx-geregelt */
 #define SY_DOSVLVDIAG  SY_ON    /* Übertemperaturschutz Dosierventil */
+#define NOXSENS_SC     1        /* NOx-Sensor vor Kat verbaut */
 `},
  {name:"Motor/Epm_pavast.xml",text:pvXml("Epm",["Epm_nEng"],[],[
    {n:"Epm_nEng",lang:"Motordrehzahl",typ:"uint16",cm:"Ident",unit:"1/min",min:"0",max:"8000"}])}
@@ -5606,7 +5615,7 @@ addEventListener("resize",closeHelp);addEventListener("scroll",()=>{if(hpBtn&&Da
   const lead=document.querySelector(".hero .lead");
   if(lead){document.querySelector(".hero h1").appendChild(mkHelp("<p>"+lead.innerHTML+"</p><p>Die Leiste unten wechselt die Ansicht: antippen oder die Kugel ziehen.</p>","Schaltplan"));lead.remove()}
   $(".fb-in").appendChild(mkHelp("<p>Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner: eine Komponente, ein Subsystem, eine Message oder eine Funktion.</p><p>Namen in Tabellen und Details lassen sich anklicken und setzen den Fokus direkt. Gelöst wird er mit dem Chip in der Kopfleiste.</p><p>Subsysteme bündeln Komponenten nach Ordner oder Namenspräfix. Bei „Ordner“ wird die Ebene genommen, die tatsächlich trennt.</p>","Fokus und Subsysteme"));
-  $(".cfg-btns").appendChild(mkHelp("<p><b>Alle Varianten</b> zeigt den Code aller Zweige zusammen. Bedingungen stehen trotzdem dabei: in der Spalte „Bedingung“, als „Variante“ und ◇ in der Exportliste und als „nur wenn …“.</p><p><b>Konkrete Konfiguration</b> wertet die Systemkonstanten aus. Abgeschaltete Zweige, Importe, Exporte und Aufrufe fehlen dann in allen Reitern. Ein geänderter Wert schaltet automatisch in diesen Modus.</p><p>Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code>, aus einer geladenen Wertedatei oder aus deiner Eingabe. Ohne Wert gilt eine Bedingung als „vielleicht“, der Code bleibt drin.</p><p><b>Als A merken</b> hält die Werte fest, <b>Mit A vergleichen</b> zeigt, welche Schnittstellen, Exporte und Aufrufe sich unterscheiden.</p>","Konfiguration"));
+  $(".cfg-btns").appendChild(mkHelp("<p><b>Alle Varianten</b> zeigt den Code aller Zweige zusammen. Bedingungen stehen trotzdem dabei: in der Spalte „Bedingung“, als „Variante“ und ◇ in der Exportliste und als „nur wenn …“.</p><p><b>Konkrete Konfiguration</b> wertet die Systemkonstanten aus. Abgeschaltete Zweige, Importe, Exporte und Aufrufe fehlen dann in allen Reitern. Ein geänderter Wert schaltet automatisch in diesen Modus.</p><p>Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code>, aus einer geladenen Wertedatei oder aus deiner Eingabe. Ohne Wert gilt eine Bedingung als „vielleicht“, der Code bleibt drin.</p><p><b>SyC-Muster</b> legt fest, woran Systemkonstanten erkannt werden, zum Beispiel <code>SY_*, *_SY, *_SC</code>. <code>*</code> steht für einen beliebigen Namensteil, Groß- und Kleinschreibung zählt.</p><p><b>Als A merken</b> hält die Werte fest, <b>Mit A vergleichen</b> zeigt, welche Schnittstellen, Exporte und Aufrufe sich unterscheiden.</p>","Konfiguration"));
 })();
 
 /* ---- Detailfeld im Graph und Vollbild ---- */
@@ -5627,7 +5636,7 @@ function renderCfg(){
   $("#cfgMode").value=S.cfg.mode;if(document.activeElement!==$("#sycPre"))$("#sycPre").value=pre;
   $("#cfgCmp").hidden=!S.cfgA;
   const unk=[...info].filter(([,o])=>o.eff===null);
-  if(!n){$("#cfgInfo").textContent=S.files.length?`Keine Systemkonstanten mit Präfix „${pre}“ in Bedingungen gefunden.`:"";$("#sycBox").hidden=true;$("#cfgFind").hidden=true;return}
+  if(!n){$("#cfgInfo").textContent=S.files.length?`Keine Systemkonstanten nach Muster „${pre}“ in Bedingungen gefunden.`:"";$("#sycBox").hidden=true;$("#cfgFind").hidden=true;return}
   $("#cfgInfo").innerHTML=on
     ?`${n} Systemkonstanten, ${unk.length?`<b class="warnt">${unk.length} ohne Wert</b>`:"alle mit Wert"}`
     :"";
@@ -5653,13 +5662,13 @@ function drawSyc(){
 $("#sycList").addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.syc;if(!k)return;const v=e.target.value.trim();if(v)S.cfg.values[k]=v;else delete S.cfg.values[k];if(S.cfg.mode!=="cfg"){S.cfg.mode="cfg";}rerun()});
 $("#sycQ").addEventListener("input",drawSyc);$("#sycUnk").addEventListener("change",drawSyc);
 $("#cfgMode").addEventListener("change",e=>{S.cfg.mode=e.target.value;run();toast(S.cfg.mode==="cfg"?"Konkrete Konfiguration aktiv":"Alle Varianten")});
-$("#sycPre").addEventListener("change",e=>{const v=e.target.value.trim();if(!v)return;S.cfg.prefix=v;run()});
+$("#sycPre").addEventListener("change",e=>{const v=e.target.value.trim();S.cfg.prefix=v||SYC_DEF;if(!v)e.target.value=SYC_DEF;run()});
 $("#cfgReset").onclick=()=>{S.cfg.values={};run();toast("Werte auf Vorgaben zurückgesetzt")};
 $("#cfgFile").addEventListener("change",async e=>{
-  const f=e.target.files[0];e.target.value="";if(!f)return;const t=await f.text(),pre=S.cfg.prefix;let n=0;
-  if(/^\s*</.test(t)){const p=parsePavast(f.name,t);for(const [k,v] of p.consts||[])if(k.startsWith(pre)){S.cfg.values[k]=v;n++}}
-  else for(const line of stripComments(t).split("\n")){const m=line.match(/^\s*#\s*define\s+([A-Za-z_]\w*)\s+(\S+)/)||line.match(/^\s*([A-Za-z_]\w*)\s*[=:;,\t ]\s*([^\s;,]+)/);if(m&&m[1].startsWith(pre)){S.cfg.values[m[1]]=m[2];n++}}
-  S.cfg.mode="cfg";run();toast(n?`${n} Werte aus ${f.name} übernommen`:`Keine Werte mit Präfix ${pre} in ${f.name} gefunden`);
+  const f=e.target.files[0];e.target.value="";if(!f)return;const t=await f.text(),pre=S.cfg.prefix,isS=sycTest(S.cfg);let n=0;
+  if(/^\s*</.test(t)){const p=parsePavast(f.name,t);for(const [k,v] of p.consts||[])if(isS(k)){S.cfg.values[k]=v;n++}}
+  else for(const line of stripComments(t).split("\n")){const m=line.match(/^\s*#\s*define\s+([A-Za-z_]\w*)\s+(\S+)/)||line.match(/^\s*([A-Za-z_]\w*)\s*[=:;,\t ]\s*([^\s;,]+)/);if(m&&isS(m[1])){S.cfg.values[m[1]]=m[2];n++}}
+  S.cfg.mode="cfg";run();toast(n?`${n} Werte aus ${f.name} übernommen`:`Keine Werte nach Muster ${pre} in ${f.name} gefunden`);
 });
 $("#cfgA").onclick=()=>{S.cfgA={values:Object.assign({},S.cfg.values),prefix:S.cfg.prefix};$("#cfgCmp").hidden=false;$("#cfgDiff").innerHTML="";toast("Aktuelle Werte als A gemerkt")};
 $("#cfgCmp").onclick=()=>{
