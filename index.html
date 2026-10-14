@@ -165,6 +165,27 @@ h3{margin:0;font-size:15px;letter-spacing:-.01em;font-weight:700;font-variation-
   transition:opacity .5s;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--text-3);opacity:.7;pointer-events:none}
 .tabcount{display:none}
+/* Konfiguration */
+.cfgbar{display:flex;flex-direction:column;gap:8px}
+.cfgbar .filter{flex:0 0 auto;height:36px;max-width:none;width:100%}
+.fb-pre{flex:0 1 140px}
+.cfg-btns{flex:1 1 auto;justify-content:flex-end;align-self:flex-end}
+#cfgInfo{margin:0}#cfgInfo:empty{display:none}
+.warnt{color:var(--over);font-weight:600}
+.cfgbar .hints{margin:0}
+#sycBox>summary{cursor:pointer;width:fit-content}
+#sycQ{flex:1 1 200px;width:auto;max-width:320px}
+.sycl{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.sycr{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:4px 10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:11px;background:var(--film)}
+.sycr label{overflow-wrap:anywhere}
+.sycr .sv{height:32px;padding:0 10px;font-family:var(--mono);font-size:12.5px;text-align:right}
+.sycr .sub{grid-column:1/-1}
+.syc{font-family:var(--mono);font-size:11.5px;color:var(--info)}
+.vmark{color:var(--info);font-size:11px;cursor:help}
+.bedc{min-width:150px}
+.badge.cfgb{color:var(--info);border-color:color-mix(in srgb,var(--info) 50%,transparent)}
+.diff{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.diff .dl{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:3px}
 /* Fokus und Subsysteme */
 .focusbar{display:flex;flex-direction:column;gap:6px}
 .fb-row{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
@@ -364,6 +385,27 @@ footer.foot a:hover{color:var(--text)}
     <p class="sub" id="fqInfo"></p>
   </section>
 
+  <section class="card cfgbar" aria-label="Konfiguration">
+    <div class="fb-row">
+      <div class="fb-g"><label class="t-idx" for="cfgMode">Konfiguration</label>
+        <select id="cfgMode" class="filter"><option value="all">Alle Varianten</option><option value="cfg">Konkrete Konfiguration</option></select></div>
+      <div class="fb-g fb-pre"><label class="t-idx" for="sycPre">SyC-Präfix</label><input id="sycPre" class="filter" value="SY_" spellcheck="false" autocomplete="off"></div>
+      <div class="btns cfg-btns">
+        <label class="pill" for="cfgFile">Werte laden</label><input type="file" id="cfgFile" hidden accept=".h,.txt,.csv,.syc,.cfg,.ini,.xml">
+        <button class="pill" id="cfgReset" type="button">Vorgaben</button>
+        <button class="pill" id="cfgA" type="button">Als A merken</button>
+        <button class="pill" id="cfgCmp" type="button" hidden>Mit A vergleichen</button>
+      </div>
+    </div>
+    <p class="sub" id="cfgInfo"></p>
+    <ul class="hints" id="cfgFind" hidden></ul>
+    <details id="sycBox" hidden><summary class="sub" id="sycSum">Systemkonstanten</summary>
+      <div class="btns" style="margin:10px 0 8px"><input id="sycQ" class="filter" placeholder="SyC filtern" aria-label="SyC filtern"><label class="toggle"><input type="checkbox" id="sycUnk"> nur ohne Wert</label></div>
+      <div class="sycl" id="sycList"></div>
+    </details>
+    <div id="cfgDiff"></div>
+  </section>
+
   <div class="tabcount" aria-hidden="true"><span id="c-arch"></span><span id="c-if"></span><span id="c-exp"></span><span id="c-dyn"></span><span id="c-files"></span></div>
 
   <section class="panel" id="p-arch" role="tabpanel" aria-labelledby="t-arch">
@@ -444,6 +486,7 @@ footer.foot a:hover{color:var(--text)}
       <h3>Was erkannt wird</h3>
       <p>PaVaSt: <code>SW-FEATURE</code> mit <code>SHORT-NAME</code>, alle <code>*-REF</code> unterhalb von <code>…IMPORT…</code> bzw. <code>…EXPORT…</code>. C: globale Definitionen (Export), <code>extern</code> (Import), direkte Zugriffe auf bekannte Messages, <code>Msg_Get/Msg_Set</code>-artige Makros und AUTOSAR <code>Rte_Read_/Rte_Write_</code>. Schreibzugriff heißt Zuweisung, <code>++/--</code> oder Übergabe per <code>&amp;</code>.</p>
       <p>Grenzen: Der Präprozessor wird nicht ausgewertet (Makros, <code>#if</code>-Varianten). Funktionszeiger und lokale Variablen mit dem Namen einer Message werden nicht aufgelöst.</p>
+      <p>Systemkonstanten: Bedingungen aus <code>#if</code>, <code>#elif</code>, <code>#ifdef</code>, aus Abfragen wie <code>if (SY_X == SY_ON)</code> und aus <code>SW-SYSCOND</code> in der PaVaSt. Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code> oder aus deiner Eingabe. Unbekannte Werte gelten als „vielleicht“, der Code bleibt dann drin.</p>
       <p>Exportliste: Aus PaVaSt kommen Langname, Typ, Umrechnung, Einheit und Grenzen aus <code>SW-VARIABLE</code>. Das Raster wird aus dem Prozessnamen gelesen (<code>…10ms</code>, <code>_Ini</code>). Eine Schreibstelle gilt als bedingt, wenn sie in einem <code>if</code>-, <code>else</code>- oder <code>switch</code>-Zweig oder hinter <code>?:</code> liegt.</p>
     </div>
   </section>
@@ -4770,14 +4813,125 @@ const RTE_R=/\bRte_I?Read_(\w+)\s*\(/g, RTE_W=/\bRte_I?Write_(\w+)\s*\(/g;
 
 function baseName(n){return n.split(/[\\/]/).pop().replace(/\.[^.]+$/,"")}
 function blank(m){return m.replace(/[^\n]/g," ")}
-function stripC(src){
-  src=src.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/g,m=>m[0]==="/"?blank(m):'""');
-  return src.replace(/^[ \t]*#(?:[^\n]*\\\n)*[^\n]*/gm,blank);
+function stripComments(src){return src.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/g,m=>m[0]==="/"?blank(m):'""')}
+function stripC(src){return stripComments(src).replace(/^[ \t]*#(?:[^\n]*\\\n)*[^\n]*/gm,blank)}
+
+/* ===== Systemkonstanten (SyC) =====
+   Bedingungen aus #if/#elif/#ifdef und SW-SYSCOND werden dreiwertig
+   ausgewertet: wahr, falsch oder unbekannt. Unbekannt bleibt drin. */
+const reEsc=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+function ppNum(v){
+  if(v==null)return null;v=String(v).trim();while(/^\(.*\)$/.test(v))v=v.slice(1,-1).trim();
+  const m=v.match(/^([-+]?)\s*(0x[0-9a-f]+|\d+(?:\.\d+)?)[ul]*$/i);
+  if(m){const n=/^0x/i.test(m[2])?parseInt(m[2],16):parseFloat(m[2]);return m[1]==="-"?-n:n}
+  if(/^(true|on)$/i.test(v))return 1;if(/^(false|off)$/i.test(v))return 0;return null;
 }
+function ppTok(s){const t=[],re=/\s*(0x[0-9a-fA-F]+[uUlL]*|\d+(?:\.\d+)?[uUlL]*|[A-Za-z_]\w*|&&|\|\||==|!=|<=|>=|<<|>>|[-+*\/%<>!~&|^?:(),])/y;let m;while(re.lastIndex<s.length&&(m=re.exec(s)))t.push(m[1]);if(s.slice(re.lastIndex).trim())t.push("§");return t}
+function ppEval(expr,ctx){
+  const t=ppTok(expr);let i=0;const peek=()=>t[i],next=()=>t[i++],B=v=>v?1:0;
+  function prim(){
+    const k=next();if(k===undefined||k==="§")throw 0;
+    if(k==="("){const v=tern();if(next()!==")")throw 0;return v}
+    if(k==="!"){const v=prim();return v===null?null:(v?0:1)}
+    if(k==="~"){const v=prim();return v===null?null:~v}
+    if(k==="-"){const v=prim();return v===null?null:-v}
+    if(k==="+")return prim();
+    if(k==="defined"){const par=peek()==="(";if(par)next();const id=next();if(par&&next()!==")")throw 0;const d=ctx.def(id);return d===null?null:B(d)}
+    if(/^(\d|0x)/i.test(k))return ppNum(k);
+    if(/^[A-Za-z_]/.test(k)){if(peek()==="("){let d=0;do{const x=next();if(x===undefined)throw 0;if(x==="(")d++;else if(x===")")d--}while(d>0);return null}return ctx.val(k)}
+    throw 0;
+  }
+  const L=[["||"],["&&"],["|"],["^"],["&"],["==","!="],["<","<=",">",">="],["<<",">>"],["+","-"],["*","/","%"]];
+  function ap(o,a,b){
+    if(o==="&&")return a===0||b===0?0:(a===null||b===null?null:1);
+    if(o==="||")return (a!==null&&a!==0)||(b!==null&&b!==0)?1:(a===null||b===null?null:0);
+    if(a===null||b===null)return null;
+    switch(o){case"|":return a|b;case"^":return a^b;case"&":return a&b;case"==":return B(a===b);case"!=":return B(a!==b);case"<":return B(a<b);case"<=":return B(a<=b);case">":return B(a>b);case">=":return B(a>=b);case"<<":return a<<b;case">>":return a>>b;case"+":return a+b;case"-":return a-b;case"*":return a*b;case"/":return b?Math.trunc(a/b):null;case"%":return b?a%b:null}
+  }
+  function bin(l){if(l>=L.length)return prim();let a=bin(l+1);while(L[l].includes(peek())){const o=next();a=ap(o,a,bin(l+1))}return a}
+  function tern(){const c=bin(0);if(peek()==="?"){next();const a=tern();if(next()!==":")throw 0;const b=tern();return c===null?(a===b?a:null):(c?a:b)}return c}
+  try{const v=tern();return i<t.length?null:v}catch(e){return null}
+}
+/* Werte: erst die eingestellte Konfiguration, dann #define aus der Datei, dann aus allen Headern bzw. SW-SYSTEMCONST */
+function sycCtx(cfg,globals,local){
+  const pre=(cfg&&cfg.prefix)||"SY_",isS=id=>id.startsWith(pre);
+  const raw=id=>{const v=cfg&&cfg.values?cfg.values[id]:null;if(isS(id)&&v!=null&&String(v).trim()!=="")return String(v);if(local&&local.has(id))return local.get(id);if(globals&&globals.has(id))return globals.get(id);return null};
+  function val(id,d){if(d>8)return null;const r=raw(id);if(r==null)return null;const n=ppNum(r);if(n!==null)return n;const t=r.trim();if(/^[A-Za-z_]\w*$/.test(t))return val(t,d+1);return ppEval(t,{val:x=>val(x,d+1),def})}
+  function def(id){if(raw(id)!=null)return true;return isS(id)?null:null}
+  return {val:id=>val(id,0),def,raw};
+}
+function sycIds(e,pre){return e?(e.match(new RegExp("\\b"+reEsc(pre)+"\\w*","g"))||[]):[]}
+/* Bedingung je Zeile; in einer konkreten Konfiguration werden inaktive Zeilen ausgeblendet */
+function ppScan(src,cfg,globals){
+  const lines=src.split("\n"),N=lines.length,active=new Array(N).fill(true),syc=new Array(N).fill(null),used=new Map();
+  const pre=(cfg&&cfg.prefix)||"SY_",doEval=!!(cfg&&cfg.mode==="cfg"),local=new Map(),ctx=sycCtx(cfg,globals,local),st=[];
+  const hasS=e=>sycIds(e,pre).length>0,note=e=>sycIds(e,pre).forEach(x=>used.set(x,(used.get(x)||0)+1));
+  const branch=(f,e)=>{const v=doEval?ppEval(e,ctx):null;
+    if(f.taken==="yes")f.act=false;else if(v===0)f.act=false;else if(v===null)f.act=null;else f.act=f.taken==="maybe"?null:true;
+    if(v!==null&&v!==0)f.taken="yes";else if(v===null&&f.taken!=="yes")f.taken="maybe"};
+  for(let k=0;k<N;k++){
+    let Ln=lines[k],j=k;while(/\\\s*$/.test(Ln)&&j+1<N)Ln=Ln.replace(/\\\s*$/,"")+" "+lines[++j];
+    const m=Ln.match(/^\s*#\s*(if|ifdef|ifndef|elif|else|endif|define|undef)\b(.*)$/);
+    if(m){
+      const d=m[1],rest=m[2].trim(),on=st.every(f=>f.act!==false);
+      if(d==="if"||d==="ifdef"||d==="ifndef"){const id=rest.split(/\s/)[0],e=d==="if"?rest:(d==="ifdef"?"defined("+id+")":"!defined("+id+")");const f={prev:[e],txt:e,taken:"no",act:null};branch(f,e);st.push(f);note(e)}
+      else if(d==="elif"&&st.length){const f=st[st.length-1];f.txt=f.prev.map(x=>"!("+x+")").join(" && ")+" && ("+rest+")";f.prev.push(rest);branch(f,rest);note(rest)}
+      else if(d==="else"&&st.length){const f=st[st.length-1];f.txt=f.prev.map(x=>"!("+x+")").join(" && ");f.act=f.taken==="yes"?false:(f.taken==="maybe"?null:true)}
+      else if(d==="endif")st.pop();
+      else if(d==="define"&&on){const dm=rest.match(/^([A-Za-z_]\w*)(\()?\s*(.*)$/);if(dm&&!dm[2])local.set(dm[1],dm[3].trim()||"1")}
+      else if(d==="undef"&&on)local.delete(rest.split(/\s/)[0]);
+      k=j;continue;
+    }
+    const act=st.every(f=>f.act!==false),txt=st.map(f=>f.txt).filter(hasS);
+    const c=txt.length?txt.map(t=>txt.length>1?"("+t+")":t).join(" && "):null;
+    for(let x=k;x<=j;x++){active[x]=act;syc[x]=c}
+    k=j;
+  }
+  return {active,syc,used};
+}
+/* Laufzeit-Abfragen wie if (SY_X == SY_ON) { … } werden in der Konfiguration ebenfalls ausgewertet */
+function matchClose(s,i,o,c){let d=0;for(;i<s.length;i++){if(s[i]===o)d++;else if(s[i]===c){d--;if(d===0)return i}}return -1}
+function stmtEnd(s,p){
+  while(p<s.length&&/\s/.test(s[p]))p++;
+  if(s[p]==="{"){const e=matchClose(s,p,"{","}");return e<0?s.length:e+1}
+  const kw=s.slice(p,p+8).match(/^(if|for|while|switch|do|else)\b/);
+  if(kw){const k=kw[1];
+    if(k==="else")return stmtEnd(s,p+4);
+    if(k==="do"){let e=stmtEnd(s,p+2);const w=s.slice(e).match(/^\s*while\s*\(/);if(w){const pc=matchClose(s,e+w[0].length-1,"(",")");const sc=s.indexOf(";",pc);return sc<0?s.length:sc+1}return e}
+    const po=s.indexOf("(",p+k.length),pc=matchClose(s,po,"(",")");if(pc<0)return s.length;let e=stmtEnd(s,pc+1);
+    if(k==="if"){const el=s.slice(e).match(/^\s*else\b/);if(el)e=stmtEnd(s,e+el[0].length)}
+    return e}
+  let d=0;for(;p<s.length;p++){const ch=s[p];if(ch==="("||ch==="[")d++;else if(ch===")"||ch==="]")d--;else if(ch===";"&&d===0)return p+1;else if(ch==="}"&&d<=0)return p}
+  return s.length;
+}
+function pruneRtIf(s,ctx,pre){
+  const re=/\bif\s*\(/g;let m;const isS=id=>id.startsWith(pre);
+  const blankR=(a,b)=>{s=s.slice(0,a)+blank(s.slice(a,b))+s.slice(b)};
+  while((m=re.exec(s))){
+    const po=m.index+m[0].length-1,pc=matchClose(s,po,"(",")");if(pc<0)continue;
+    const cond=s.slice(po+1,pc),ids=cond.match(/[A-Za-z_]\w*/g)||[];
+    if(!ids.some(isS)||!ids.every(x=>isS(x)||x==="defined"||ctx.val(x)!==null))continue;
+    const v=ppEval(cond,ctx);if(v===null)continue;
+    const te=stmtEnd(s,pc+1),el=s.slice(te).match(/^\s*else\b/);
+    if(!v)blankR(pc+1,te);else if(el)blankR(te,stmtEnd(s,te+el[0].length));
+  }
+  return s;
+}
+function prepC(text,cfg,globals){
+  const pre=(cfg&&cfg.prefix)||"SY_";
+  const cmt=stripComments(text),pp=ppScan(cmt,cfg,globals);
+  let src=cmt.replace(/^[ \t]*#(?:[^\n]*\\\n)*[^\n]*/gm,blank);
+  if(cfg&&cfg.mode==="cfg"){
+    src=src.split("\n").map((l,k)=>pp.active[k]===false?blank(l):l).join("\n");
+    src=pruneRtIf(src,sycCtx(cfg,globals,null),pre);
+  }
+  return {src,syc:pp.syc,used:pp.used};
+}
+const normCond=c=>{if(c==null)return "";let x=String(c).replace(/\s+/g,"");while(x.startsWith("(")&&matchClose(x,0,"(",")")===x.length-1)x=x.slice(1,-1);return x};
 function splitTop(s,sep){const out=[];let d=0,st=0;for(let i=0;i<s.length;i++){const c=s[i];if(c==="("||c==="[")d++;else if(c===")"||c==="]")d--;else if(c===sep&&d===0){out.push(s.slice(st,i));st=i+1}}out.push(s.slice(st));return out}
 
-function parseC(name,text){
-  const src=stripC(text), n=src.length;
+function parseC(name,text,cfg,globals){
+  const P=prepC(text,cfg,globals),src=P.src,n=src.length,lsyc=l=>P.syc[l-1]||null;
   const nl=[];for(let i=0;i<n;i++)if(src[i]==="\n")nl.push(i);
   const lineOf=p=>{let lo=0,hi=nl.length;while(lo<hi){const m=(lo+hi)>>1;if(nl[m]<p)lo=m+1;else hi=m}return lo+1};
   const funcs=[],top=[];let depth=0,seg=0,i=0;
@@ -4789,7 +4943,7 @@ function parseC(name,text){
         const m=header.match(/([A-Za-z_]\w*)\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)\s*$/);
         if(m&&!KW.has(m[1])&&header.indexOf("=")<0){
           let d=1,j=i+1;while(j<n&&d){if(src[j]==="{")d++;else if(src[j]==="}")d--;j++}
-          funcs.push({name:m[1],file:name,line:lineOf(i),isStatic:/\bstatic\b/.test(header),body:src.slice(i+1,j-1),bodyStart:i+1,sig:header.replace(/\s+/g," ").trim()});
+          funcs.push({name:m[1],file:name,line:lineOf(i),isStatic:/\bstatic\b/.test(header),body:src.slice(i+1,j-1),bodyStart:i+1,sig:header.replace(/\s+/g," ").trim(),syc:lsyc(lineOf(i))});
           i=j;seg=j;continue;
         }
       }
@@ -4817,15 +4971,18 @@ function parseC(name,text){
       if(baseType===null)baseType=lhs.slice(0,m.index).replace(/\b(extern|static)\b/g,"").replace(/\s+/g," ").trim();
       (isExt?externs:isSt?statics:defs).add(m[1]);
       if(!isExt){let init=eq.length>1?eq.slice(1).join("=").trim():null;if(init===""&&hadInit)init="{…}";
-        defInfo.set(m[1],{type:(baseType+(m[2]?" "+m[2].replace(/\s+/g,""):"")).trim(),init,file:name,line,isStatic:isSt})}
+        defInfo.set(m[1],{type:(baseType+(m[2]?" "+m[2].replace(/\s+/g,""):"")).trim(),init,file:name,line,isStatic:isSt,syc:lsyc(line)})}
     }
   }
-  for(const f of funcs){analyseBody(f);f.wpos=f.wpos.map(x=>({id:x.id,line:lineOf(f.bodyStart+x.pos),cond:x.cond}))}
-  return {file:name,funcs,defs,statics,externs,protos,defInfo};
+  for(const f of funcs){
+    analyseBody(f);f.wpos=f.wpos.map(x=>{const l=lineOf(f.bodyStart+x.pos);return {id:x.id,line:l,cond:x.cond,syc:lsyc(l)}});
+    f.rsyc=new Map();for(const x of f.rpos){const c=lsyc(lineOf(f.bodyStart+x.pos))||"";if(!f.rsyc.has(x.id))f.rsyc.set(x.id,new Set());f.rsyc.get(x.id).add(c)}delete f.rpos;
+  }
+  return {file:name,funcs,defs,statics,externs,protos,defInfo,used:P.used};
 }
 
 function analyseBody(f){
-  const b=f.body;f.calls=new Set();f.occ=new Map();f.mR=new Set();f.mW=new Set();f.wpos=[];
+  const b=f.body;f.calls=new Set();f.occ=new Map();f.mR=new Set();f.mW=new Set();f.wpos=[];f.rpos=[];
   const re=/\b[A-Za-z_]\w*\b/g;let m;
   while((m=re.exec(b))){
     const id=m[0];if(KW.has(id)||/^\d/.test(id))continue;
@@ -4835,9 +4992,9 @@ function analyseBody(f){
     if(/(\.|->)\s*$/.test(before))continue;
     let a=after,p;do{p=a;a=a.replace(/^\s*(?:\[[^\]]*\]|\.\s*\w+|->\s*\w+)/,"")}while(a!==p);
     const w=/^\s*(?:=(?!=)|[+\-*\/%&|^]=|<<=|>>=|\+\+|--)/.test(a)||/(\+\+|--)\s*$/.test(before)||/(?:^|[^&])&\s*$/.test(before);
-    const o=f.occ.get(id)||{r:false,w:false};if(w){o.w=true;f.wpos.push({id,pos:m.index,cond:isCond(b,m.index)})}else o.r=true;f.occ.set(id,o);
+    const o=f.occ.get(id)||{r:false,w:false};if(w){o.w=true;f.wpos.push({id,pos:m.index,cond:isCond(b,m.index)})}else{o.r=true;f.rpos.push({id,pos:m.index})}f.occ.set(id,o);
   }
-  for(const [rx,set] of [[GET_RE,f.mR],[SET_RE,f.mW],[RTE_R,f.mR],[RTE_W,f.mW]]){rx.lastIndex=0;let k;while((k=rx.exec(b))){set.add(k[1]);if(set===f.mW)f.wpos.push({id:k[1],pos:k.index,cond:isCond(b,k.index)})}}
+  for(const [rx,set] of [[GET_RE,f.mR],[SET_RE,f.mW],[RTE_R,f.mR],[RTE_W,f.mW]]){rx.lastIndex=0;let k;while((k=rx.exec(b))){set.add(k[1]);if(set===f.mW)f.wpos.push({id:k[1],pos:k.index,cond:isCond(b,k.index)});else f.rpos.push({id:k[1],pos:k.index})}}
 }
 /* Liegt die Stelle in einem if/else/switch-Zweig oder hinter einem ?: ? */
 function isCond(b,pos){
@@ -4859,14 +5016,16 @@ function parsePavast(name,text){
   const roots=feats.length?feats:[doc.documentElement];
   const features=roots.map(fe=>{
     const nm=feats.length?shortName(fe):(shortName(doc.documentElement)||baseName(name));
-    const imports=new Set(),exports=new Set();
+    const imports=new Map(),exports=new Map();
+    const condOf=r=>{const cs=[];let e=r.parentElement;while(e){for(const ch of e.children)if(ln(ch)==="SW-SYSCOND"&&ch.textContent.trim())cs.push(ch.textContent.trim().replace(/\s+/g," "));if(e===fe)break;e=e.parentElement}return cs.length?cs.map(x=>cs.length>1?"("+x+")":x).join(" && "):null};
+    const put=(mp,v,c)=>{if(!mp.has(v))mp.set(v,c);else{const o=mp.get(v);if(o===null||c===null)mp.set(v,null);else if(normCond(o)!==normCond(c))mp.set(v,"("+o+") || ("+c+")")}};
     for(const r of fe.getElementsByTagName("*")){
       if(!/-REF$/.test(ln(r))||r.children.length)continue;
       let near=r.parentElement,dir=null;
       while(near&&near!==fe.parentElement){const t=ln(near);if(t==="SW-FEATURE"&&near!==fe){dir="skip";break}if(!dir&&/IMPORT/.test(t))dir="i";else if(!dir&&/EXPORT/.test(t))dir="e";if(near===fe)break;near=near.parentElement}
       if(dir!=="i"&&dir!=="e")continue;
       const v=r.textContent.trim().split("/").pop();if(!v)continue;
-      (dir==="i"?imports:exports).add(v);
+      put(dir==="i"?imports:exports,v,condOf(r));
     }
     return {name:nm,imports,exports};
   });
@@ -4886,7 +5045,12 @@ function parsePavast(name,text){
     }
     vars.set(nm,o);
   }
-  return {file:name,features,vars};
+  const consts=new Map();
+  for(const e of all){
+    if(ln(e)!=="SW-SYSTEMCONST")continue;const nm=shortName(e);if(!nm)continue;
+    for(const c of e.getElementsByTagName("*")){if(c.children.length)continue;if(/^(V|VT|VALUE|SW-VALUE)$/.test(ln(c))&&c.textContent.trim()){consts.set(nm,c.textContent.trim());break}}
+  }
+  return {file:name,features,vars,consts};
 }
 
 function classify(name,text){
@@ -4904,17 +5068,29 @@ function compForC(base,pvNames){
 }
 
 const ENV="⟨Umgebung⟩";
-function analyze(files){
-  const pv=[],cs=[];
-  for(const f of files){try{if(f.kind==="pv")pv.push(parsePavast(f.name,f.text));else if(f.kind==="c")cs.push(parseC(f.name,f.text))}catch(e){f.err=String(e)}}
+function analyze(files,cfg){
+  cfg=cfg||{mode:"all",prefix:"SY_",values:{}};const pre=cfg.prefix||"SY_";
+  const pv=[],cs=[],globals=new Map(),gFrom=new Map();
+  for(const f of files){try{if(f.kind==="pv")pv.push(parsePavast(f.name,f.text))}catch(e){f.err=String(e)}}
+  for(const f of files)if(f.kind==="c"){const re=/^[ \t]*#[ \t]*define[ \t]+([A-Za-z_]\w*)(?![\w(])[ \t]*([^\n]*)/gm;let m;const t=stripComments(f.text);while((m=re.exec(t)))if(!globals.has(m[1])){globals.set(m[1],m[2].trim()||"1");gFrom.set(m[1],f.name)}}
+  for(const p of pv)if(p.consts)for(const [k,v] of p.consts)if(!globals.has(k)){globals.set(k,v);gFrom.set(k,p.file)}
+  for(const f of files){try{if(f.kind==="c")cs.push(parseC(f.name,f.text,cfg,globals))}catch(e){f.err=String(e)}}
+  const ctx=sycCtx(cfg,globals,null),onCfg=cfg.mode==="cfg";
+  const keep=c=>!onCfg||c==null||ppEval(c,ctx)!==0;
+  const sycInfo=new Map();const useS=(id,where,file)=>{if(!sycInfo.has(id))sycInfo.set(id,{n:0,files:new Set(),pv:false});const o=sycInfo.get(id);o.n++;o.files.add(file);if(where==="pv")o.pv=true};
+  for(const r of cs)for(const [id,n] of r.used){useS(id,"c",r.file);sycInfo.get(id).n+=n-1}
+  for(const p of pv)for(const ft of p.features)for(const mp of [ft.imports,ft.exports])for(const c of mp.values())sycIds(c,pre).forEach(id=>useS(id,"pv",p.file));
   const comps=new Map();
-  const C=n=>{if(!comps.has(n))comps.set(n,{name:n,pvFiles:[],cFiles:[],hasPV:false,hasC:false,imp:new Set(),exp:new Set(),defs:new Set(),ext:new Set(),reads:new Set(),writes:new Set(),funcs:[],procs:[]});return comps.get(n)};
-  for(const p of pv)for(const ft of p.features){const c=C(ft.name);c.hasPV=true;c.pvFiles.push(p.file);ft.imports.forEach(x=>c.imp.add(x));ft.exports.forEach(x=>c.exp.add(x))}
+  const C=n=>{if(!comps.has(n))comps.set(n,{name:n,pvFiles:[],cFiles:[],hasPV:false,hasC:false,imp:new Set(),exp:new Set(),impCond:new Map(),expCond:new Map(),defs:new Set(),ext:new Set(),reads:new Set(),writes:new Set(),funcs:[],procs:[]});return comps.get(n)};
+  for(const p of pv)for(const ft of p.features){const c=C(ft.name);c.hasPV=true;c.pvFiles.push(p.file);
+    for(const [x,cd] of ft.imports)if(keep(cd)){c.imp.add(x);c.impCond.set(x,cd)}
+    for(const [x,cd] of ft.exports)if(keep(cd)){c.exp.add(x);c.expCond.set(x,cd)}}
   const pvNames=[...comps.keys()];
   const varProps=new Map();for(const p of pv)if(p.vars)for(const [k,v] of p.vars)varProps.set(k,Object.assign(varProps.get(k)||{},v));
   const fileComp={};
   for(const p of pv)fileComp[p.file]=p.features.map(f=>f.name).join(", ")||"—";
   for(const r of cs){
+    if(!r.funcs.length&&!r.defs.size&&!r.externs.size){fileComp[r.file]=[...r.used.keys()].length||[...globals.keys()].some(k=>k.startsWith(pre)&&gFrom.get(k)===r.file)?"Konfiguration":"—";continue}
     const c=C(compForC(baseName(r.file),pvNames));c.hasC=true;c.cFiles.push(r.file);fileComp[r.file]=c.name;
     r.defs.forEach(x=>c.defs.add(x));r.externs.forEach(x=>c.ext.add(x));
     c.defInfo=c.defInfo||new Map();for(const [k,v] of r.defInfo)if(!v.isStatic&&!c.defInfo.has(k))c.defInfo.set(k,v);
@@ -4953,7 +5129,7 @@ function analyze(files){
   for(const c of comps.values()){
     const entries=c.funcs.filter(f=>!f.isStatic&&(!called.has(f.name)||PROC_RE.test(f.name))||PROC_RE.test(f.name));
     const uniq=[...new Map(entries.map(f=>[f.name,f])).values()];
-    c.procs=uniq.map(f=>{const t=trans(f.name,new Set());return {name:f.name,file:f.file,line:f.line,R:[...t.R].sort(),W:[...t.W].sort(),tree:tree(f.name,new Set(),0)}});
+    c.procs=uniq.map(f=>{const t=trans(f.name,new Set());return {name:f.name,file:f.file,line:f.line,syc:f.syc,R:[...t.R].sort(),W:[...t.W].sort(),tree:tree(f.name,new Set(),0)}});
     for(const p of c.procs){p.W.forEach(m=>push(procW,m,{comp:c.name,proc:p.name}));p.R.forEach(m=>push(procR,m,{comp:c.name,proc:p.name}))}
   }
   // Producer / Consumer
@@ -4976,7 +5152,7 @@ function analyze(files){
       const decl=c.hasPV?c.imp.has(m):(c.ext.has(m)||use);
       const st=decl&&use?"ok":decl?"unused":"undecl";
       const from=ps.length?ps:[ENV];
-      for(const p of from)flows.push({m,from:p,to:c.name,st,multi:ps.length>1});
+      for(const p of from){const pc=comps.get(p);flows.push({m,from:p,to:c.name,st,multi:ps.length>1,icond:c.impCond.get(m)??null,econd:pc?pc.expCond.get(m)??null:null})}
     }
   }
   // Aufrufe über Komponentengrenzen
@@ -4992,7 +5168,8 @@ function analyze(files){
     for(const fn of seen){if(!reach.has(fn))reach.set(fn,[]);reach.get(fn).push({comp:c.name,proc:p.name,r:rasterOf(p.name)})}
   }
   const exportsList=buildExports({comps,M,flows,calls:[...calls.values()],procR,reach,varProps,fnBy});
-  return {comps,M,prov,flows,calls:[...calls.values()],procW,procR,issues,fileComp,exportsList,reach};
+  for(const [id,o] of sycInfo){o.def=globals.get(id)??null;o.defFrom=gFrom.get(id)||null;o.eff=ctx.val(id)}
+  return {comps,M,prov,flows,calls:[...calls.values()],procW,procR,issues,fileComp,exportsList,reach,sycInfo,cfg};
 }
 
 /* Exportliste: je Export die statische und die dynamische Sicht */
@@ -5007,7 +5184,7 @@ function buildExports({comps,flows,calls,procR,reach,varProps,fnBy}){
       const writes=[];
       for(const f of allFuncs)for(const w of f.wpos)if(w.id===m){
         const procs=(reach.get(f.name)||[]);
-        writes.push({comp:f.comp,fn:f.name,file:f.file,line:w.line,cond:w.cond,fremd:f.comp!==c.name,procs});
+        writes.push({comp:f.comp,fn:f.name,file:f.file,line:w.line,cond:w.cond,syc:w.syc,fremd:f.comp!==c.name,procs});
       }
       const wProcs=uniqBy(writes.flatMap(w=>w.procs),x=>x.proc);
       const readers=[];for(const k of cons){for(const x of (procR.get(m)||[]).filter(x=>x.comp===k.comp))readers.push({comp:k.comp,proc:x.proc,r:rasterOf(x.proc)})}
@@ -5023,7 +5200,9 @@ function buildExports({comps,flows,calls,procR,reach,varProps,fnBy}){
       if(writes.length&&!wProcs.length)hints.push({lv:"info",t:"Schreibstelle von keinem Prozess aus erreichbar"});
       const pMin=cyc.length?Math.min(...cyc.map(x=>x.r.ms)):null;
       for(const r of readers)if(pMin!=null&&r.r.ms!=null&&r.r.ms<pMin)hints.push({lv:"warn",t:r.proc+" liest alle "+r.r.ms+" ms, erzeugt wird alle "+pMin+" ms"});
-      out.push({kind:"Message",comp:c.name,name:m,pv:c.hasPV?c.exp.has(m):null,hasC:c.hasC,def,pvp,cons,writes,wProcs,readers:uniqBy(readers,x=>x.proc),hints:uniqBy(hints,x=>x.t)});
+      const pvCond=c.exp.has(m)?c.expCond.get(m)??null:null,cCond=def?def.syc??null:null;
+      if(c.hasPV&&c.exp.has(m)&&def&&normCond(pvCond)!==normCond(cCond))hints.push({lv:"warn",t:"Bedingung PaVaSt „"+(pvCond||"immer")+"“ ≠ C „"+(cCond||"immer")+"“"});
+      out.push({kind:"Message",comp:c.name,name:m,pvCond,cCond,pv:c.hasPV?c.exp.has(m):null,hasC:c.hasC,def,pvp,cons,writes,wProcs,readers:uniqBy(readers,x=>x.proc),hints:uniqBy(hints,x=>x.t)});
     }
   }
   /* Funktionen, die über die Komponentengrenze aufgerufen werden */
@@ -5045,7 +5224,7 @@ function uniqBy(a,k){const s=new Set();return a.filter(x=>{const v=k(x);if(s.has
 /* ===== Oberfläche ===== */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const S={files:[],model:null,cy:null,sel:null};
+const S={files:[],model:null,cy:null,sel:null,cfg:{mode:"all",prefix:"SY_",values:{}},cfgA:null};
 
 /* ---- Beispieldaten (Abgasnachbehandlung, frei erfunden) ---- */
 function pvXml(name,ex,im,vars){
@@ -5063,7 +5242,8 @@ function pvXml(name,ex,im,vars){
   <SW-DATA-DICTIONARY-SPEC><SW-VARIABLES>
 ${vx}
   </SW-VARIABLES></SW-DATA-DICTIONARY-SPEC>`:"";
-  const refs=a=>a.map(x=>`            <SW-VARIABLE-REF>${x}</SW-VARIABLE-REF>`).join("\n");
+  const xe=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const refs=a=>a.map(x=>{const [n,c]=x.split("|");return c?`            <SW-VARIABLE-REF-SYSCOND><SW-VARIABLE-REF>${n}</SW-VARIABLE-REF><SW-SYSCOND>${xe(c)}</SW-SYSCOND></SW-VARIABLE-REF-SYSCOND>`:`            <SW-VARIABLE-REF>${n}</SW-VARIABLE-REF>`}).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>
 <MSRSW>
   <SHORT-NAME>${name}</SHORT-NAME>
@@ -5132,7 +5312,9 @@ void ExhTSens_Ini(void)
 uint16 SCRDos_mfDosDes;       /* Soll-Dosiermenge [mg/s] */
 extern uint16 ExhTSens_tDs;
 extern uint16 ExhTSens_tUs;
+#if (SY_SCRVAR == 2)
 extern uint16 NOxSens_rNOxUs;
+#endif
 extern uint8  DosVlv_stVlv;
 
 static uint16 SCRDos_CalcEff(void)
@@ -5142,7 +5324,12 @@ static uint16 SCRDos_CalcEff(void)
 
 static uint16 SCRDos_CalcDem(uint16 eff)
 {
-    uint16 dem = (NOxSens_rNOxUs * eff) / 1000u;
+    uint16 dem;
+#if (SY_SCRVAR == 2)
+    dem = (NOxSens_rNOxUs * eff) / 1000u;   /* NOx-geregelt */
+#else
+    dem = eff / 4u;                          /* gesteuert */
+#endif
     if (ExhTSens_tUs < 4230u) { dem = 0u; }   /* nicht in PaVaSt importiert */
     return dem;
 }
@@ -5170,7 +5357,9 @@ static void DosVlv_Drive(uint16 duty)
 
 static void DosVlv_Protect(void)
 {
+#if (SY_DOSVLVDIAG == SY_ON)
     if (ExhTSens_GetTMax() > 9730u) { DosVlv_stVlv = 1u; }
+#endif
 }
 
 void DosVlv_Proc10ms(void)
@@ -5180,13 +5369,19 @@ void DosVlv_Proc10ms(void)
     DosVlv_Drive(SCRDos_mfDosDes * 4u);
 }
 `},
- {name:"Sensorik/ExhTSens_pavast.xml",text:pvXml("ExhTSens",["ExhTSens_tUs","ExhTSens_tDs"],["Epm_nEng"],[
+ {name:"Sensorik/ExhTSens_pavast.xml",text:pvXml("ExhTSens",["ExhTSens_tUs","ExhTSens_tDs|SY_SCRVAR > 0"],["Epm_nEng"],[
    {n:"ExhTSens_tUs",lang:"Abgastemperatur vor SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"},
    {n:"ExhTSens_tDs",lang:"Abgastemperatur nach SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"}])},
- {name:"SCR/SCRDos_pavast.xml",text:pvXml("SCRDos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs","DosVlv_stVlv"],[
+ {name:"SCR/SCRDos_pavast.xml",text:pvXml("SCRDos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs|SY_SCRVAR == 2","DosVlv_stVlv"],[
    {n:"SCRDos_mfDosDes",lang:"Soll-Dosiermenge Harnstoff",typ:"uint16",cm:"Ident",unit:"mg/s",min:"0",max:"4000"}])},
- {name:"SCR/DosVlv_pavast.xml",text:pvXml("DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs"],[
+ {name:"SCR/DosVlv_pavast.xml",text:pvXml("DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs|SY_DOSVLVDIAG == SY_ON"],[
    {n:"DosVlv_stVlv",lang:"Status Dosierventil (0 = ok, 1 = Fehler)",typ:"uint8",cm:"Ident",unit:"-",min:"0",max:"1"}])},
+ {name:"Konfig/sy_conf.h",text:`/* Beispiel: Systemkonstanten dieser Variante */
+#define SY_OFF         0
+#define SY_ON          1
+#define SY_SCRVAR      2        /* 1 = gesteuert, 2 = NOx-geregelt */
+#define SY_DOSVLVDIAG  SY_ON    /* Übertemperaturschutz Dosierventil */
+`},
  {name:"Motor/Epm_pavast.xml",text:pvXml("Epm",["Epm_nEng"],[],[
    {n:"Epm_nEng",lang:"Motordrehzahl",typ:"uint16",cm:"Ident",unit:"1/min",min:"0",max:"8000"}])}
 ];
@@ -5333,22 +5528,83 @@ function showPanel(t){
 
 /* ---- Lauf ---- */
 function run(){
-  S.model=analyze(S.files);S.sel=null;
+  S.model=analyze(S.files,S.cfg);S.sel=null;
+  S.modelAll=S.cfg.mode==="cfg"?analyze(S.files,Object.assign({},S.cfg,{mode:"all"})):S.model;
   if(!S.grpTouched)$("#grpBy").value=S.files.some(f=>/[\\/]/.test(f.name))?"ordner":"praefix";
   computeGroups();initCollapse();S.expOpen.clear();S.expShut.clear();S.expLimit=200;S.ifLimit=300;
   if(S.focus&&!focusOptions().some(o=>o.type===S.focus.type&&o.name===S.focus.name))S.focus=null;
-  renderStats();renderFocus();renderGraph();renderIf();renderExp();renderDyn();renderFiles();
+  renderStats();renderCfg();renderFocus();renderGraph();renderIf();renderExp();renderDyn();renderFiles();
   $("#detail").innerHTML=S.files.length?'<p class="empty">Wähle eine Komponente, ein Subsystem oder einen Pfeil.</p>':'<p class="empty">Noch keine Dateien eingelegt.</p>';
 }
 function renderStats(){
   const m=S.model,nc=[...m.comps.values()].length,np=[...m.comps.values()].reduce((a,c)=>a+c.procs.length,0);
   const und=m.flows.filter(f=>f.st==="undecl").length,unu=m.flows.filter(f=>f.st==="unused").length;
   const sample=S.files.some(f=>f.sample);
-  $("#stats").innerHTML=(sample?'<span class="badge">Beispieldaten</span>':"")+
+  const cf=S.cfg.mode==="cfg"?'<span class="badge cfgb">Konfiguration</span>':"";
+  $("#stats").innerHTML=(sample?'<span class="badge">Beispieldaten</span>':"")+cf+
    `<span class="stat"><b>${nc}</b> Komponenten</span><span class="stat"><b>${m.M.size}</b> Messages</span><span class="stat"><b>${np}</b> Prozesse</span>`+
    (und?`<span class="stat" style="color:var(--over)"><b>${und}</b> undeklariert</span>`:"")+(unu?`<span class="stat"><b>${unu}</b> ungenutzt</span>`:"");
   $("#c-arch").textContent=nc||"";$("#c-if").textContent=m.M.size||"";$("#c-dyn").textContent=np||"";$("#c-files").textContent=S.files.length||"";$("#c-exp").textContent=m.exportsList.length||"";try{DOCK.refresh()}catch(e){}
 }
+
+/* ---- Konfiguration (SyC) ---- */
+let cfgT=null;const rerun=()=>{clearTimeout(cfgT);cfgT=setTimeout(run,220)};
+function renderCfg(){
+  const M=S.model,info=M.sycInfo,n=info.size,pre=S.cfg.prefix,on=S.cfg.mode==="cfg";
+  $("#cfgMode").value=S.cfg.mode;if(document.activeElement!==$("#sycPre"))$("#sycPre").value=pre;
+  $("#cfgCmp").hidden=!S.cfgA;
+  const unk=[...info].filter(([,o])=>o.eff===null);
+  if(!n){$("#cfgInfo").textContent=S.files.length?`Keine Systemkonstanten mit Präfix „${pre}“ in Bedingungen gefunden.`:"";$("#sycBox").hidden=true;$("#cfgFind").hidden=true;return}
+  $("#cfgInfo").innerHTML=on
+    ?`Konkrete Konfiguration: ${n} Systemkonstanten, ${unk.length?`<b class="warnt">${unk.length} ohne Wert</b> (Code darunter bleibt drin)`:"alle mit Wert"}. Abgeschaltete Zweige, Importe und Exporte fehlen in allen Reitern.`
+    :`${n} Systemkonstanten in Bedingungen gefunden. „Alle Varianten“ zeigt den Code aller Zweige zusammen. Für eine Variante „Konkrete Konfiguration“ wählen oder einen Wert ändern.`;
+  // Befunde
+  const find=[];
+  if(on){
+    for(const f of M.flows)if(f.from===ENV){const was=(S.modelAll.prov.get(f.m)||[]);if(was.length)find.push({lv:"bad",t:`${f.m}: ${f.to} liest, aber ${was.join(", ")} liefert in dieser Konfiguration nicht`})}
+    unk.slice(0,6).forEach(([k])=>find.push({lv:"warn",t:`${k} hat keinen Wert`}));if(unk.length>6)find.push({lv:"warn",t:`… und ${unk.length-6} weitere ohne Wert`});
+  }
+  const fl=$("#cfgFind");fl.hidden=!find.length;fl.innerHTML=find.map(x=>`<li class="${x.lv}">${esc(x.t)}</li>`).join("");
+  $("#sycBox").hidden=false;if(on&&!S.sycOpened){$("#sycBox").open=true;S.sycOpened=true}
+  $("#sycSum").textContent=`Systemkonstanten (${n})`+(on&&unk.length?` · ${unk.length} ohne Wert`:"");
+  drawSyc();
+}
+function drawSyc(){
+  const ae=document.activeElement,fid=ae&&ae.classList&&ae.classList.contains("sv")?ae.id:null,sel=fid?ae.selectionStart:0;
+  const info=S.model.sycInfo,q=$("#sycQ").value.trim().toLowerCase(),u=$("#sycUnk").checked;
+  const rows=[...info].sort((a,b)=>a[0].localeCompare(b[0])).filter(([k,o])=>(!q||k.toLowerCase().includes(q))&&(!u||o.eff===null));
+  $("#sycList").innerHTML=rows.map(([k,o])=>{const v=S.cfg.values[k]??"";const st=o.eff===null?'<span class="st undecl">ohne Wert</span>':`<span class="acc">= ${esc(String(o.eff))}</span>`;
+    return `<div class="sycr"><label class="mono" for="sv-${esc(k)}">${esc(k)}</label><input class="filter sv" id="sv-${esc(k)}" data-syc="${esc(k)}" value="${esc(v)}" placeholder="${o.def!=null?esc(o.def):"Wert"}" spellcheck="false" autocomplete="off"><span class="sub">${st} · ${o.n}× in ${o.files.size} Datei${o.files.size===1?"":"en"}${o.def!=null?` · Vorgabe ${esc(o.def)}${o.defFrom?" aus "+esc(baseName(o.defFrom)):""}`:""}</span></div>`}).join("")||'<p class="sub">Keine passende Systemkonstante.</p>';
+  if(fid){const el=document.getElementById(fid);if(el){el.focus();try{el.setSelectionRange(sel,sel)}catch(e){}}}
+}
+$("#sycList").addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.syc;if(!k)return;const v=e.target.value.trim();if(v)S.cfg.values[k]=v;else delete S.cfg.values[k];if(S.cfg.mode!=="cfg"){S.cfg.mode="cfg";}rerun()});
+$("#sycQ").addEventListener("input",drawSyc);$("#sycUnk").addEventListener("change",drawSyc);
+$("#cfgMode").addEventListener("change",e=>{S.cfg.mode=e.target.value;run();toast(S.cfg.mode==="cfg"?"Konkrete Konfiguration aktiv":"Alle Varianten")});
+$("#sycPre").addEventListener("change",e=>{const v=e.target.value.trim();if(!v)return;S.cfg.prefix=v;run()});
+$("#cfgReset").onclick=()=>{S.cfg.values={};run();toast("Werte auf Vorgaben zurückgesetzt")};
+$("#cfgFile").addEventListener("change",async e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;const t=await f.text(),pre=S.cfg.prefix;let n=0;
+  if(/^\s*</.test(t)){const p=parsePavast(f.name,t);for(const [k,v] of p.consts||[])if(k.startsWith(pre)){S.cfg.values[k]=v;n++}}
+  else for(const line of stripComments(t).split("\n")){const m=line.match(/^\s*#\s*define\s+([A-Za-z_]\w*)\s+(\S+)/)||line.match(/^\s*([A-Za-z_]\w*)\s*[=:;,\t ]\s*([^\s;,]+)/);if(m&&m[1].startsWith(pre)){S.cfg.values[m[1]]=m[2];n++}}
+  S.cfg.mode="cfg";run();toast(n?`${n} Werte aus ${f.name} übernommen`:`Keine Werte mit Präfix ${pre} in ${f.name} gefunden`);
+});
+$("#cfgA").onclick=()=>{S.cfgA={values:Object.assign({},S.cfg.values),prefix:S.cfg.prefix};$("#cfgCmp").hidden=false;$("#cfgDiff").innerHTML="";toast("Aktuelle Werte als A gemerkt")};
+$("#cfgCmp").onclick=()=>{
+  if(!S.cfgA)return;
+  const A=analyze(S.files,{mode:"cfg",prefix:S.cfgA.prefix,values:S.cfgA.values}),B=analyze(S.files,Object.assign({},S.cfg,{mode:"cfg"}));
+  const fk=M=>new Map(M.flows.map(f=>[(f.from===ENV?"Umgebung":f.from)+" → "+f.to+": "+f.m,f]));
+  const ek=M=>new Map(M.exportsList.map(e=>[e.comp+": "+e.name+(e.kind==="Funktion"?"()":""),e]));
+  const ck=M=>new Map(M.calls.flatMap(c=>[...c.fns].map(f=>[c.from+" ruft "+c.to+": "+f+"()",c])));
+  const dif=(a,b)=>[...a.keys()].filter(k=>!b.has(k)).sort();
+  const sec=(t,l)=>l.length?`<div><span class="t-idx">${t} (${l.length})</span><ul class="dl">${l.slice(0,80).map(x=>`<li class="mono">${esc(x)}</li>`).join("")}${l.length>80?`<li class="sub">… und ${l.length-80} weitere</li>`:""}</ul></div>`:"";
+  const vd=[...new Set([...Object.keys(S.cfgA.values),...Object.keys(S.cfg.values)])].filter(k=>(S.cfgA.values[k]??"")!==(S.cfg.values[k]??"")).sort();
+  const parts=[["Schnittstellen nur in A",dif(fk(A),fk(B))],["Schnittstellen nur aktuell",dif(fk(B),fk(A))],["Exporte nur in A",dif(ek(A),ek(B))],["Exporte nur aktuell",dif(ek(B),ek(A))],["Aufrufe nur in A",dif(ck(A),ck(B))],["Aufrufe nur aktuell",dif(ck(B),ck(A))]];
+  const any=parts.some(p=>p[1].length);
+  $("#cfgDiff").innerHTML=`<div class="diff"><div class="row"><h3>Vergleich A ↔ aktuell</h3><button class="pill" type="button" id="cfgDiffX">Schließen</button></div>
+    <p class="sub">${vd.length?"Abweichende Werte: "+vd.map(k=>`${esc(k)} ${esc(S.cfgA.values[k]??"Vorgabe")} → ${esc(S.cfg.values[k]??"Vorgabe")}`).join(", "):"Beide Konfigurationen haben dieselben Werte."}</p>
+    ${any?`<div class="cols2">${parts.map(p=>sec(p[0],p[1])).join("")}</div>`:'<p class="sub">Keine Unterschiede in Schnittstellen, Exporten oder Aufrufen.</p>'}</div>`;
+  $("#cfgDiffX").onclick=()=>{$("#cfgDiff").innerHTML=""};
+};
 
 /* ---- Gruppen (Subsysteme) und Fokus ---- */
 S.collapsed=new Set();S.focus=null;S.expSort={k:"comp",dir:1};S.expOpen=new Set();S.expShut=new Set();S.expLimit=200;S.ifLimit=300;S.groups=new Map();S.grpOf=new Map();
@@ -5525,7 +5781,7 @@ function showEdge(it){
   $("#detail").innerHTML=`<h3>${esc(lab(it.a))} → ${esc(lab(it.b))}</h3><p class="sub">${items.length} Message${items.length>1?"s":""}${agg?" über die Subsystemgrenze":""}</p><ul class="msgl">`+
    items.map(f=>{const w=procsOf(S.model.procW,f.m,f.from),r=procsOf(S.model.procR,f.m,f.to);
     return `<li><div>${fbtn("msg",f.m)} ${pill(f.st)}${f.multi?' <span class="st multi">mehrere Producer</span>':""}</div>
-     <div class="sub">${agg?esc(lab(f.from))+" → "+esc(f.to)+"<br>":""}${w.length?"geschrieben in "+w.map(esc).join(", "):f.from===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`}).join("")+"</ul>";
+     <div class="sub">${agg?esc(lab(f.from))+" → "+esc(f.to)+"<br>":""}${f.icond||f.econd?`<span class="syc">${f.econd?"Export nur wenn "+esc(f.econd):""}${f.econd&&f.icond?" · ":""}${f.icond?"Import nur wenn "+esc(f.icond):""}</span><br>`:""}${w.length?"geschrieben in "+w.map(esc).join(", "):f.from===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`}).join("")+"</ul>";
 }
 function showGroup(g,isClosed){
   const members=S.groups.get(g)||[],set=new Set(members);
@@ -5576,16 +5832,18 @@ function drawIf(){
   for(const c of [...S.model.comps.values()].sort((a,b)=>a.name.localeCompare(b.name))){
     if(only&&c.name!==only)continue;if(F&&!F.view.has(c.name))continue;
     const exp=new Set([...c.exp,...[...c.defs].filter(x=>S.model.M.has(x))]);
-    for(const m of [...exp].sort())rows.push({c,m,dir:"Export",pv:c.exp.has(m),cd:c.writes.has(m)||c.defs.has(m),partner:S.model.flows.filter(f=>f.from===c.name&&f.m===m).map(f=>f.to)});
+    for(const m of [...exp].sort()){const d=c.defInfo&&c.defInfo.get(m);rows.push({c,m,dir:"Export",pv:c.exp.has(m),cd:c.writes.has(m)||c.defs.has(m),partner:S.model.flows.filter(f=>f.from===c.name&&f.m===m).map(f=>f.to),pc:c.exp.has(m)?c.expCond.get(m)??null:undefined,cc:d?[d.syc||""]:[]})}
     const imp=new Set([...c.imp,...S.model.flows.filter(f=>f.to===c.name).map(f=>f.m)]);
-    for(const m of [...imp].sort()){const f=S.model.flows.find(x=>x.to===c.name&&x.m===m);rows.push({c,m,dir:"Import",pv:c.imp.has(m),cd:c.reads.has(m),partner:f?[f.from]:[],st:f&&f.st})}
+    for(const m of [...imp].sort()){const f=S.model.flows.find(x=>x.to===c.name&&x.m===m);const cc=new Set();c.funcs.forEach(g=>{const r=g.rsyc&&g.rsyc.get(m);if(r)r.forEach(x=>cc.add(x))});rows.push({c,m,dir:"Import",pv:c.imp.has(m),cd:c.reads.has(m),partner:f?[f.from]:[],st:f&&f.st,pc:c.imp.has(m)?c.impCond.get(m)??null:undefined,cc:[...cc]})}
   }
   const filt=rows.filter(r=>(!q||r.m.toLowerCase().includes(q))&&(!F||(F.msg?r.m===F.msg:F.fn?F.core.has(r.c.name):(F.core.has(r.c.name)||r.partner.some(p=>F.core.has(p))))));
   const yn=(b,has)=>!has?'<span class="no">n/a</span>':b?'<span class="yes">✓</span>':'<span class="no">–</span>';
   const vis=filt.slice(0,S.ifLimit);
-  $("#ifTbl").innerHTML=filt.length?`<table><thead><tr><th>Komponente</th><th>Message</th><th>Richtung</th><th>PaVaSt</th><th>C-Code</th><th>Partner</th><th>Status</th></tr></thead><tbody>`+
+  $("#ifTbl").innerHTML=filt.length?`<table><thead><tr><th>Komponente</th><th>Message</th><th>Richtung</th><th>PaVaSt</th><th>C-Code</th><th>Bedingung</th><th>Partner</th><th>Status</th></tr></thead><tbody>`+
    vis.map(r=>{const st=r.dir==="Import"?r.st:(r.c.hasPV&&!r.pv?"undecl":r.c.hasC&&!r.cd?"unused":"ok");
-    return `<tr><td>${esc(r.c.name)}</td><td class="mono">${fbtn("msg",r.m)}</td><td>${r.dir}</td><td class="c">${yn(r.pv,r.c.hasPV)}</td><td class="c">${yn(r.cd,r.c.hasC)}</td><td class="mono">${r.partner.map(p=>esc(p===ENV?"Umgebung":p)).join(", ")||"—"}</td><td>${st?pill(st):""}</td></tr>`}).join("")+"</tbody></table>"+more(filt.length-vis.length,"ifMore")
+    const ccs=[...new Set(r.cc.map(normCond))],mis=r.pc!==undefined&&r.cc.length&&(ccs.length>1||ccs[0]!==normCond(r.pc));
+    const bed=(r.pc?`<span class="syc">PaVaSt: ${esc(r.pc)}</span>`:"")+(r.cc.some(x=>x)?`${r.pc?"<br>":""}<span class="syc">C: ${r.cc.map(x=>esc(x||"immer")).join(" | ")}</span>`:"");
+    return `<tr><td>${esc(r.c.name)}</td><td class="mono">${fbtn("msg",r.m)}</td><td>${r.dir}</td><td class="c">${yn(r.pv,r.c.hasPV)}</td><td class="c">${yn(r.cd,r.c.hasC)}</td><td class="bedc">${bed||'<span class="no">immer</span>'}${mis?' <span class="st undecl">abweichend</span>':""}</td><td class="mono">${r.partner.map(p=>esc(p===ENV?"Umgebung":p)).join(", ")||"—"}</td><td>${st?pill(st):""}</td></tr>`}).join("")+"</tbody></table>"+more(filt.length-vis.length,"ifMore")
    :'<p class="sub">Keine Schnittstellen gefunden.</p>';
   const mb=$("#ifMore");if(mb)mb.onclick=()=>{S.ifLimit+=300;drawIf()};
 }
@@ -5618,10 +5876,11 @@ function expDetail(e){
   const p=e.pvp,d=e.def;
   const typ=[d&&'<span class="mono">'+esc(d.type)+'</span> <span class="acc">C</span>',p.typ&&esc(p.typ)+' <span class="acc">PaVaSt</span>'].filter(Boolean).join(" · ");
   const range=p.min!=null||p.max!=null?esc((p.min??"?")+" … "+(p.max??"?"))+(p.einheit?" "+esc(p.einheit):""):p.einheit?esc(p.einheit):"";
-  const wr=e.writes.map(w=>`${esc(w.fn)}() <span class="acc">${esc(w.file)}:${w.line}${w.cond?" · bedingt":""}</span>${w.fremd?' <span class="st multi">'+esc(w.comp)+'</span>':""}`).join("<br>");
+  const wr=e.writes.map(w=>`${esc(w.fn)}() <span class="acc">${esc(w.file)}:${w.line}${w.cond?" · bedingt":""}</span>${w.syc?' <span class="syc">nur wenn '+esc(w.syc)+'</span>':""}${w.fremd?' <span class="st multi">'+esc(w.comp)+'</span>':""}`).join("<br>");
   return `${p.lang?`<p class="sub" style="margin:0 0 6px">${esc(p.lang)}</p>`:""}<div class="exp-b"><section><span class="t-idx">Statisch</span><dl class="kv">
       ${dd("Typ",typ)}${dd("Bereich",range)}${dd("Umrechnung",p.umrechnung&&esc(p.umrechnung))}
       ${dd("Definiert",d?esc(d.file)+":"+d.line:(e.hasC?'<span class="acc">nicht gefunden</span>':'<span class="acc">kein C-Code geladen</span>'))}
+      ${dd("Variante",e.pvCond||e.cCond?[e.pvCond&&'<span class="syc">PaVaSt: '+esc(e.pvCond)+'</span>',e.cCond&&'<span class="syc">C: '+esc(e.cCond)+'</span>'].filter(Boolean).join("<br>"):"")}
       ${dd("Initialwert",d&&d.init!=null?'<span class="mono">'+esc(d.init)+'</span>':(p.init?esc(p.init):""))}
       ${dd("Abnehmer",e.cons.map(c=>esc(c.comp)+" "+pill(c.st)).join("<br>")||'<span class="acc">keiner</span>')}
     </dl></section>
@@ -5651,7 +5910,7 @@ function drawExp(){
       const rast=[...new Set((e.kind==="Funktion"?e.procs:e.wProcs).map(x=>x.r.txt))].join(", ")||'<span class="no">—</span>';
       const cons=e.kind==="Funktion"?e.callers.map(c=>c.comp):e.cons.map(c=>c.comp);
       const hc=e.hints.length?`<span class="hc s${s}">${e.hints.length}</span>`:'<span class="no">—</span>';
-      html+=`<tr class="xr${open?" open":""}" data-k="${esc(key)}" tabindex="0" aria-expanded="${open}"><td class="cv">${open?"▾":"▸"}</td><td class="mono">${esc(e.name)}${e.kind==="Funktion"?"()":""}</td><td>${esc(e.comp)}</td><td>${e.kind}</td><td class="c">${pv}</td><td>${rast}</td><td>${cons.length?`<b>${cons.length}</b> <span class="acc">${esc(cons.slice(0,2).join(", "))}${cons.length>2?" …":""}</span>`:'<span class="no">keiner</span>'}</td><td>${hc}</td></tr>`;
+      html+=`<tr class="xr${open?" open":""}" data-k="${esc(key)}" tabindex="0" aria-expanded="${open}"><td class="cv">${open?"▾":"▸"}</td><td class="mono">${esc(e.name)}${e.kind==="Funktion"?"()":""}${e.pvCond||e.cCond?` <span class="vmark" title="variantenabhängig: ${esc(e.pvCond||e.cCond)}">◇</span>`:""}</td><td>${esc(e.comp)}</td><td>${e.kind}</td><td class="c">${pv}</td><td>${rast}</td><td>${cons.length?`<b>${cons.length}</b> <span class="acc">${esc(cons.slice(0,2).join(", "))}${cons.length>2?" …":""}</span>`:'<span class="no">keiner</span>'}</td><td>${hc}</td></tr>`;
       if(open)html+=`<tr class="xd"><td></td><td colspan="7">${expDetail(e)}</td></tr>`;
     }
   }
@@ -5703,7 +5962,7 @@ function renderDyn(){
     return head+byG.get(g).map(c=>{
       if(!c.hasC)return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"><summary><h3>${esc(c.name)}</h3><span class="sub">nur PaVaSt</span></summary><p class="sub">Kein C-Code geladen. Aufrufketten brauchen die .c-Dateien.</p></details>`;
       const ps=c.procs.filter(procOk),treesOpen=ps.length<=3;
-      const procs=ps.map(p=>`<div class="proc"><div class="row"><h3 class="mono" style="font-size:14px">${esc(p.name)}()</h3><span class="sub">${esc(rasterOf(p.name).txt)} · ${esc(p.file)}:${p.line}</span></div>
+      const procs=ps.map(p=>`<div class="proc"><div class="row"><h3 class="mono" style="font-size:14px">${esc(p.name)}()</h3><span class="sub">${esc(rasterOf(p.name).txt)} · ${esc(p.file)}:${p.line}</span></div>${p.syc?`<p class="syc" style="margin:2px 0 0">nur wenn ${esc(p.syc)}</p>`:""}
         <div class="cols2" style="margin-top:6px"><div><div class="sub">schreibt (über ganze Kette)</div><div class="chips">${p.W.map(m=>`<span class="chip w${F&&F.msg===m?" hl":""}">${esc(m)}</span>`).join("")||'<span class="sub">nichts</span>'}</div></div>
         <div><div class="sub">liest</div><div class="chips">${p.R.map(m=>`<span class="chip${F&&F.msg===m?" hl":""}" title="Producer: ${esc(srcOf(m))}">${esc(m)} <span class="acc">← ${esc(srcOf(m))}</span></span>`).join("")||'<span class="sub">nichts</span>'}</div></div></div>
         <details style="margin-top:8px"${treesOpen?" open":""}><summary class="sub">Aufrufbaum</summary><ul class="tree">${treeHtml(p.tree)}</ul>
