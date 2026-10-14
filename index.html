@@ -165,6 +165,39 @@ h3{margin:0;font-size:15px;letter-spacing:-.01em;font-weight:700;font-variation-
   transition:opacity .5s;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--text-3);opacity:.7;pointer-events:none}
 .tabcount{display:none}
+/* Hilfe: ?-Knopf wie in der Kopfleiste, Text erscheint im Feld daneben */
+.hbtn{display:inline-grid;place-items:center;width:26px;height:26px;flex:none;border-radius:100px;border:1px solid var(--glass-edge);background:transparent;color:var(--text-2);
+  font-family:var(--mono);font-size:12.5px;font-weight:500;cursor:pointer;vertical-align:middle;margin-left:8px;transition:border-color var(--t-s),color var(--t-s),background var(--t-s)}
+.hbtn:hover,.hbtn[aria-expanded="true"]{border-color:var(--line-hi);color:var(--text);background:var(--amber-soft)}
+.fb-in .hbtn,.cfg-btns .hbtn{width:36px;height:36px;margin-left:0}
+.helppop{position:fixed;z-index:95;width:min(380px,calc(100vw - 24px));max-height:min(70vh,520px);overflow:auto;padding:14px 16px;border-radius:15px;border:1px solid var(--glass-edge);
+  background:var(--surface);box-shadow:var(--shadow-lg);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);font-size:13.5px;line-height:1.55;color:var(--text-2)}
+.helppop p{margin:0 0 8px}.helppop p:last-child{margin:0}
+.helppop .legend{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.helppop:focus{outline:none}
+/* Kopf kompakt */
+.hero{padding-block:clamp(20px,3vw,30px) 0}
+.hero h1{font-size:clamp(24px,3.2vw,36px);margin-top:10px}
+.hero .stats{margin-top:12px}
+/* Graph: volle Breite, Höhe nach Bildschirm */
+.panel .archgrid{display:block}
+.cywrap{position:relative;margin-top:12px}
+.cywrap #cy{height:clamp(440px,calc(100vh - 250px),1600px);height:clamp(440px,calc(100dvh - 250px),1600px);min-height:0}
+.dpanel{position:absolute;top:10px;right:10px;z-index:5;width:min(340px,calc(100% - 20px));max-height:calc(100% - 20px);overflow:auto;padding:14px 16px;border-radius:13px;
+  border:1px solid var(--glass-edge);background:var(--surface);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3)}
+.dclose{position:sticky;top:0;float:right;width:30px;height:30px;margin:-4px -6px 4px 8px;background:var(--surface)}
+.gsheet.full{position:fixed;z-index:80;inset:calc(10px + env(safe-area-inset-top,0px)) calc(10px + env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) calc(10px + env(safe-area-inset-left,0px));
+  display:flex;flex-direction:column;background:var(--surface-solid);-webkit-backdrop-filter:none;backdrop-filter:none}
+.gsheet.full .cywrap{flex:1;min-height:0}
+.gsheet.full #cy{height:100%}
+html.gfull{overflow:hidden}
+html.gfull .dock,html.gfull .nav,html.gfull footer.foot{visibility:hidden}
+html.gfull .wrap{z-index:90}
+#bFull .fc{display:none}.gsheet.full #bFull .fo{display:none}.gsheet.full #bFull .fc{display:inline}
+@media (max-width:720px){
+  .cywrap #cy{height:clamp(380px,calc(100vh - 230px),900px);height:clamp(380px,calc(100dvh - 230px),900px)}
+  .dpanel{top:auto;bottom:8px;left:8px;right:8px;width:auto;max-height:58%}
+}
 /* Konfiguration */
 .cfgbar{display:flex;flex-direction:column;gap:8px}
 .cfgbar .filter{flex:0 0 auto;height:36px;max-width:none;width:100%}
@@ -410,7 +443,7 @@ footer.foot a:hover{color:var(--text)}
 
   <section class="panel" id="p-arch" role="tabpanel" aria-labelledby="t-arch">
     <div class="archgrid">
-      <div class="sheet">
+      <div class="sheet gsheet" id="gsheet">
         <div class="row">
           <div><span class="t-idx">Statisch + Aufrufketten</span><h2>Komponentengraph</h2></div>
           <div class="btns">
@@ -419,20 +452,23 @@ footer.foot a:hover{color:var(--text)}
             <button class="pill" id="bCollapse" type="button" hidden>Gruppen zuklappen</button>
             <button class="pill" id="bFit" type="button">Einpassen</button>
             <button class="pill" id="bMer" type="button">Mermaid kopieren</button>
+            <button class="pill icon-btn" id="bFull" type="button" aria-label="Graph im Vollbild" aria-pressed="false" title="Vollbild (Esc beendet)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="fo" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="fc" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
           </div>
         </div>
         <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Antippen hebt die Nachbarschaft hervor und zeigt Details. Doppeltippen klappt ein Subsystem auf oder zu.</p>
-        <div id="cy" style="margin-top:12px" aria-label="Komponentengraph"></div>
-        <div class="legend">
+        <div class="cywrap">
+          <div id="cy" aria-label="Komponentengraph"></div>
+          <aside class="dpanel" id="dpanel" hidden aria-label="Details"><button class="pill icon-btn dclose" id="dclose" type="button" aria-label="Details schließen">✕</button><div id="detail"><p class="empty"></p></div></aside>
+        </div>
+        <template id="h-legend"><div class="legend">
           <span><i class="ln"></i>deklariert und genutzt</span>
           <span><i class="ln unused"></i>deklariert, nicht gelesen</span>
           <span><i class="ln undecl"></i>gelesen, nicht deklariert</span>
           <span><i class="ln call"></i>Funktionsaufruf</span>
           <span>gestrichelter Knoten: Umgebung</span>
           <span>gestrichelter Rahmen: Subsystem · Doppelrand: zugeklappt</span>
-        </div>
+        </div></template>
       </div>
-      <aside class="sheet detail" id="detail"><p class="empty">Wähle eine Komponente oder einen Pfeil.</p></aside>
     </div>
   </section>
 
@@ -482,13 +518,10 @@ footer.foot a:hover{color:var(--text)}
       <p class="lede">C-Dateien landen bei der Komponente mit gleichem Namen. <code>SCRDos_Calc.c</code> gehört zu <code>SCRDos</code>, wenn es dafür eine PaVaSt gibt.</p>
       <ul class="flist" id="flist"></ul>
     </div>
-    <div class="sheet note">
-      <h3>Was erkannt wird</h3>
-      <p>PaVaSt: <code>SW-FEATURE</code> mit <code>SHORT-NAME</code>, alle <code>*-REF</code> unterhalb von <code>…IMPORT…</code> bzw. <code>…EXPORT…</code>. C: globale Definitionen (Export), <code>extern</code> (Import), direkte Zugriffe auf bekannte Messages, <code>Msg_Get/Msg_Set</code>-artige Makros und AUTOSAR <code>Rte_Read_/Rte_Write_</code>. Schreibzugriff heißt Zuweisung, <code>++/--</code> oder Übergabe per <code>&amp;</code>.</p>
+    <template id="h-files"><p>PaVaSt: <code>SW-FEATURE</code> mit <code>SHORT-NAME</code>, alle <code>*-REF</code> unterhalb von <code>…IMPORT…</code> bzw. <code>…EXPORT…</code>. C: globale Definitionen (Export), <code>extern</code> (Import), direkte Zugriffe auf bekannte Messages, <code>Msg_Get/Msg_Set</code>-artige Makros und AUTOSAR <code>Rte_Read_/Rte_Write_</code>. Schreibzugriff heißt Zuweisung, <code>++/--</code> oder Übergabe per <code>&amp;</code>.</p>
       <p>Grenzen: Der Präprozessor wird nicht ausgewertet (Makros, <code>#if</code>-Varianten). Funktionszeiger und lokale Variablen mit dem Namen einer Message werden nicht aufgelöst.</p>
       <p>Systemkonstanten: Bedingungen aus <code>#if</code>, <code>#elif</code>, <code>#ifdef</code>, aus Abfragen wie <code>if (SY_X == SY_ON)</code> und aus <code>SW-SYSCOND</code> in der PaVaSt. Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code> oder aus deiner Eingabe. Unbekannte Werte gelten als „vielleicht“, der Code bleibt dann drin.</p>
-      <p>Exportliste: Aus PaVaSt kommen Langname, Typ, Umrechnung, Einheit und Grenzen aus <code>SW-VARIABLE</code>. Das Raster wird aus dem Prozessnamen gelesen (<code>…10ms</code>, <code>_Ini</code>). Eine Schreibstelle gilt als bedingt, wenn sie in einem <code>if</code>-, <code>else</code>- oder <code>switch</code>-Zweig oder hinter <code>?:</code> liegt.</p>
-    </div>
+      <p>Exportliste: Aus PaVaSt kommen Langname, Typ, Umrechnung, Einheit und Grenzen aus <code>SW-VARIABLE</code>. Das Raster wird aus dem Prozessnamen gelesen (<code>…10ms</code>, <code>_Ini</code>). Eine Schreibstelle gilt als bedingt, wenn sie in einem <code>if</code>-, <code>else</code>- oder <code>switch</code>-Zweig oder hinter <code>?:</code> liegt.</p></template>
   </section>
 </main>
 
@@ -5534,7 +5567,7 @@ function run(){
   computeGroups();initCollapse();S.expOpen.clear();S.expShut.clear();S.expLimit=200;S.ifLimit=300;
   if(S.focus&&!focusOptions().some(o=>o.type===S.focus.type&&o.name===S.focus.name))S.focus=null;
   renderStats();renderCfg();renderFocus();renderGraph();renderIf();renderExp();renderDyn();renderFiles();
-  $("#detail").innerHTML=S.files.length?'<p class="empty">Wähle eine Komponente, ein Subsystem oder einen Pfeil.</p>':'<p class="empty">Noch keine Dateien eingelegt.</p>';
+  $("#detail").innerHTML='<p class="empty"></p>';
 }
 function renderStats(){
   const m=S.model,nc=[...m.comps.values()].length,np=[...m.comps.values()].reduce((a,c)=>a+c.procs.length,0);
@@ -5547,6 +5580,46 @@ function renderStats(){
   $("#c-arch").textContent=nc||"";$("#c-if").textContent=m.M.size||"";$("#c-dyn").textContent=np||"";$("#c-files").textContent=S.files.length||"";$("#c-exp").textContent=m.exportsList.length||"";try{DOCK.refresh()}catch(e){}
 }
 
+/* ---- Hilfe ---- */
+const HP=document.createElement("div");HP.className="helppop";HP.setAttribute("role","dialog");HP.tabIndex=-1;HP.hidden=true;document.body.appendChild(HP);
+let hpBtn=null,hpT=0;
+function mkHelp(html,label){const b=document.createElement("button");b.type="button";b.className="hbtn";b.textContent="?";b.setAttribute("aria-label","Hilfe: "+label);b.setAttribute("aria-expanded","false");b._help=html;return b}
+function openHelp(b){
+  closeHelp();hpBtn=b;b.setAttribute("aria-expanded","true");HP.innerHTML=b._help;HP.setAttribute("aria-label",b.getAttribute("aria-label"));HP.hidden=false;
+  const r=b.getBoundingClientRect(),w=HP.offsetWidth,h=HP.offsetHeight;
+  let x=Math.min(Math.max(12,r.left+r.width/2-w/2),innerWidth-w-12),y=r.bottom+8;if(y+h>innerHeight-12)y=Math.max(12,r.top-h-8);
+  HP.style.left=x+"px";HP.style.top=y+"px";hpT=Date.now();HP.focus({preventScroll:true});
+}
+function closeHelp(){if(!hpBtn)return;hpBtn.setAttribute("aria-expanded","false");HP.hidden=true;hpBtn=null}
+document.addEventListener("click",e=>{const b=e.target.closest(".hbtn");if(b){if(hpBtn===b)closeHelp();else openHelp(b);return}if(!e.target.closest(".helppop"))closeHelp()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&hpBtn){const b=hpBtn;closeHelp();b.focus()}});
+addEventListener("resize",closeHelp);addEventListener("scroll",()=>{if(hpBtn&&Date.now()-hpT>400)closeHelp()},{passive:true});
+(function(){
+  /* Jeder Erklärtext wandert hinter einen ?-Knopf an der Überschrift seines Felds */
+  document.querySelectorAll(".lede").forEach(p=>{
+    const box=p.closest(".sheet,.card"),h=box&&box.querySelector("h2");if(!h)return;
+    let html="<p>"+p.innerHTML+"</p>";
+    if(box.id==="gsheet")html+=document.getElementById("h-legend").innerHTML;
+    if(box.closest("#p-files")){const t=document.getElementById("h-files");if(t)html+=t.innerHTML}
+    h.appendChild(mkHelp(html,h.textContent));p.remove();
+  });
+  const lead=document.querySelector(".hero .lead");
+  if(lead){document.querySelector(".hero h1").appendChild(mkHelp("<p>"+lead.innerHTML+"</p><p>Die Leiste unten wechselt die Ansicht: antippen oder die Kugel ziehen.</p>","Schaltplan"));lead.remove()}
+  $(".fb-in").appendChild(mkHelp("<p>Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner: eine Komponente, ein Subsystem, eine Message oder eine Funktion.</p><p>Namen in Tabellen und Details lassen sich anklicken und setzen den Fokus direkt. Gelöst wird er mit dem Chip in der Kopfleiste.</p><p>Subsysteme bündeln Komponenten nach Ordner oder Namenspräfix. Bei „Ordner“ wird die Ebene genommen, die tatsächlich trennt.</p>","Fokus und Subsysteme"));
+  $(".cfg-btns").appendChild(mkHelp("<p><b>Alle Varianten</b> zeigt den Code aller Zweige zusammen. Bedingungen stehen trotzdem dabei: in der Spalte „Bedingung“, als „Variante“ und ◇ in der Exportliste und als „nur wenn …“.</p><p><b>Konkrete Konfiguration</b> wertet die Systemkonstanten aus. Abgeschaltete Zweige, Importe, Exporte und Aufrufe fehlen dann in allen Reitern. Ein geänderter Wert schaltet automatisch in diesen Modus.</p><p>Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code>, aus einer geladenen Wertedatei oder aus deiner Eingabe. Ohne Wert gilt eine Bedingung als „vielleicht“, der Code bleibt drin.</p><p><b>Als A merken</b> hält die Werte fest, <b>Mit A vergleichen</b> zeigt, welche Schnittstellen, Exporte und Aufrufe sich unterscheiden.</p>","Konfiguration"));
+})();
+
+/* ---- Detailfeld im Graph und Vollbild ---- */
+(function(){
+  const det=$("#detail"),pan=$("#dpanel");
+  new MutationObserver(()=>{const empty=!det.textContent.trim()||!!det.querySelector(":scope > p.empty");pan.hidden=empty}).observe(det,{childList:true,subtree:true,characterData:true});
+  $("#dclose").onclick=()=>{det.innerHTML='<p class="empty"></p>';if(S.cy){S.cy.elements().removeClass("faded");S.cy.elements().unselect()}};
+  const full=on=>{$("#gsheet").classList.toggle("full",on);document.documentElement.classList.toggle("gfull",on);$("#bFull").setAttribute("aria-pressed",on);$("#bFull").setAttribute("aria-label",on?"Vollbild beenden":"Graph im Vollbild");
+    requestAnimationFrame(()=>{if(S.cy){S.cy.resize();S.cy.fit(undefined,30)}})};
+  $("#bFull").onclick=()=>full(!$("#gsheet").classList.contains("full"));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!hpBtn&&$("#gsheet").classList.contains("full"))full(false)});
+})();
+
 /* ---- Konfiguration (SyC) ---- */
 let cfgT=null;const rerun=()=>{clearTimeout(cfgT);cfgT=setTimeout(run,220)};
 function renderCfg(){
@@ -5556,8 +5629,8 @@ function renderCfg(){
   const unk=[...info].filter(([,o])=>o.eff===null);
   if(!n){$("#cfgInfo").textContent=S.files.length?`Keine Systemkonstanten mit Präfix „${pre}“ in Bedingungen gefunden.`:"";$("#sycBox").hidden=true;$("#cfgFind").hidden=true;return}
   $("#cfgInfo").innerHTML=on
-    ?`Konkrete Konfiguration: ${n} Systemkonstanten, ${unk.length?`<b class="warnt">${unk.length} ohne Wert</b> (Code darunter bleibt drin)`:"alle mit Wert"}. Abgeschaltete Zweige, Importe und Exporte fehlen in allen Reitern.`
-    :`${n} Systemkonstanten in Bedingungen gefunden. „Alle Varianten“ zeigt den Code aller Zweige zusammen. Für eine Variante „Konkrete Konfiguration“ wählen oder einen Wert ändern.`;
+    ?`${n} Systemkonstanten, ${unk.length?`<b class="warnt">${unk.length} ohne Wert</b>`:"alle mit Wert"}`
+    :"";
   // Befunde
   const find=[];
   if(on){
@@ -5654,12 +5727,12 @@ const optLabel=o=>KIND[o.type]+": "+o.name+(o.type==="fn"?"()":"");
 function renderFocus(){
   $("#fqList").innerHTML=S.model?focusOptions().map(o=>`<option value="${esc(optLabel(o))}"></option>`).join(""):"";
   const F=focusSets(),chip=$("#fchip");
-  if(!F){chip.hidden=true;$("#fqClear").hidden=true;$("#fqInfo").textContent=S.model&&S.model.comps.size?"Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner.":"";if(document.activeElement!==$("#fq"))$("#fq").value="";return}
+  if(!F){chip.hidden=true;$("#fqClear").hidden=true;$("#fqInfo").textContent="";if(document.activeElement!==$("#fq"))$("#fq").value="";return}
   chip.hidden=false;$("#fqClear").hidden=false;
   chip.innerHTML=`<span class="fdot"></span>${esc(S.focus.name)}<span class="fx" aria-hidden="true">✕</span>`;chip.setAttribute("aria-label","Fokus "+S.focus.name+" lösen");
   $("#fq").value=optLabel(S.focus);
   const nb=[...F.view].filter(n=>!F.core.has(n)).length;
-  $("#fqInfo").textContent=`Fokus auf ${KIND[S.focus.type]} ${S.focus.name}: ${F.core.size} Komponente${F.core.size===1?"":"n"} im Kern`+(nb?`, ${nb} direkte${nb===1?"r":""} Partner`:"")+". Alle Reiter zeigen nur diesen Ausschnitt.";
+  $("#fqInfo").textContent=`Fokus auf ${KIND[S.focus.type]} ${S.focus.name}: ${F.core.size} Komponente${F.core.size===1?"":"n"} im Kern`+(nb?`, ${nb} direkte${nb===1?"r":""} Partner`:"")+".";
 }
 function setFocus(f){S.focus=f;S.expOpen.clear();S.expLimit=200;S.ifLimit=300;renderFocus();renderGraph();drawIf();drawExp();renderDyn();if(f)toast("Fokus: "+f.name)}
 function parseFocus(v){
@@ -5747,7 +5820,7 @@ function renderGraph(){
   try{S.cy=cytoscape(opts)}catch(err){opts.layout={name:"cose",padding:30,animate:false};S.cy=cytoscape(opts)}
   S.cy.on("tap",e=>{
     const t=e.target;
-    if(t===S.cy){S.cy.elements().removeClass("faded");$("#detail").innerHTML='<p class="empty">Wähle eine Komponente, ein Subsystem oder einen Pfeil.</p>';return}
+    if(t===S.cy){S.cy.elements().removeClass("faded");$("#detail").innerHTML='<p class="empty"></p>';return}
     if(t.isNode()){hood(t);const id=t.id();if(id.startsWith("G:"))showGroup(id.slice(2),true);else if(id.startsWith("P:"))showGroup(id.slice(2),false);else showComp(id)}
     else{const set=t.union(t.connectedNodes());fade(set);showEdge(S.edgeItems.get(t.id()))}
   });
