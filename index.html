@@ -159,6 +159,46 @@ h3{margin:0;font-size:15px;letter-spacing:-.01em;font-weight:700;font-variation-
   transition:opacity .5s;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--text-3);opacity:.7;pointer-events:none}
 .tabcount{display:none}
+/* Fokus und Subsysteme */
+.focusbar{display:flex;flex-direction:column;gap:6px}
+.fb-row{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.fb-f{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:5px}
+.fb-g{flex:0 1 220px;display:flex;flex-direction:column;gap:5px}
+.fb-in{display:flex;gap:8px}
+.focusbar .filter{flex:0 0 auto;height:36px;max-width:none;width:100%}
+.focusbar .fb-in .fq{flex:1 1 auto;width:auto;min-width:0}
+#fqInfo{margin:0}#fqInfo:empty{display:none}
+.filter.mini{flex:0 0 auto;width:auto;max-width:120px}
+.fchip{gap:8px;border-color:var(--line-hi);background:var(--amber-soft);max-width:240px}
+.fchip .fdot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex:none}
+.fchip .fx{color:var(--text-3);font-size:12px}
+.lnk{background:none;border:0;padding:0;cursor:pointer;font:inherit;font-family:var(--mono);font-size:12.5px;color:var(--text);text-align:left;border-bottom:1px dashed var(--line-strong)}
+.lnk:hover{color:var(--amber);border-bottom-color:var(--amber)}
+.chips .lnk,.msgl .lnk{border-bottom:0}
+.chip.hl{border-color:var(--amber);background:var(--amber-soft)}
+/* Exportliste als Tabelle */
+.xt{min-width:720px}
+.xt th{padding:0}
+.sortb{all:unset;cursor:pointer;display:block;padding:8px;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit}
+.sortb:hover{color:var(--text)}.sortb:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.xt .cv{width:22px;color:var(--text-3);text-align:center}
+.xr{cursor:pointer}.xr:hover td{background:var(--film)}
+.xr.open td{background:var(--amber-soft);border-bottom-color:transparent}
+.xr:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.xd td{background:var(--film);padding:10px 12px 14px}
+.xg td{padding:0;border-bottom:1px solid var(--line-strong)}
+.xgb{all:unset;cursor:pointer;display:flex;align-items:baseline;gap:10px;width:100%;padding:12px 8px 6px;font-weight:700;font-variation-settings:'wdth' 106;box-sizing:border-box}
+.xgb .cv{width:14px}.xgb:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.hc{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px}
+.hc::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--text-3)}
+.hc.s2::before{background:var(--over)}.hc.s3::before{background:var(--red-ink)}
+/* Aufrufketten */
+.dgrp{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:6px 2px -4px}
+.dgrp .t-idx{flex-basis:100%}
+.dcomp>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
+.dcomp>summary::-webkit-details-marker{display:none}
+.dcomp>summary h3::before{content:"▸";display:inline-block;width:16px;color:var(--text-3);transition:transform .2s}
+.dcomp[open]>summary h3::before{transform:rotate(90deg)}
 /* Querformat auf Telefon und Tablet: die Leiste steht links, die Kugel ragt nach innen */
 .dock.side{left:calc(12px + env(safe-area-inset-left,0px));top:50%;bottom:auto;transform-origin:0 0;filter:drop-shadow(14px 0 28px var(--dock-shadow))}
 .dock.side .dock-btn svg,.dock.side .dock-bead svg{transform:rotate(-90deg)}
@@ -274,6 +314,7 @@ footer.foot a:hover{color:var(--text)}
   <div class="nav-in">
     <a class="brand" href="#top"><span class="mark" aria-hidden="true"><svg viewBox="15 5 90 102"><path d="M26,16 V62 A34,34 0 0 0 94,62 V16" fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="64" r="18.5" fill="var(--amber)"/></svg></span><b>Schaltplan</b><small>Werkstatt</small><span class="crumb" id="crumb" aria-live="polite"></span></a>
     <div class="nav-r">
+      <button class="pill fchip" id="fchip" type="button" hidden></button>
       <a class="pill hide-sm" href="https://maikunverricht.github.io/WerkbankUnverricht/" target="_blank" rel="noopener">Werkbank ↗</a>
       <button class="pill icon-btn" id="themeBtn" type="button" aria-label="Hell/Dunkel umschalten">
         <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
@@ -305,6 +346,18 @@ footer.foot a:hover{color:var(--text)}
     </div>
   </section>
 
+  <section class="card focusbar" aria-label="Fokus und Gruppierung">
+    <div class="fb-row">
+      <div class="fb-f"><label class="t-idx" for="fq">Fokus</label>
+        <div class="fb-in"><input id="fq" class="filter fq" list="fqList" placeholder="Komponente, Subsystem, Message oder Funktion" autocomplete="off" spellcheck="false">
+        <button class="pill" id="fqClear" type="button" hidden>Lösen</button></div>
+        <datalist id="fqList"></datalist></div>
+      <div class="fb-g"><label class="t-idx" for="grpBy">Subsysteme</label>
+        <select id="grpBy" class="filter"><option value="ordner">nach Ordner</option><option value="praefix">nach Namenspräfix</option><option value="keine">keine</option></select></div>
+    </div>
+    <p class="sub" id="fqInfo"></p>
+  </section>
+
   <div class="tabcount" aria-hidden="true"><span id="c-arch"></span><span id="c-if"></span><span id="c-exp"></span><span id="c-dyn"></span><span id="c-files"></span></div>
 
   <section class="panel" id="p-arch" role="tabpanel" aria-labelledby="t-arch">
@@ -314,11 +367,13 @@ footer.foot a:hover{color:var(--text)}
           <div><span class="t-idx">Statisch + Aufrufketten</span><h2>Komponentengraph</h2></div>
           <div class="btns">
             <label class="toggle"><input type="checkbox" id="calls" checked> Funktionsaufrufe</label>
+            <select id="hood" class="filter mini" aria-label="Nachbarschaft beim Antippen"><option value="1">1 Stufe</option><option value="2">2 Stufen</option></select>
+            <button class="pill" id="bCollapse" type="button" hidden>Gruppen zuklappen</button>
             <button class="pill" id="bFit" type="button">Einpassen</button>
             <button class="pill" id="bMer" type="button">Mermaid kopieren</button>
           </div>
         </div>
-        <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Knoten oder Pfeil antippen für Details.</p>
+        <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Antippen hebt die Nachbarschaft hervor und zeigt Details. Doppeltippen klappt ein Subsystem auf oder zu.</p>
         <div id="cy" style="margin-top:12px" aria-label="Komponentengraph"></div>
         <div class="legend">
           <span><i class="ln"></i>deklariert und genutzt</span>
@@ -326,6 +381,7 @@ footer.foot a:hover{color:var(--text)}
           <span><i class="ln undecl"></i>gelesen, nicht deklariert</span>
           <span><i class="ln call"></i>Funktionsaufruf</span>
           <span>gestrichelter Knoten: Umgebung</span>
+          <span>gestrichelter Rahmen: Subsystem · Doppelrand: zugeklappt</span>
         </div>
       </div>
       <aside class="sheet detail" id="detail"><p class="empty">Wähle eine Komponente oder einen Pfeil.</p></aside>
@@ -355,14 +411,16 @@ footer.foot a:hover{color:var(--text)}
           <button class="pill" id="bMd" type="button">Markdown kopieren</button>
         </div>
       </div>
-      <p class="lede">Jeder Export einer Komponente: links, wie er deklariert und definiert ist, rechts, wer ihn zur Laufzeit schreibt und liest. Das Raster kommt aus dem Prozessnamen.</p>
+      <p class="lede">Eine Zeile je Export. Antippen klappt die statische und dynamische Beschreibung auf, die Spaltenköpfe sortieren. Das Raster kommt aus dem Prozessnamen.</p>
       <div class="btns" style="margin-top:10px">
         <select id="exComp" class="filter" aria-label="Komponente"></select>
         <input id="exQ" class="filter" placeholder="Export filtern" aria-label="Export filtern">
         <label class="toggle"><input type="checkbox" id="exHint"> nur mit Hinweisen</label>
+        <label class="toggle"><input type="checkbox" id="exGroup" checked> nach Komponente gruppieren</label>
+        <button class="pill" id="exAll" type="button">Alle auf/zu</button>
       </div>
     </div>
-    <div id="exList" class="panel"></div>
+    <div id="exList" class="sheet"></div>
   </section>
 
   <section class="panel" id="p-dyn" role="tabpanel" aria-labelledby="t-dyn" hidden>
@@ -782,7 +840,7 @@ ${refs(im)}
 </MSRSW>`;
 }
 const SAMPLE=[
- {name:"ExhTSens.c",text:`/* Beispiel: Abgastemperatur */
+ {name:"Sensorik/ExhTSens.c",text:`/* Beispiel: Abgastemperatur */
 #include "ExhTSens.h"
 
 uint16 ExhTSens_tUs;          /* vor Kat [0.1 K] */
@@ -819,7 +877,7 @@ void ExhTSens_Ini(void)
     ExhTSens_tDs = 2930u;
 }
 `},
- {name:"SCRDos.c",text:`/* Beispiel: Harnstoffdosierung */
+ {name:"SCR/SCRDos.c",text:`/* Beispiel: Harnstoffdosierung */
 #include "SCRDos.h"
 
 uint16 SCRDos_mfDosDes;       /* Soll-Dosiermenge [mg/s] */
@@ -850,7 +908,7 @@ void SCRDos_Proc100ms(void)
     }
 }
 `},
- {name:"DosVlv.c",text:`/* Beispiel: Dosierventil */
+ {name:"SCR/DosVlv.c",text:`/* Beispiel: Dosierventil */
 #include "DosVlv.h"
 
 uint8 DosVlv_stVlv;           /* 0 = ok, 1 = Fehler */
@@ -873,14 +931,14 @@ void DosVlv_Proc10ms(void)
     DosVlv_Drive(SCRDos_mfDosDes * 4u);
 }
 `},
- {name:"ExhTSens_pavast.xml",text:pvXml("ExhTSens",["ExhTSens_tUs","ExhTSens_tDs"],["Epm_nEng"],[
+ {name:"Sensorik/ExhTSens_pavast.xml",text:pvXml("ExhTSens",["ExhTSens_tUs","ExhTSens_tDs"],["Epm_nEng"],[
    {n:"ExhTSens_tUs",lang:"Abgastemperatur vor SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"},
    {n:"ExhTSens_tDs",lang:"Abgastemperatur nach SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"}])},
- {name:"SCRDos_pavast.xml",text:pvXml("SCRDos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs","DosVlv_stVlv"],[
+ {name:"SCR/SCRDos_pavast.xml",text:pvXml("SCRDos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs","DosVlv_stVlv"],[
    {n:"SCRDos_mfDosDes",lang:"Soll-Dosiermenge Harnstoff",typ:"uint16",cm:"Ident",unit:"mg/s",min:"0",max:"4000"}])},
- {name:"DosVlv_pavast.xml",text:pvXml("DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs"],[
+ {name:"SCR/DosVlv_pavast.xml",text:pvXml("DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs"],[
    {n:"DosVlv_stVlv",lang:"Status Dosierventil (0 = ok, 1 = Fehler)",typ:"uint8",cm:"Ident",unit:"-",min:"0",max:"1"}])},
- {name:"Epm_pavast.xml",text:pvXml("Epm",["Epm_nEng"],[],[
+ {name:"Motor/Epm_pavast.xml",text:pvXml("Epm",["Epm_nEng"],[],[
    {n:"Epm_nEng",lang:"Motordrehzahl",typ:"uint16",cm:"Ident",unit:"1/min",min:"0",max:"8000"}])}
 ];
 
@@ -1027,8 +1085,11 @@ function showPanel(t){
 /* ---- Lauf ---- */
 function run(){
   S.model=analyze(S.files);S.sel=null;
-  renderStats();renderGraph();renderIf();renderExp();renderDyn();renderFiles();
-  $("#detail").innerHTML=S.files.length?'<p class="empty">Wähle eine Komponente oder einen Pfeil.</p>':'<p class="empty">Noch keine Dateien eingelegt.</p>';
+  if(!S.grpTouched)$("#grpBy").value=S.files.some(f=>/[\\/]/.test(f.name))?"ordner":"praefix";
+  computeGroups();initCollapse();S.expOpen.clear();S.expShut.clear();S.expLimit=200;S.ifLimit=300;
+  if(S.focus&&!focusOptions().some(o=>o.type===S.focus.type&&o.name===S.focus.name))S.focus=null;
+  renderStats();renderFocus();renderGraph();renderIf();renderExp();renderDyn();renderFiles();
+  $("#detail").innerHTML=S.files.length?'<p class="empty">Wähle eine Komponente, ein Subsystem oder einen Pfeil.</p>':'<p class="empty">Noch keine Dateien eingelegt.</p>';
 }
 function renderStats(){
   const m=S.model,nc=[...m.comps.values()].length,np=[...m.comps.values()].reduce((a,c)=>a+c.procs.length,0);
@@ -1040,6 +1101,80 @@ function renderStats(){
   $("#c-arch").textContent=nc||"";$("#c-if").textContent=m.M.size||"";$("#c-dyn").textContent=np||"";$("#c-files").textContent=S.files.length||"";$("#c-exp").textContent=m.exportsList.length||"";try{DOCK.refresh()}catch(e){}
 }
 
+/* ---- Gruppen (Subsysteme) und Fokus ---- */
+S.collapsed=new Set();S.focus=null;S.expSort={k:"comp",dir:1};S.expOpen=new Set();S.expShut=new Set();S.expLimit=200;S.ifLimit=300;S.groups=new Map();S.grpOf=new Map();
+function dirParts(c){const f=c.cFiles[0]||c.pvFiles[0]||"";const p=f.split(/[\\/]/);p.pop();return p}
+function prefixOf(n){let m=n.match(/^([A-Z]{2,})(?=[A-Z][a-z]|_|\d|$)/);if(m)return m[1];m=n.match(/^([A-Za-z][a-z0-9]*)(?=[A-Z_]|$)/);return m?m[1]:n}
+function computeGroups(){
+  const mode=$("#grpBy").value,comps=[...S.model.comps.values()],g=new Map();
+  let depth=-1;
+  if(mode==="ordner"){
+    const dirs=comps.map(dirParts),max=Math.max(0,...dirs.map(d=>d.length));
+    for(let d=0;d<max;d++){if(new Set(dirs.map(x=>x[d]||"ohne Ordner")).size>=2){depth=d;break}}
+    if(depth<0)depth=max-1;
+  }
+  for(const c of comps){
+    let k=null;
+    if(mode==="ordner"){const d=dirParts(c);k=depth>=0?(d[depth]||"ohne Ordner"):"ohne Ordner"}
+    else if(mode==="praefix")k=prefixOf(c.name);
+    if(k==null)continue;if(!g.has(k))g.set(k,[]);g.get(k).push(c.name);
+  }
+  S.groups=g;S.grpOf=new Map();for(const [k,l] of g)if(mode==="ordner"?g.size>1:l.length>1)l.forEach(n=>S.grpOf.set(n,k));
+}
+const realGroups=()=>[...new Set(S.grpOf.values())];
+const multiGroups=()=>realGroups().filter(k=>(S.groups.get(k)||[]).length>1);
+function initCollapse(){S.collapsed=new Set();const mg=multiGroups();if(mg.length>=2&&S.model.comps.size>12)mg.forEach(g=>S.collapsed.add(g))}
+$("#grpBy").addEventListener("change",()=>{S.grpTouched=true;computeGroups();initCollapse();if(S.focus&&S.focus.type==="grp")S.focus=null;renderFocus();renderGraph();drawExp();renderDyn()});
+
+function focusSets(){
+  const f=S.focus;if(!f||!S.model)return null;const M=S.model,core=new Set();let msg=null,fn=null;
+  if(f.type==="comp")core.add(f.name);
+  else if(f.type==="grp")(S.groups.get(f.name)||[]).forEach(n=>core.add(n));
+  else if(f.type==="msg"){msg=f.name;(M.prov.get(msg)||[]).forEach(n=>core.add(n));M.flows.filter(x=>x.m===msg).forEach(x=>{if(x.from!==ENV)core.add(x.from);core.add(x.to)})}
+  else if(f.type==="fn"){fn=f.name;for(const c of M.comps.values()){if(c.funcs.some(g=>g.name===fn&&!g.isStatic))core.add(c.name);if(c.funcs.some(g=>g.calls.has(fn)))core.add(c.name)}}
+  const view=new Set(core);
+  if(!msg&&!fn){M.flows.forEach(x=>{if(core.has(x.from))view.add(x.to);if(core.has(x.to)&&x.from!==ENV)view.add(x.from)});M.calls.forEach(x=>{if(core.has(x.from))view.add(x.to);if(core.has(x.to))view.add(x.from)})}
+  return {core,view,msg,fn};
+}
+const KIND={comp:"Komponente",grp:"Subsystem",msg:"Message",fn:"Funktion"};
+function focusOptions(){
+  const M=S.model,o=[];
+  realGroups().sort().forEach(g=>o.push({type:"grp",name:g}));
+  [...M.comps.keys()].sort().forEach(n=>o.push({type:"comp",name:n}));
+  [...M.M].sort().forEach(n=>o.push({type:"msg",name:n}));
+  M.exportsList.filter(e=>e.kind==="Funktion").forEach(e=>o.push({type:"fn",name:e.name}));
+  return o;
+}
+const optLabel=o=>KIND[o.type]+": "+o.name+(o.type==="fn"?"()":"");
+function renderFocus(){
+  $("#fqList").innerHTML=S.model?focusOptions().map(o=>`<option value="${esc(optLabel(o))}"></option>`).join(""):"";
+  const F=focusSets(),chip=$("#fchip");
+  if(!F){chip.hidden=true;$("#fqClear").hidden=true;$("#fqInfo").textContent=S.model&&S.model.comps.size?"Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner.":"";if(document.activeElement!==$("#fq"))$("#fq").value="";return}
+  chip.hidden=false;$("#fqClear").hidden=false;
+  chip.innerHTML=`<span class="fdot"></span>${esc(S.focus.name)}<span class="fx" aria-hidden="true">✕</span>`;chip.setAttribute("aria-label","Fokus "+S.focus.name+" lösen");
+  $("#fq").value=optLabel(S.focus);
+  const nb=[...F.view].filter(n=>!F.core.has(n)).length;
+  $("#fqInfo").textContent=`Fokus auf ${KIND[S.focus.type]} ${S.focus.name}: ${F.core.size} Komponente${F.core.size===1?"":"n"} im Kern`+(nb?`, ${nb} direkte${nb===1?"r":""} Partner`:"")+". Alle Reiter zeigen nur diesen Ausschnitt.";
+}
+function setFocus(f){S.focus=f;S.expOpen.clear();S.expLimit=200;S.ifLimit=300;renderFocus();renderGraph();drawIf();drawExp();renderDyn();if(f)toast("Fokus: "+f.name)}
+function parseFocus(v){
+  v=v.trim();if(!v)return null;
+  const m=v.match(/^(Komponente|Subsystem|Message|Funktion):\s*(.+)$/);
+  const opts=focusOptions();
+  if(m){const type=Object.keys(KIND).find(k=>KIND[k]===m[1]);const name=m[2].replace(/\(\)$/,"");return opts.find(o=>o.type===type&&o.name===name)||null}
+  const name=v.replace(/\(\)$/,"");
+  for(const t of ["comp","grp","msg","fn"]){const o=opts.find(x=>x.type===t&&x.name===name);if(o)return o}
+  const lo=name.toLowerCase();return opts.find(x=>x.name.toLowerCase()===lo)||null;
+}
+$("#fq").addEventListener("change",e=>{const f=parseFocus(e.target.value);if(f)setFocus(f);else if(e.target.value.trim())toast("Nichts mit diesem Namen gefunden")});
+$("#fq").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();const f=parseFocus(e.target.value);if(f)setFocus(f);else toast("Nichts mit diesem Namen gefunden")}});
+$("#fqClear").onclick=()=>setFocus(null);$("#fchip").onclick=()=>setFocus(null);
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-focus]");if(b){const i=b.dataset.focus.indexOf(":");setFocus({type:b.dataset.focus.slice(0,i),name:b.dataset.focus.slice(i+1)});return}
+  const a=e.target.closest("[data-grp]");if(a){const g=a.dataset.grp;if(a.dataset.act==="open")S.collapsed.delete(g);else S.collapsed.add(g);renderGraph();showGroup(g,S.collapsed.has(g))}
+});
+const fbtn=(type,name,txt)=>`<button class="lnk" type="button" data-focus="${type}:${esc(name)}">${txt||esc(name)}</button>`;
+
 /* ---- Graph ---- */
 function tok(){const cs=getComputedStyle(document.documentElement);const g=k=>cs.getPropertyValue(k).trim();return {surface:g("--surface-solid"),void:g("--void"),text:g("--text"),text2:g("--text-2"),text3:g("--text-3"),line:g("--line-strong"),amber:g("--amber"),free:g("--free"),over:g("--over"),info:g("--info")}}
 function edgeGroups(){
@@ -1047,90 +1182,138 @@ function edgeGroups(){
   for(const f of S.model.flows){const k=f.from+"→"+f.to;if(!g.has(k))g.set(k,{from:f.from,to:f.to,items:[]});g.get(k).items.push(f)}
   return [...g.values()];
 }
+function nid(n){if(n===ENV)return ENV;const g=S.grpOf.get(n);return g!=null&&S.collapsed.has(g)&&!S.focus?"G:"+g:n}
+const lab=id=>id===ENV?"Umgebung":id.startsWith("G:")?id.slice(2):id;
+function flowSt(items){return items.some(i=>i.st==="undecl")?"undecl":items.every(i=>i.st==="unused")?"unused":"ok"}
 function renderGraph(){
   const box=$("#cy");
   if(typeof cytoscape==="undefined"){box.innerHTML='<p class="cyfail">Die Grafik-Bibliothek konnte nicht geladen werden. Tabellen und Aufrufketten funktionieren trotzdem.</p>';return}
-  try{if(window.cytoscapeDagre)cytoscape.use(window.cytoscapeDagre)}catch(e){}
-  const m=S.model,T=tok(),els=[];
-  const groups=edgeGroups();
-  const needEnv=groups.some(g=>g.from===ENV);
-  for(const c of m.comps.values()){
-    const cls=!c.hasC?"pvonly":"";
-    els.push({data:{id:c.name,label:c.name+"\n"+(c.hasPV?"PaVaSt":"—")+" · "+(c.hasC?c.cFiles.length+" C":"kein C")},classes:cls});
+  try{if(window.cytoscapeDagre&&!S.dagreOk){cytoscape.use(window.cytoscapeDagre);S.dagreOk=true}}catch(e){S.dagreOk=true}
+  const M=S.model,T=tok(),els=[],F=focusSets();S.edgeItems=new Map();
+  const inView=n=>n===ENV||!F||F.view.has(n);
+  const touchesCore=x=>F.core.has(x.from)||F.core.has(x.to);
+  const flows=M.flows.filter(x=>inView(x.from)&&inView(x.to)&&(!F||(F.msg?x.m===F.msg:F.fn?false:touchesCore(x))));
+  const calls=($("#calls").checked||(F&&F.fn))?M.calls.filter(c=>inView(c.from)&&inView(c.to)&&(!F||(F.fn?c.fns.has(F.fn):F.msg?false:touchesCore(c)))):[];
+  const shown=[...M.comps.values()].filter(c=>!F||F.view.has(c.name));
+  const parents=new Set(),closed=new Map();
+  for(const c of shown){
+    const g=S.grpOf.get(c.name),id=nid(c.name);
+    if(id.startsWith("G:")){closed.set(g,(closed.get(g)||0)+1);continue}
+    const node={data:{id:c.name,label:c.name+"\n"+(c.hasPV?"PaVaSt":"—")+" · "+(c.hasC?c.cFiles.length+" C":"kein C")},classes:(!c.hasC?"pvonly":"")+(F&&F.core.has(c.name)?" core":"")};
+    if(g!=null){node.data.parent="P:"+g;parents.add(g)}
+    els.push(node);
   }
-  if(needEnv)els.push({data:{id:ENV,label:"Umgebung\n(Producer fehlt)"},classes:"env"});
-  for(const g of groups){
-    const st=g.items.some(i=>i.st==="undecl")?"undecl":g.items.every(i=>i.st==="unused")?"unused":"ok";
-    els.push({data:{id:"f:"+g.from+"→"+g.to,source:g.from,target:g.to,label:String(g.items.length)},classes:st});
+  for(const g of parents)els.push({data:{id:"P:"+g,label:g},classes:"grpbox"});
+  const agg=new Map(),intern=new Map();
+  const add=(kind,a,b,item)=>{const k=kind+"|"+a+"|"+b;if(!agg.has(k))agg.set(k,{kind,a,b,items:[]});agg.get(k).items.push(item)};
+  for(const x of flows){const a=nid(x.from),b=nid(x.to);if(a===b){intern.set(a,(intern.get(a)||0)+1);continue}add("f",a,b,x)}
+  for(const c of calls){const a=nid(c.from),b=nid(c.to);if(a!==b)add("c",a,b,c)}
+  for(const [g,n] of closed){const i=intern.get("G:"+g)||0;els.push({data:{id:"G:"+g,label:g+"\n"+n+" Komponente"+(n>1?"n":"")+(i?" · "+i+" intern":"")},classes:"grp"})}
+  if([...agg.values()].some(e=>e.a===ENV))els.push({data:{id:ENV,label:"Umgebung\n(Producer fehlt)"},classes:"env"});
+  let i=0;
+  for(const e of agg.values()){
+    const id="e"+(i++);S.edgeItems.set(id,e);
+    if(e.kind==="f")els.push({data:{id,source:e.a,target:e.b,label:String(e.items.length)},classes:flowSt(e.items)});
+    else els.push({data:{id,source:e.a,target:e.b,label:"ƒ "+new Set(e.items.flatMap(c=>[...c.fns])).size},classes:"call"});
   }
-  if($("#calls").checked)for(const c of m.calls)els.push({data:{id:"c:"+c.from+"→"+c.to,source:c.from,target:c.to,label:"ƒ "+c.fns.size},classes:"call"});
   if(S.cy){S.cy.destroy();S.cy=null}
-  if(!els.length){box.innerHTML='<p class="cyfail">Lege C- und PaVaSt-Dateien ein oder lade das Beispiel.</p>';return}
+  const mg=multiGroups().length;$("#bCollapse").hidden=!mg||!!F;
+  $("#bCollapse").textContent=S.collapsed.size<mg?"Gruppen zuklappen":"Gruppen aufklappen";
+  if(!els.length){box.innerHTML='<p class="cyfail">'+(F?"Im Fokus gibt es keine Verbindungen.":"Lege C- und PaVaSt-Dateien ein oder lade das Beispiel.")+'</p>';return}
   box.innerHTML="";
   const font='"JetBrains Mono", ui-monospace, Menlo, monospace';
-  S.cy=cytoscape({container:box,elements:els,wheelSensitivity:.25,minZoom:.25,maxZoom:3,
+  const opts={container:box,elements:els,wheelSensitivity:.25,minZoom:.15,maxZoom:3,
     style:[
       {selector:"node",style:{shape:"round-rectangle","background-color":T.surface,"border-width":1.5,"border-color":T.line,label:"data(label)","text-wrap":"wrap","text-valign":"center","text-halign":"center",color:T.text,"font-family":font,"font-size":12,width:"label",height:"label",padding:"14px","line-height":1.45}},
       {selector:"node.pvonly",style:{"border-style":"dashed",color:T.text2}},
       {selector:"node.env",style:{"border-style":"dashed","background-opacity":.4,color:T.text3}},
+      {selector:"node.grpbox",style:{"background-opacity":.28,"border-style":"dashed","border-color":T.line,"text-valign":"top","text-halign":"center","text-margin-y":-6,color:T.text2,"font-size":12,"font-weight":600,padding:"16px"}},
+      {selector:"node.grp",style:{"border-width":4,"border-style":"double","border-color":T.text2,"font-weight":600}},
+      {selector:"node.core",style:{"border-color":T.amber,"border-width":2.5}},
       {selector:"node:selected",style:{"border-color":T.amber,"border-width":2.5}},
       {selector:"edge",style:{"curve-style":"bezier","target-arrow-shape":"triangle",width:1.6,"line-color":T.free,"target-arrow-color":T.free,label:"data(label)","font-family":font,"font-size":11,color:T.text2,"text-background-color":T.void,"text-background-opacity":1,"text-background-padding":"3px","text-background-shape":"roundrectangle","arrow-scale":1}},
       {selector:"edge.unused",style:{"line-style":"dashed","line-color":T.text3,"target-arrow-color":T.text3,"line-dash-pattern":[6,5]}},
       {selector:"edge.undecl",style:{"line-color":T.over,"target-arrow-color":T.over,color:T.over}},
       {selector:"edge.call",style:{"line-style":"dotted","line-color":T.info,"target-arrow-color":T.info,"target-arrow-shape":"vee",color:T.info}},
-      {selector:"edge:selected",style:{"line-color":T.amber,"target-arrow-color":T.amber,width:2.6}}
+      {selector:"edge:selected",style:{"line-color":T.amber,"target-arrow-color":T.amber,width:2.6}},
+      {selector:".faded",style:{opacity:.13}}
     ],
-    layout:window.cytoscapeDagre||(typeof dagre!=="undefined")?{name:"dagre",rankDir:"LR",nodeSep:40,rankSep:110,edgeSep:20,padding:30}:{name:"breadthfirst",directed:true,padding:30}
+    layout:S.dagreOk&&window.cytoscapeDagre?{name:"dagre",rankDir:"LR",nodeSep:36,rankSep:100,edgeSep:18,padding:30}:{name:"breadthfirst",directed:true,padding:30}};
+  try{S.cy=cytoscape(opts)}catch(err){opts.layout={name:"cose",padding:30,animate:false};S.cy=cytoscape(opts)}
+  S.cy.on("tap",e=>{
+    const t=e.target;
+    if(t===S.cy){S.cy.elements().removeClass("faded");$("#detail").innerHTML='<p class="empty">Wähle eine Komponente, ein Subsystem oder einen Pfeil.</p>';return}
+    if(t.isNode()){hood(t);const id=t.id();if(id.startsWith("G:"))showGroup(id.slice(2),true);else if(id.startsWith("P:"))showGroup(id.slice(2),false);else showComp(id)}
+    else{const set=t.union(t.connectedNodes());fade(set);showEdge(S.edgeItems.get(t.id()))}
   });
-  S.cy.on("tap","node",e=>showComp(e.target.id()));
-  S.cy.on("tap","edge",e=>{const id=e.target.id();const k=id.slice(2);const [a,b]=k.split("→");id[0]==="c"?showCall(a,b):showFlow(a,b)});
-  S.cy.on("tap",e=>{if(e.target===S.cy)$("#detail").innerHTML='<p class="empty">Wähle eine Komponente oder einen Pfeil.</p>'});
+  S.cy.on("dbltap",e=>{const t=e.target;if(t===S.cy||!t.isNode())return;const id=t.id();
+    if(id.startsWith("G:")){S.collapsed.delete(id.slice(2));renderGraph()}else if(id.startsWith("P:")){S.collapsed.add(id.slice(2));renderGraph()}});
+}
+function fade(set){set=set.union(set.nodes().ancestors());S.cy.elements().addClass("faded");set.removeClass("faded")}
+/* Nachbarschaft: nur der Knoten und seine Partner bleiben kräftig */
+function hood(n){
+  const d=+$("#hood").value;const base=n.isParent()?n.union(n.descendants()):n;
+  let set=base.closedNeighborhood();if(d>1)set=set.union(set.nodes().closedNeighborhood());
+  fade(set.union(base));
 }
 $("#calls").addEventListener("change",renderGraph);
 $("#bFit").onclick=()=>S.cy&&S.cy.fit(undefined,30);
+$("#bCollapse").onclick=()=>{const mg=multiGroups();if(S.collapsed.size<mg.length)mg.forEach(g=>S.collapsed.add(g));else S.collapsed.clear();renderGraph()};
 const reTheme=()=>{if(S.model)renderGraph()};
 try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",reTheme)}catch(e){}
 new MutationObserver(reTheme).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 
 const pill=st=>({ok:'<span class="st ok">ok</span>',unused:'<span class="st unused">ungenutzt</span>',undecl:'<span class="st undecl">undeklariert</span>'}[st]);
 const procsOf=(mp,m,comp)=>(mp.get(m)||[]).filter(x=>x.comp===comp).map(x=>x.proc);
-function showFlow(a,b){
-  const items=S.model.flows.filter(f=>f.from===a&&f.to===b).sort((x,y)=>x.m.localeCompare(y.m));
-  $("#detail").innerHTML=`<h3>${esc(a)} → ${esc(b)}</h3><p class="sub">${items.length} Message${items.length>1?"s":""}</p><ul class="msgl">`+
-   items.map(f=>{const w=procsOf(S.model.procW,f.m,a),r=procsOf(S.model.procR,f.m,b);
-    return `<li><div class="mono">${esc(f.m)} ${pill(f.st)}${f.multi?' <span class="st multi">mehrere Producer</span>':""}</div>
-     <div class="sub">${w.length?"geschrieben in "+w.map(esc).join(", "):a===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`}).join("")+"</ul>";
+function showEdge(it){
+  if(!it)return;
+  if(it.kind==="c"){
+    const fns=uniqBy(it.items.flatMap(c=>[...c.fns].map(f=>({f,from:c.from,to:c.to}))),x=>x.f+x.from);
+    $("#detail").innerHTML=`<h3>${esc(lab(it.a))} ruft ${esc(lab(it.b))}</h3><p class="sub">Funktionsaufrufe über die Grenze. In der PaVaSt-Message-Schnittstelle tauchen sie nicht auf.</p><ul class="msgl">${fns.map(x=>`<li>${fbtn("fn",x.f,esc(x.f)+"()")}${it.a.startsWith("G:")||it.b.startsWith("G:")?` <span class="sub">${esc(x.from)} → ${esc(x.to)}</span>`:""}</li>`).join("")}</ul>`;
+    return;
+  }
+  const items=[...it.items].sort((x,y)=>x.m.localeCompare(y.m)),agg=it.a.startsWith("G:")||it.b.startsWith("G:");
+  $("#detail").innerHTML=`<h3>${esc(lab(it.a))} → ${esc(lab(it.b))}</h3><p class="sub">${items.length} Message${items.length>1?"s":""}${agg?" über die Subsystemgrenze":""}</p><ul class="msgl">`+
+   items.map(f=>{const w=procsOf(S.model.procW,f.m,f.from),r=procsOf(S.model.procR,f.m,f.to);
+    return `<li><div>${fbtn("msg",f.m)} ${pill(f.st)}${f.multi?' <span class="st multi">mehrere Producer</span>':""}</div>
+     <div class="sub">${agg?esc(lab(f.from))+" → "+esc(f.to)+"<br>":""}${w.length?"geschrieben in "+w.map(esc).join(", "):f.from===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`}).join("")+"</ul>";
 }
-function showCall(a,b){
-  const c=S.model.calls.find(x=>x.from===a&&x.to===b);
-  $("#detail").innerHTML=`<h3>${esc(a)} ruft ${esc(b)}</h3><p class="sub">Funktionsaufrufe über die Komponentengrenze. Solche Aufrufe tauchen in der PaVaSt-Message-Schnittstelle nicht auf.</p><div class="chips">${[...c.fns].map(f=>`<span class="chip">${esc(f)}()</span>`).join("")}</div>`;
+function showGroup(g,isClosed){
+  const members=S.groups.get(g)||[],set=new Set(members);
+  const out=S.model.flows.filter(f=>set.has(f.from)&&!set.has(f.to)),inn=S.model.flows.filter(f=>set.has(f.to)&&!set.has(f.from)),intern=S.model.flows.filter(f=>set.has(f.from)&&set.has(f.to));
+  $("#detail").innerHTML=`<span class="t-idx">Subsystem</span><h3>${esc(g)}</h3>
+   <dl class="kv"><dt>Komponenten</dt><dd>${members.length}</dd><dt>Nach außen</dt><dd>${new Set(out.map(f=>f.m)).size} Messages</dd><dt>Von außen</dt><dd>${new Set(inn.map(f=>f.m)).size} Messages</dd><dt>Intern</dt><dd>${new Set(intern.map(f=>f.m)).size} Messages</dd></dl>
+   <div class="chips">${members.sort().map(n=>fbtn("comp",n,`<span class="chip">${esc(n)}</span>`)).join("")}</div>
+   <div class="btns" style="margin-top:12px">${!S.focus?`<button class="pill" type="button" data-grp="${esc(g)}" data-act="${isClosed?"open":"close"}">${isClosed?"Aufklappen":"Zuklappen"}</button>`:""}${fbtn("grp",g,"Fokus auf Subsystem").replace('class="lnk"','class="pill"')}</div>`;
 }
 function showComp(n){
-  if(n===ENV){const ms=S.model.flows.filter(f=>f.from===ENV);$("#detail").innerHTML=`<h3>Umgebung</h3><p class="sub">Messages, die importiert oder gelesen werden, aber von keiner geladenen Komponente stammen.</p><div class="chips">${[...new Set(ms.map(f=>f.m))].map(m=>`<span class="chip">${esc(m)}</span>`).join("")}</div>`;return}
-  const c=S.model.comps.get(n);
+  if(n===ENV){const ms=S.model.flows.filter(f=>f.from===ENV);$("#detail").innerHTML=`<h3>Umgebung</h3><p class="sub">Messages, die importiert oder gelesen werden, aber von keiner geladenen Komponente stammen.</p><div class="chips">${[...new Set(ms.map(f=>f.m))].map(m=>fbtn("msg",m,`<span class="chip">${esc(m)}</span>`)).join("")}</div>`;return}
+  const c=S.model.comps.get(n);if(!c)return;
   const out=S.model.flows.filter(f=>f.from===n),inn=S.model.flows.filter(f=>f.to===n);
-  const iss=S.model.issues.filter(i=>i.comp===n);
-  $("#detail").innerHTML=`<h3>${esc(n)}</h3>
+  const iss=S.model.issues.filter(i=>i.comp===n),g=S.grpOf.get(n);
+  $("#detail").innerHTML=`${g!=null?`<span class="t-idx">Subsystem ${esc(g)}</span>`:""}<h3>${esc(n)}</h3>
    <dl class="kv"><dt>PaVaSt</dt><dd>${c.pvFiles.map(esc).join(", ")||"—"}</dd><dt>C</dt><dd>${c.cFiles.map(esc).join(", ")||"—"}</dd>
    <dt>Prozesse</dt><dd>${c.procs.map(p=>esc(p.name)).join(", ")||"—"}</dd></dl>
-   <h3>Exporte</h3><div class="chips">${[...new Set([...c.exp,...out.map(f=>f.m)])].sort().map(m=>`<span class="chip w">${esc(m)}</span>`).join("")||'<span class="sub">keine</span>'}</div>
-   <h3 style="margin-top:10px">Importe</h3><ul class="msgl">${inn.sort((x,y)=>x.m.localeCompare(y.m)).map(f=>`<li class="mono">${esc(f.m)} <span class="sub">von ${esc(f.from)}</span> ${pill(f.st)}</li>`).join("")||'<li class="sub">keine</li>'}</ul>
-   ${iss.length?`<h3 style="margin-top:10px">Auffällig</h3><ul class="msgl">${iss.map(i=>`<li class="mono">${esc(i.m)} <span class="sub">${esc(i.kind)}</span></li>`).join("")}</ul>`:""}
-   <p style="margin-top:12px"><button class="pill" type="button" onclick="gotoDyn('${esc(n).replace(/'/g,"\\'")}')">Aufrufketten ansehen</button></p>`;
+   <h3>Exporte</h3><div class="chips">${[...new Set([...c.exp,...out.map(f=>f.m)])].sort().map(m=>fbtn("msg",m,`<span class="chip w">${esc(m)}</span>`)).join("")||'<span class="sub">keine</span>'}</div>
+   <h3>Importe</h3><ul class="msgl">${inn.sort((x,y)=>x.m.localeCompare(y.m)).map(f=>`<li>${fbtn("msg",f.m)} <span class="sub">von ${esc(lab(f.from))}</span> ${pill(f.st)}</li>`).join("")||'<li class="sub">keine</li>'}</ul>
+   ${iss.length?`<h3>Auffällig</h3><ul class="msgl">${iss.map(i=>`<li class="mono">${esc(i.m)} <span class="sub">${esc(i.kind)}</span></li>`).join("")}</ul>`:""}
+   <div class="btns" style="margin-top:12px">${fbtn("comp",n,"Fokus auf Komponente").replace('class="lnk"','class="pill"')}<button class="pill" type="button" onclick="gotoDyn('${esc(n).replace(/'/g,"\\'")}')">Aufrufketten</button></div>`;
 }
-function gotoDyn(n){openTab("dyn");const el=document.getElementById("dyn-"+n);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})}
+function gotoDyn(n){openTab("dyn");const el=document.getElementById("dyn-"+n);if(el){el.open=true;el.scrollIntoView({behavior:"smooth",block:"start"})}}
 
 $("#bMer").onclick=async()=>{
   if(!S.model||!S.model.comps.size)return toast("Nichts zu kopieren");
   const id=s=>"n_"+s.replace(/\W/g,"_");const L=["flowchart LR"];
   const names=new Set([...S.model.comps.keys()]);if(S.model.flows.some(f=>f.from===ENV))names.add(ENV);
-  for(const n of names)L.push(`  ${id(n)}["${n===ENV?"Umgebung":n}"]`);
+  const byG=new Map();for(const n of names){const g=S.grpOf.get(n);if(!byG.has(g))byG.set(g,[]);byG.get(g).push(n)}
+  for(const [g,l] of byG){if(g!=null)L.push(`  subgraph ${id("G_"+g)}["${g}"]`);for(const n of l)L.push(`  ${g!=null?"  ":""}${id(n)}["${n===ENV?"Umgebung":n}"]`);if(g!=null)L.push("  end")}
   for(const g of edgeGroups()){const st=g.items.some(i=>i.st==="undecl")?" undeklariert":"";L.push(`  ${id(g.from)} ${g.items.every(i=>i.st==="unused")?"-.->":"-->"}|"${g.items.length}${st}"| ${id(g.to)}`)}
   if($("#calls").checked)for(const c of S.model.calls)L.push(`  ${id(c.from)} -. "ƒ ${[...c.fns].join(", ")}" .-> ${id(c.to)}`);
   const txt=L.join("\n");
   try{await navigator.clipboard.writeText(txt);toast("Mermaid-Code kopiert")}catch(e){showCopyFallback(txt)}
 };
 function showCopyFallback(txt){openTab("arch");$("#detail").innerHTML='<h3>Zum Kopieren</h3><p class="sub">Kopieren war nicht möglich. Text markieren und kopieren:</p><textarea id="merTxt" rows="12" style="width:100%;font-family:var(--mono);font-size:12px;color:var(--text);background:var(--film);border:1px solid var(--line);border-radius:11px;padding:8px">'+esc(txt)+"</textarea>";$("#merTxt").select()}
+const more=(n,id)=>n>0?`<p style="margin-top:10px"><button class="pill" type="button" id="${id}">Weitere ${Math.min(n,id==="ifMore"?300:200)} von ${n} anzeigen</button></p>`:"";
 
 /* ---- Schnittstellen ---- */
 function renderIf(){
@@ -1140,52 +1323,54 @@ function renderIf(){
   drawIf();
 }
 function drawIf(){
-  const q=$("#ifQ").value.trim().toLowerCase(),only=$("#ifComp").value,rows=[];
+  const q=$("#ifQ").value.trim().toLowerCase(),only=$("#ifComp").value,rows=[],F=focusSets();
   for(const c of [...S.model.comps.values()].sort((a,b)=>a.name.localeCompare(b.name))){
-    if(only&&c.name!==only)continue;
+    if(only&&c.name!==only)continue;if(F&&!F.view.has(c.name))continue;
     const exp=new Set([...c.exp,...[...c.defs].filter(x=>S.model.M.has(x))]);
     for(const m of [...exp].sort())rows.push({c,m,dir:"Export",pv:c.exp.has(m),cd:c.writes.has(m)||c.defs.has(m),partner:S.model.flows.filter(f=>f.from===c.name&&f.m===m).map(f=>f.to)});
     const imp=new Set([...c.imp,...S.model.flows.filter(f=>f.to===c.name).map(f=>f.m)]);
     for(const m of [...imp].sort()){const f=S.model.flows.find(x=>x.to===c.name&&x.m===m);rows.push({c,m,dir:"Import",pv:c.imp.has(m),cd:c.reads.has(m),partner:f?[f.from]:[],st:f&&f.st})}
   }
-  const filt=rows.filter(r=>!q||r.m.toLowerCase().includes(q));
+  const filt=rows.filter(r=>(!q||r.m.toLowerCase().includes(q))&&(!F||(F.msg?r.m===F.msg:F.fn?F.core.has(r.c.name):(F.core.has(r.c.name)||r.partner.some(p=>F.core.has(p))))));
   const yn=(b,has)=>!has?'<span class="no">n/a</span>':b?'<span class="yes">✓</span>':'<span class="no">–</span>';
+  const vis=filt.slice(0,S.ifLimit);
   $("#ifTbl").innerHTML=filt.length?`<table><thead><tr><th>Komponente</th><th>Message</th><th>Richtung</th><th>PaVaSt</th><th>C-Code</th><th>Partner</th><th>Status</th></tr></thead><tbody>`+
-   filt.map(r=>{const st=r.dir==="Import"?r.st:(r.c.hasPV&&!r.pv?"undecl":r.c.hasC&&!r.cd?"unused":"ok");
-    return `<tr><td>${esc(r.c.name)}</td><td class="mono">${esc(r.m)}</td><td>${r.dir}</td><td class="c">${yn(r.pv,r.c.hasPV)}</td><td class="c">${yn(r.cd,r.c.hasC)}</td><td class="mono">${r.partner.map(p=>esc(p===ENV?"Umgebung":p)).join(", ")||"—"}</td><td>${st?pill(st):""}</td></tr>`}).join("")+"</tbody></table>"
+   vis.map(r=>{const st=r.dir==="Import"?r.st:(r.c.hasPV&&!r.pv?"undecl":r.c.hasC&&!r.cd?"unused":"ok");
+    return `<tr><td>${esc(r.c.name)}</td><td class="mono">${fbtn("msg",r.m)}</td><td>${r.dir}</td><td class="c">${yn(r.pv,r.c.hasPV)}</td><td class="c">${yn(r.cd,r.c.hasC)}</td><td class="mono">${r.partner.map(p=>esc(p===ENV?"Umgebung":p)).join(", ")||"—"}</td><td>${st?pill(st):""}</td></tr>`}).join("")+"</tbody></table>"+more(filt.length-vis.length,"ifMore")
    :'<p class="sub">Keine Schnittstellen gefunden.</p>';
+  const mb=$("#ifMore");if(mb)mb.onclick=()=>{S.ifLimit+=300;drawIf()};
 }
-$("#ifQ").addEventListener("input",drawIf);$("#ifComp").addEventListener("change",drawIf);
+$("#ifQ").addEventListener("input",()=>{S.ifLimit=300;drawIf()});$("#ifComp").addEventListener("change",()=>{S.ifLimit=300;drawIf()});
 
-/* ---- Exportliste ---- */
+/* ---- Exportliste: kompakte Tabelle, Zeile klappt auf ---- */
 const procTxt=x=>esc(x.proc)+' <span class="acc">'+esc(x.r.txt)+'</span>';
 function renderExp(){
   const sel=$("#exComp"),cur=sel.value;
   sel.innerHTML='<option value="">Alle Komponenten</option>'+[...S.model.comps.keys()].sort().map(n=>`<option${n===cur?" selected":""}>${esc(n)}</option>`).join("");
   drawExp();
 }
+const sev=e=>e.hints.some(h=>h.lv==="bad")?3:e.hints.some(h=>h.lv==="warn")?2:e.hints.length?1:0;
+const rastMs=e=>{const l=(e.kind==="Funktion"?e.procs:e.wProcs).map(x=>x.r.ms).filter(x=>x!=null);return l.length?Math.min(...l):1e9};
+const nCons=e=>e.kind==="Funktion"?e.callers.length:e.cons.length;
 function expRows(){
-  const q=$("#exQ").value.trim().toLowerCase(),only=$("#exComp").value,h=$("#exHint").checked;
-  return S.model.exportsList.filter(e=>(!only||e.comp===only)&&(!q||e.name.toLowerCase().includes(q))&&(!h||e.hints.some(x=>x.lv!=="info")));
+  const q=$("#exQ").value.trim().toLowerCase(),only=$("#exComp").value,h=$("#exHint").checked,F=focusSets();
+  const r=S.model.exportsList.filter(e=>(!only||e.comp===only)&&(!q||e.name.toLowerCase().includes(q))&&(!h||e.hints.some(x=>x.lv!=="info"))&&
+    (!F||(F.msg?e.name===F.msg:F.fn?e.name===F.fn:(F.core.has(e.comp)||(e.cons||[]).some(c=>F.core.has(c.comp))||(e.callers||[]).some(c=>F.core.has(c.comp))))));
+  const {k,dir}=S.expSort;
+  const key={name:e=>e.name.toLowerCase(),comp:e=>e.comp.toLowerCase()+"\u0000"+e.name.toLowerCase(),kind:e=>e.kind,pv:e=>e.pv===null?2:e.pv?0:1,raster:rastMs,cons:nCons,hint:e=>-sev(e)}[k];
+  return r.sort((a,b)=>{const x=key(a),y=key(b);return (x<y?-1:x>y?1:0)*dir||a.name.localeCompare(b.name)});
 }
-function drawExp(){
-  const rows=expRows();
-  if(!rows.length){$("#exList").innerHTML='<div class="sheet sub">'+(S.model.exportsList.length?"Kein Export passt zum Filter.":"Noch keine Exporte gefunden. Lege C- und PaVaSt-Dateien ein.")+'</div>';return}
+const ekey=e=>e.kind[0]+"|"+e.comp+"|"+e.name;
+function expDetail(e){
   const dd=(k,v)=>v?`<dt>${k}</dt><dd>${v}</dd>`:"";
-  $("#exList").innerHTML=rows.map(e=>{
-    const hint=e.hints.length?`<ul class="hints">${e.hints.map(x=>`<li class="${x.lv}">${esc(x.t)}</li>`).join("")}</ul>`:"";
-    if(e.kind==="Funktion"){
-      return `<article class="sheet exp"><header class="exp-h"><div><span class="t-idx">${esc(e.comp)} · Funktion</span><h3 class="mono">${esc(e.name)}()</h3></div></header>
-      <div class="exp-b"><section><span class="t-idx">Statisch</span><dl class="kv">${dd("Signatur",'<span class="mono">'+esc(e.sig)+'</span>')}${dd("Definiert",esc(e.file)+":"+e.line)}${dd("Aufrufer",e.callers.map(c=>esc(c.comp)+" · "+esc(c.fn)+"()").join("<br>"))}</dl></section>
-      <section><span class="t-idx">Dynamisch</span><dl class="kv">${dd("Läuft in",e.procs.map(procTxt).join("<br>")||'<span class="acc">keinem Prozess zugeordnet</span>')}${dd("Schreibt",e.W.map(esc).join(", ")||"nichts")}${dd("Liest",e.R.map(esc).join(", ")||"nichts")}</dl></section></div>${hint}</article>`;
-    }
-    const p=e.pvp,d=e.def;
-    const typ=[d&&'<span class="mono">'+esc(d.type)+'</span> <span class="acc">C</span>',p.typ&&esc(p.typ)+' <span class="acc">PaVaSt</span>'].filter(Boolean).join(" · ");
-    const range=p.min!=null||p.max!=null?esc((p.min??"?")+" … "+(p.max??"?"))+(p.einheit?" "+esc(p.einheit):""):p.einheit?esc(p.einheit):"";
-    const st=e.pv===null?'<span class="st unused">keine PaVaSt</span>':e.pv?'<span class="st ok">deklariert</span>':'<span class="st undecl">nicht deklariert</span>';
-    const wr=e.writes.map(w=>`${esc(w.fn)}() <span class="acc">${esc(w.file)}:${w.line}${w.cond?" · bedingt":""}</span>${w.fremd?' <span class="st multi">'+esc(w.comp)+'</span>':""}`).join("<br>");
-    return `<article class="sheet exp"><header class="exp-h"><div><span class="t-idx">${esc(e.comp)} · Message</span><h3 class="mono">${esc(e.name)}</h3>${p.lang?`<p class="sub">${esc(p.lang)}</p>`:""}</div><div>${st}</div></header>
-    <div class="exp-b"><section><span class="t-idx">Statisch</span><dl class="kv">
+  const hint=e.hints.length?`<ul class="hints">${e.hints.map(x=>`<li class="${x.lv}">${esc(x.t)}</li>`).join("")}</ul>`:"";
+  if(e.kind==="Funktion")return `<div class="exp-b"><section><span class="t-idx">Statisch</span><dl class="kv">${dd("Signatur",'<span class="mono">'+esc(e.sig)+'</span>')}${dd("Definiert",esc(e.file)+":"+e.line)}${dd("Aufrufer",e.callers.map(c=>esc(c.comp)+" · "+esc(c.fn)+"()").join("<br>"))}</dl></section>
+      <section><span class="t-idx">Dynamisch</span><dl class="kv">${dd("Läuft in",e.procs.map(procTxt).join("<br>")||'<span class="acc">keinem Prozess zugeordnet</span>')}${dd("Schreibt",e.W.map(esc).join(", ")||"nichts")}${dd("Liest",e.R.map(esc).join(", ")||"nichts")}</dl></section></div>${hint}`;
+  const p=e.pvp,d=e.def;
+  const typ=[d&&'<span class="mono">'+esc(d.type)+'</span> <span class="acc">C</span>',p.typ&&esc(p.typ)+' <span class="acc">PaVaSt</span>'].filter(Boolean).join(" · ");
+  const range=p.min!=null||p.max!=null?esc((p.min??"?")+" … "+(p.max??"?"))+(p.einheit?" "+esc(p.einheit):""):p.einheit?esc(p.einheit):"";
+  const wr=e.writes.map(w=>`${esc(w.fn)}() <span class="acc">${esc(w.file)}:${w.line}${w.cond?" · bedingt":""}</span>${w.fremd?' <span class="st multi">'+esc(w.comp)+'</span>':""}`).join("<br>");
+  return `${p.lang?`<p class="sub" style="margin:0 0 6px">${esc(p.lang)}</p>`:""}<div class="exp-b"><section><span class="t-idx">Statisch</span><dl class="kv">
       ${dd("Typ",typ)}${dd("Bereich",range)}${dd("Umrechnung",p.umrechnung&&esc(p.umrechnung))}
       ${dd("Definiert",d?esc(d.file)+":"+d.line:(e.hasC?'<span class="acc">nicht gefunden</span>':'<span class="acc">kein C-Code geladen</span>'))}
       ${dd("Initialwert",d&&d.init!=null?'<span class="mono">'+esc(d.init)+'</span>':(p.init?esc(p.init):""))}
@@ -1195,10 +1380,45 @@ function drawExp(){
       ${dd("Erzeugt in",e.wProcs.map(procTxt).join("<br>")||(e.hasC?'<span class="acc">keinem Prozess</span>':'<span class="acc">—</span>'))}
       ${dd("Schreibstellen",wr)}
       ${dd("Gelesen in",e.readers.map(r=>esc(r.comp)+" · "+procTxt(r)).join("<br>")||(e.cons.length?'<span class="acc">Leser ohne C-Code</span>':""))}
-    </dl></section></div>${hint}</article>`;
-  }).join("");
+    </dl></section></div>${hint}<p style="margin-top:8px">${fbtn(e.kind==="Funktion"?"fn":"msg",e.name,"Fokus auf "+(e.kind==="Funktion"?"Funktion":"Message"))}</p>`;
 }
-$("#exQ").addEventListener("input",drawExp);$("#exComp").addEventListener("change",drawExp);$("#exHint").addEventListener("change",drawExp);
+function drawExp(){
+  const rows=expRows(),box=$("#exList");
+  if(!rows.length){box.innerHTML='<p class="sub">'+(S.model.exportsList.length?"Kein Export passt zum Filter.":"Noch keine Exporte gefunden. Lege C- und PaVaSt-Dateien ein.")+'</p>';return}
+  const grp=$("#exGroup").checked,{k,dir}=S.expSort;
+  const cols=[["name","Name"],["comp","Komponente"],["kind","Art"],["pv","PaVaSt"],["raster","Erzeugt"],["cons","Abnehmer"],["hint","Hinweise"]];
+  const th=cols.map(([c,t])=>`<th aria-sort="${k===c?(dir>0?"ascending":"descending"):"none"}"><button class="sortb" type="button" data-sort="${c}">${t}${k===c?(dir>0?" ↑":" ↓"):""}</button></th>`).join("");
+  let html=`<table class="xt"><thead><tr><th class="cv"></th>${th}</tr></thead><tbody>`,shown=0;
+  const order=grp?[...new Set(rows.map(e=>e.comp))].sort():[null];
+  for(const g of order){
+    const part=g==null?rows:rows.filter(e=>e.comp===g);
+    if(g!=null){const shut=S.expShut.has(g),w=part.filter(e=>sev(e)>=2).length;
+      html+=`<tr class="xg"><td colspan="8"><button type="button" class="xgb" data-shut="${esc(g)}" aria-expanded="${!shut}"><span class="cv">${shut?"▸":"▾"}</span>${esc(g)}<span class="acc">${part.length} Export${part.length===1?"":"e"}${w?" · "+w+" mit Hinweis":""}</span></button></td></tr>`;
+      if(shut)continue}
+    for(const e of part){
+      if(shown>=S.expLimit)break;shown++;
+      const key=ekey(e),open=S.expOpen.has(key),s=sev(e);
+      const pv=e.kind==="Funktion"?'<span class="no">—</span>':e.pv===null?'<span class="no">n/a</span>':e.pv?'<span class="yes">✓</span>':'<span class="st undecl">fehlt</span>';
+      const rast=[...new Set((e.kind==="Funktion"?e.procs:e.wProcs).map(x=>x.r.txt))].join(", ")||'<span class="no">—</span>';
+      const cons=e.kind==="Funktion"?e.callers.map(c=>c.comp):e.cons.map(c=>c.comp);
+      const hc=e.hints.length?`<span class="hc s${s}">${e.hints.length}</span>`:'<span class="no">—</span>';
+      html+=`<tr class="xr${open?" open":""}" data-k="${esc(key)}" tabindex="0" aria-expanded="${open}"><td class="cv">${open?"▾":"▸"}</td><td class="mono">${esc(e.name)}${e.kind==="Funktion"?"()":""}</td><td>${esc(e.comp)}</td><td>${e.kind}</td><td class="c">${pv}</td><td>${rast}</td><td>${cons.length?`<b>${cons.length}</b> <span class="acc">${esc(cons.slice(0,2).join(", "))}${cons.length>2?" …":""}</span>`:'<span class="no">keiner</span>'}</td><td>${hc}</td></tr>`;
+      if(open)html+=`<tr class="xd"><td></td><td colspan="7">${expDetail(e)}</td></tr>`;
+    }
+  }
+  html+="</tbody></table>"+more(rows.filter(e=>!grp||!S.expShut.has(e.comp)).length-shown,"exMore");
+  box.innerHTML=`<div class="tbl-wrap">${html}</div>`;
+  const mb=$("#exMore");if(mb)mb.onclick=()=>{S.expLimit+=200;drawExp()};
+}
+$("#exList").addEventListener("click",e=>{
+  if(e.target.closest("[data-focus]"))return;
+  const s=e.target.closest("[data-sort]");if(s){const k=s.dataset.sort;S.expSort={k,dir:S.expSort.k===k?-S.expSort.dir:1};drawExp();return}
+  const g=e.target.closest("[data-shut]");if(g){const n=g.dataset.shut;S.expShut.has(n)?S.expShut.delete(n):S.expShut.add(n);drawExp();return}
+  const r=e.target.closest("tr.xr");if(r){const k=r.dataset.k;S.expOpen.has(k)?S.expOpen.delete(k):S.expOpen.add(k);drawExp();const n=document.querySelector(`tr.xr[data-k="${CSS.escape(k)}"]`);if(n)n.focus()}
+});
+$("#exList").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("tr.xr")){e.preventDefault();e.target.click()}});
+$("#exQ").addEventListener("input",()=>{S.expLimit=200;drawExp()});$("#exComp").addEventListener("change",()=>{S.expLimit=200;drawExp()});$("#exHint").addEventListener("change",drawExp);$("#exGroup").addEventListener("change",drawExp);
+$("#exAll").onclick=()=>{const rows=expRows();const allOpen=rows.every(e=>S.expOpen.has(ekey(e)));if(allOpen)S.expOpen.clear();else rows.slice(0,S.expLimit).forEach(e=>S.expOpen.add(ekey(e)));S.expShut.clear();drawExp()};
 function expTable(){
   const H=["Komponente","Art","Name","Langname","PaVaSt","Typ C","Typ PaVaSt","Einheit","Min","Max","Definiert","Initialwert","Abnehmer","Erzeugt in (Raster)","Schreibstellen","Gelesen in (Raster)","Hinweise"];
   const rows=expRows().map(e=>e.kind==="Funktion"?[e.comp,"Funktion",e.name+"()","",  "", e.sig,"","","","",e.file+":"+e.line,"",e.callers.map(c=>c.comp+"."+c.fn+"()").join(", "),e.procs.map(x=>x.proc+" ("+x.r.txt+")").join(", "),"W: "+e.W.join(", "),"R: "+e.R.join(", "),e.hints.map(h=>h.t).join(" | ")]
@@ -1210,7 +1430,7 @@ async function copyText(txt,what){try{await navigator.clipboard.writeText(txt);t
 $("#bCsv").onclick=()=>{const {H,rows}=expTable();const q=v=>/[;"\n]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v;copyText([H,...rows].map(r=>r.map(q).join(";")).join("\n"),"CSV")};
 $("#bMd").onclick=()=>{const {H,rows}=expTable();const c=v=>String(v).replace(/\|/g,"\\|");copyText(["| "+H.join(" | ")+" |","|"+H.map(()=>"---").join("|")+"|",...rows.map(r=>"| "+r.map(c).join(" | ")+" |")].join("\n"),"Markdown")};
 
-/* ---- Aufrufketten ---- */
+/* ---- Aufrufketten: nach Subsystem, Komponenten klappen auf ---- */
 function srcOf(m){const p=S.model.prov.get(m);return p&&p.length?p.join(", "):"Umgebung"}
 function treeHtml(n){
   const acc=[...n.R.map(x=>"r:"+x),...n.W.map(x=>"w:"+x)];
@@ -1220,16 +1440,27 @@ function treeHtml(n){
   return `<li>${label}${kids?`<ul>${kids}</ul>`:""}</li>`;
 }
 function renderDyn(){
-  const comps=[...S.model.comps.values()].sort((a,b)=>a.name.localeCompare(b.name));
-  if(!comps.length){$("#dyn").innerHTML='<div class="sheet sub">Noch keine Dateien eingelegt.</div>';return}
-  $("#dyn").innerHTML=comps.map(c=>{
-    if(!c.hasC)return `<div class="sheet" id="dyn-${esc(c.name)}"><h3>${esc(c.name)}</h3><p class="sub">Nur PaVaSt geladen, kein C-Code. Aufrufketten brauchen die .c-Dateien.</p></div>`;
-    const procs=c.procs.map(p=>`<div class="proc"><div class="row"><h3 class="mono" style="font-size:14px">${esc(p.name)}()</h3><span class="sub">${esc(p.file)}:${p.line}</span></div>
-      <div class="cols2" style="margin-top:6px"><div><div class="sub">schreibt (über ganze Kette)</div><div class="chips">${p.W.map(m=>`<span class="chip w">${esc(m)}</span>`).join("")||'<span class="sub">nichts</span>'}</div></div>
-      <div><div class="sub">liest</div><div class="chips">${p.R.map(m=>`<span class="chip" title="Producer: ${esc(srcOf(m))}">${esc(m)} <span class="acc">← ${esc(srcOf(m))}</span></span>`).join("")||'<span class="sub">nichts</span>'}</div></div></div>
-      <details style="margin-top:8px" open><summary class="sub" style="cursor:pointer">Aufrufbaum</summary><ul class="tree">${treeHtml(p.tree)}</ul>
-      ${p.tree.extCalls&&p.tree.extCalls.length?`<p class="sub">Externe Aufrufe direkt: ${p.tree.extCalls.map(esc).join(", ")}</p>`:""}</details></div>`).join("");
-    return `<div class="sheet" id="dyn-${esc(c.name)}"><div class="row"><h3>${esc(c.name)}</h3><span class="sub">${c.funcs.length} Funktionen · ${c.procs.length} Prozesse</span></div><div style="margin-top:8px">${procs||'<p class="sub">Keine Prozesse erkannt.</p>'}</div></div>`;
+  const F=focusSets(),M=S.model;
+  const reachFn=F&&F.fn?new Set((M.reach.get(F.fn)||[]).map(x=>x.proc)):null;
+  const procOk=p=>!F||(F.msg?(p.R.includes(F.msg)||p.W.includes(F.msg)):F.fn?reachFn.has(p.name):true);
+  let comps=[...M.comps.values()].filter(c=>!F||(F.msg||F.fn?c.procs.some(procOk):F.core.has(c.name)));
+  comps.sort((a,b)=>a.name.localeCompare(b.name));
+  if(!comps.length){$("#dyn").innerHTML=`<div class="sheet sub">${M.comps.size?"Im Fokus gibt es keine Prozesse.":"Noch keine Dateien eingelegt."}</div>`;return}
+  const many=comps.length>4&&!F;
+  const byG=new Map();for(const c of comps){const g=S.grpOf.get(c.name)??null;if(!byG.has(g))byG.set(g,[]);byG.get(g).push(c)}
+  const gs=[...byG.keys()].sort((a,b)=>a==null?1:b==null?-1:a.localeCompare(b));
+  $("#dyn").innerHTML=gs.map(g=>{
+    const head=gs.length>1||g!=null?`<div class="dgrp"><span class="t-idx">Subsystem</span><h3>${g==null?"ohne Subsystem":esc(g)}</h3><span class="acc">${byG.get(g).length} Komponente${byG.get(g).length===1?"":"n"}</span></div>`:"";
+    return head+byG.get(g).map(c=>{
+      if(!c.hasC)return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"><summary><h3>${esc(c.name)}</h3><span class="sub">nur PaVaSt</span></summary><p class="sub">Kein C-Code geladen. Aufrufketten brauchen die .c-Dateien.</p></details>`;
+      const ps=c.procs.filter(procOk),treesOpen=ps.length<=3;
+      const procs=ps.map(p=>`<div class="proc"><div class="row"><h3 class="mono" style="font-size:14px">${esc(p.name)}()</h3><span class="sub">${esc(rasterOf(p.name).txt)} · ${esc(p.file)}:${p.line}</span></div>
+        <div class="cols2" style="margin-top:6px"><div><div class="sub">schreibt (über ganze Kette)</div><div class="chips">${p.W.map(m=>`<span class="chip w${F&&F.msg===m?" hl":""}">${esc(m)}</span>`).join("")||'<span class="sub">nichts</span>'}</div></div>
+        <div><div class="sub">liest</div><div class="chips">${p.R.map(m=>`<span class="chip${F&&F.msg===m?" hl":""}" title="Producer: ${esc(srcOf(m))}">${esc(m)} <span class="acc">← ${esc(srcOf(m))}</span></span>`).join("")||'<span class="sub">nichts</span>'}</div></div></div>
+        <details style="margin-top:8px"${treesOpen?" open":""}><summary class="sub">Aufrufbaum</summary><ul class="tree">${treeHtml(p.tree)}</ul>
+        ${p.tree.extCalls&&p.tree.extCalls.length?`<p class="sub">Externe Aufrufe direkt: ${p.tree.extCalls.map(esc).join(", ")}</p>`:""}</details></div>`).join("");
+      return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"${many?"":" open"}><summary><h3>${esc(c.name)}</h3><span class="sub">${c.funcs.length} Funktionen · ${ps.length}${ps.length!==c.procs.length?" von "+c.procs.length:""} Prozesse</span></summary><div style="margin-top:8px">${procs||'<p class="sub">Keine Prozesse erkannt.</p>'}</div></details>`;
+    }).join("");
   }).join("");
 }
 
