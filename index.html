@@ -128,6 +128,13 @@ h3{margin:0;font-size:15px;letter-spacing:-.01em;font-weight:700;font-variation-
 .drop.over{background:var(--amber-soft);border-color:var(--amber)}
 .drop strong{display:block;font-size:16px;font-weight:700;font-variation-settings:'wdth' 108;letter-spacing:-.01em}
 .drop small{display:block;color:var(--text-3);font-size:13px;margin-top:2px}
+.drop{cursor:pointer;flex-direction:column;justify-content:center;text-align:center;gap:14px;padding:34px 20px;border-width:2px;min-height:170px}
+.drop:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.drop .drop-ic{width:40px;height:40px;color:var(--amber);transition:transform var(--t-s)}
+.drop.over .drop-ic{transform:translateY(-4px) scale(1.08)}
+.drop .btns{justify-content:center;cursor:default}
+.dropveil{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--amber-soft);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);pointer-events:none;border:3px dashed var(--amber);margin:10px;border-radius:20px;font-size:22px;font-weight:700;color:var(--text)}
+.dropveil[hidden]{display:none}
 
 /* Dock: Meniskus-Leiste wie im Auftritt — die Leiste schmilzt um die ziehbare Kugel */
 .dock{position:fixed;z-index:45;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
@@ -395,8 +402,9 @@ footer.foot a:hover{color:var(--text)}
   </section>
 
   <section class="card" aria-label="Dateien einlegen">
-    <div class="drop" id="drop">
-      <div><strong>Dateien einlegen</strong><small><code>.c</code> <code>.h</code> und PaVaSt (<code>.xml</code>, <code>.pavast</code>) hierher ziehen</small></div>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Dateien oder Ordner hierher ziehen oder klicken, um sie auszuwählen">
+      <svg class="drop-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+      <div><strong>Dateien oder Ordner hier ablegen</strong><small><code>.c</code> <code>.h</code> und PaVaSt (<code>.xml</code>, <code>.pavast</code>) · ganze Ordner inkl. Unterordner · oder klicken zum Auswählen</small></div>
       <div class="btns">
         <label class="pill primary" for="fin">Dateien wählen</label>
         <label class="pill" for="din">Ordner</label>
@@ -415,7 +423,7 @@ footer.foot a:hover{color:var(--text)}
         <button class="pill" id="fqClear" type="button" hidden>Lösen</button></div>
         <datalist id="fqList"></datalist></div>
       <div class="fb-g"><label class="t-idx" for="grpBy">Cluster</label>
-        <select id="grpBy" class="filter"><option value="ordner">nach Ordner</option><option value="praefix">nach Namenspräfix</option><option value="kopplung">nach Kopplung (automatisch)</option><option value="keine">keine</option></select></div>
+        <select id="grpBy" class="filter"><option value="praefix" title="Alle FCs mit gleichem Namensteil vor dem ersten Unterstrich bilden einen Cluster">nach Präfix (vor „_“)</option><option value="ordner">nach Ordner</option><option value="kopplung">nach Kopplung (automatisch)</option><option value="keine">keine</option></select></div>
     </div>
     <p class="sub" id="fqInfo"></p>
   </section>
@@ -458,7 +466,7 @@ footer.foot a:hover{color:var(--text)}
             <button class="pill icon-btn" id="bFull" type="button" aria-label="Graph im Vollbild" aria-pressed="false" title="Vollbild (Esc beendet)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="fo" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="fc" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
           </div>
         </div>
-        <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Antippen hebt die Nachbarschaft hervor und zeigt Details. Doppeltippen klappt ein Subsystem auf oder zu.</p>
+        <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Antippen hebt die Nachbarschaft hervor und zeigt Details. Doppeltippen klappt einen Cluster auf oder zu.</p>
         <div class="cywrap">
           <div id="cy" aria-label="Komponentengraph"></div>
           <aside class="dpanel" id="dpanel" hidden aria-label="Details"><button class="pill icon-btn dclose" id="dclose" type="button" aria-label="Details schließen">✕</button><div id="detail"><p class="empty"></p></div></aside>
@@ -520,11 +528,11 @@ footer.foot a:hover{color:var(--text)}
   <section class="panel" id="p-files" role="tabpanel" aria-labelledby="t-files" hidden>
     <div class="sheet">
       <span class="t-idx">Eingelegt</span><h2>Dateien</h2>
-      <p class="lede">C-Dateien landen bei der Komponente mit gleichem Namen. <code>SCRDos_Calc.c</code> gehört zu <code>SCRDos</code>, wenn es dafür eine PaVaSt gibt.</p>
+      <p class="lede">C-Dateien landen bei der Komponente mit gleichem Namen. <code>SCR_Dos_Calc.c</code> gehört zu <code>SCR_Dos</code>, wenn es dafür eine PaVaSt gibt.</p>
       <ul class="flist" id="flist"></ul>
     </div>
     <template id="h-files"><p>PaVaSt: <code>SW-FEATURE</code> mit <code>SHORT-NAME</code>, alle <code>*-REF</code> unterhalb von <code>…IMPORT…</code> bzw. <code>…EXPORT…</code>. C: globale Definitionen (Export), <code>extern</code> (Import), direkte Zugriffe auf bekannte Messages, <code>Msg_Get/Msg_Set</code>-artige Makros und AUTOSAR <code>Rte_Read_/Rte_Write_</code>. Schreibzugriff heißt Zuweisung, <code>++/--</code> oder Übergabe per <code>&amp;</code>.</p>
-      <p>Grenzen: Der Präprozessor wird nicht ausgewertet (Makros, <code>#if</code>-Varianten). Funktionszeiger und lokale Variablen mit dem Namen einer Message werden nicht aufgelöst.</p>
+      <p>Grenzen: Makros werden nicht expandiert, <code>#if</code>-Zweige nur über Systemkonstanten ausgewertet (siehe unten). Funktionszeiger und lokale Variablen mit dem Namen einer Message werden nicht aufgelöst.</p>
       <p>Systemkonstanten: Bedingungen aus <code>#if</code>, <code>#elif</code>, <code>#ifdef</code>, aus Abfragen wie <code>if (SY_X == SY_ON)</code> und aus <code>SW-SYSCOND</code> in der PaVaSt. Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code> oder aus deiner Eingabe. Unbekannte Werte gelten als „vielleicht“, der Code bleibt dann drin.</p>
       <p>Exportliste: Aus PaVaSt kommen Langname, Typ, Umrechnung, Einheit und Grenzen aus <code>SW-VARIABLE</code>. Das Raster wird aus dem Prozessnamen gelesen (<code>…10ms</code>, <code>_Ini</code>). Eine Schreibstelle gilt als bedingt, wenn sie in einem <code>if</code>-, <code>else</code>- oder <code>switch</code>-Zweig oder hinter <code>?:</code> liegt.</p></template>
   </section>
@@ -5329,7 +5337,7 @@ ${refs(im)}
 </MSRSW>`;
 }
 const SAMPLE=[
- {name:"Sensorik/ExhTSens.c",text:`/* Beispiel: Abgastemperatur */
+ {name:"Sensorik/Exh_TSens.c",text:`/* Beispiel: Abgastemperatur */
 #include "ExhTSens.h"
 
 uint16 ExhTSens_tUs;          /* vor Kat [0.1 K] */
@@ -5366,7 +5374,7 @@ void ExhTSens_Ini(void)
     ExhTSens_tDs = 2930u;
 }
 `},
- {name:"SCR/SCRDos.c",text:`/* Beispiel: Harnstoffdosierung */
+ {name:"SCR/SCR_Dos.c",text:`/* Beispiel: Harnstoffdosierung */
 #include "SCRDos.h"
 
 uint16 SCRDos_mfDosDes;       /* Soll-Dosiermenge [mg/s] */
@@ -5404,7 +5412,7 @@ void SCRDos_Proc100ms(void)
     }
 }
 `},
- {name:"SCR/DosVlv.c",text:`/* Beispiel: Dosierventil */
+ {name:"SCR/SCR_DosVlv.c",text:`/* Beispiel: Dosierventil */
 #include "DosVlv.h"
 
 uint8 DosVlv_stVlv;           /* 0 = ok, 1 = Fehler */
@@ -5429,12 +5437,12 @@ void DosVlv_Proc10ms(void)
     DosVlv_Drive(SCRDos_mfDosDes * 4u);
 }
 `},
- {name:"Sensorik/ExhTSens_pavast.xml",text:pvXml("ExhTSens",["ExhTSens_tUs","ExhTSens_tDs|SY_SCRVAR > 0"],["Epm_nEng"],[
+ {name:"Sensorik/Exh_TSens_pavast.xml",text:pvXml("Exh_TSens",["ExhTSens_tUs","ExhTSens_tDs|SY_SCRVAR > 0"],["Epm_nEng"],[
    {n:"ExhTSens_tUs",lang:"Abgastemperatur vor SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"},
    {n:"ExhTSens_tDs",lang:"Abgastemperatur nach SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"}])},
- {name:"SCR/SCRDos_pavast.xml",text:pvXml("SCRDos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs|(SY_SCRVAR == 2) && (NOXSENS_SC == 1)","DosVlv_stVlv"],[
+ {name:"SCR/SCR_Dos_pavast.xml",text:pvXml("SCR_Dos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs|(SY_SCRVAR == 2) && (NOXSENS_SC == 1)","DosVlv_stVlv"],[
    {n:"SCRDos_mfDosDes",lang:"Soll-Dosiermenge Harnstoff",typ:"uint16",cm:"Ident",unit:"mg/s",min:"0",max:"4000"}])},
- {name:"SCR/DosVlv_pavast.xml",text:pvXml("DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs|SY_DOSVLVDIAG == SY_ON"],[
+ {name:"SCR/SCR_DosVlv_pavast.xml",text:pvXml("SCR_DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs|SY_DOSVLVDIAG == SY_ON"],[
    {n:"DosVlv_stVlv",lang:"Status Dosierventil (0 = ok, 1 = Fehler)",typ:"uint8",cm:"Ident",unit:"-",min:"0",max:"1"}])},
  {name:"Konfig/sy_conf.h",text:`/* Beispiel: Systemkonstanten dieser Variante */
 #define SY_OFF         0
@@ -5450,23 +5458,61 @@ void DosVlv_Proc10ms(void)
 /* ---- Dateien ---- */
 function loadSample(){S.files=SAMPLE.map(f=>({name:f.name,text:f.text,kind:classify(f.name,f.text),sample:true}));run()}
 async function addFiles(list){
+  if(!list.length){toast("Keine C-/PaVaSt-Dateien gefunden");return}
   if(S.files.some(f=>f.sample))S.files=[];
   let skipped=0;
-  for(const file of list){
+  for(const it of list){
+    const file=it.file||it;
     if(file.size>8e6){skipped++;continue}
-    const text=await file.text();const kind=classify(file.name,text);
+    const text=await file.text();
+    const name=it.path||file.webkitRelativePath||file.name;
+    const kind=classify(name,text);
     if(!kind){skipped++;continue}
-    const name=file.webkitRelativePath||file.name;
     S.files=S.files.filter(f=>f.name!==name);S.files.push({name,text,kind,sample:false});
   }
   run();toast(`${list.length-skipped} Dateien eingelegt`+(skipped?`, ${skipped} übersprungen (kein C/PaVaSt)`:""));
 }
 $("#fin").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
 $("#din").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
+
+/* Drag & Drop: Dateien und ganze Ordner (rekursiv), überall auf der Seite */
+const SRC_RE=/\.(c|h|xml|pavast|pvs|txt)$/i, SKIP_DIR=/^(\.git|\.svn|node_modules)$/;
+const readEntries=rd=>new Promise((res,rej)=>rd.readEntries(res,rej));
+async function walkEntry(en,base,out){
+  if(en.isFile){
+    if(base&&!SRC_RE.test(en.name))return;
+    const f=await new Promise((res,rej)=>en.file(res,rej));
+    out.push({file:f,path:base+en.name});
+  }else if(en.isDirectory){
+    if(SKIP_DIR.test(en.name))return;
+    const rd=en.createReader();let batch;
+    do{batch=await readEntries(rd);for(const c of batch)await walkEntry(c,base+en.name+"/",out)}while(batch.length);
+  }
+}
+async function collectDropped(dt){
+  /* Einträge müssen synchron geholt werden, bevor das erste await läuft */
+  const files=[...(dt.files||[])];
+  const entries=[...(dt.items||[])].filter(i=>i.kind==="file").map(i=>i.webkitGetAsEntry?i.webkitGetAsEntry():null);
+  if(!entries.length||!entries.every(Boolean))return files;
+  const out=[];
+  try{for(const en of entries)await walkEntry(en,"",out)}catch(err){return files}
+  return out;
+}
 const drop=$("#drop");
-["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over")}));
-["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
-drop.addEventListener("drop",e=>{const fs=[...(e.dataTransfer.files||[])];if(fs.length)addFiles(fs)});
+const veil=document.createElement("div");veil.className="dropveil";veil.hidden=true;veil.textContent="Zum Einlegen loslassen";document.body.appendChild(veil);
+const hasFiles=e=>e.dataTransfer&&[...(e.dataTransfer.types||[])].includes("Files");
+let dragDepth=0;
+function endDrag(){dragDepth=0;veil.hidden=true;drop.classList.remove("over")}
+window.addEventListener("dragenter",e=>{if(!hasFiles(e))return;e.preventDefault();dragDepth++;veil.hidden=false});
+window.addEventListener("dragover",e=>{if(!hasFiles(e))return;e.preventDefault();e.dataTransfer.dropEffect="copy";drop.classList.toggle("over",!!e.target.closest&&!!e.target.closest("#drop"))});
+window.addEventListener("dragleave",e=>{if(!hasFiles(e))return;if(--dragDepth<=0)endDrag()});
+window.addEventListener("drop",async e=>{
+  if(!hasFiles(e))return;
+  e.preventDefault();endDrag();
+  addFiles(await collectDropped(e.dataTransfer));
+});
+drop.addEventListener("click",e=>{if(e.target.closest(".btns"))return;$("#fin").click()});
+drop.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target===drop){e.preventDefault();$("#fin").click()}});
 $("#bSample").onclick=loadSample;
 $("#bClear").onclick=()=>{S.files=[];run()};
 
@@ -5591,7 +5637,7 @@ function showPanel(t){
 function run(){
   S.model=analyze(S.files,S.cfg);S.sel=null;
   S.modelAll=S.cfg.mode==="cfg"?analyze(S.files,Object.assign({},S.cfg,{mode:"all"})):S.model;
-  if(!S.grpTouched){let g=null;try{g=localStorage.getItem("sp-grp")}catch(e){}$("#grpBy").value=g||(S.files.some(f=>/[\\/]/.test(f.name))?"ordner":"kopplung")}
+  if(!S.grpTouched){let g=null;try{g=localStorage.getItem("sp-grp2")}catch(e){}$("#grpBy").value=g||"praefix"}
   computeGroups();initCollapse();S.expOpen.clear();S.expShut.clear();S.expLimit=200;S.ifLimit=300;
   if(S.focus&&!focusOptions().some(o=>o.type===S.focus.type&&o.name===S.focus.name))S.focus=null;
   renderStats();renderCfg();renderFocus();renderGraph();renderIf();renderExp();renderDyn();renderFiles();
@@ -5633,7 +5679,7 @@ addEventListener("resize",closeHelp);addEventListener("scroll",()=>{if(hpBtn&&Da
   });
   const lead=document.querySelector(".hero .lead");
   if(lead){document.querySelector(".hero h1").appendChild(mkHelp("<p>"+lead.innerHTML+"</p><p>Die Leiste unten wechselt die Ansicht: antippen oder die Kugel ziehen.</p>","Schaltplan"));lead.remove()}
-  $(".fb-in").appendChild(mkHelp("<p>Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner: eine Komponente, ein Subsystem, eine Message oder eine Funktion.</p><p>Namen in Tabellen und Details lassen sich anklicken und setzen den Fokus direkt. Gelöst wird er mit dem Chip in der Kopfleiste.</p><p><b>Cluster</b> bündeln Komponenten: nach Ordner (die Ebene, die tatsächlich trennt), nach Namenspräfix oder automatisch nach Kopplung. Bei Kopplung landen Komponenten, die viele Messages und Aufrufe austauschen, im selben Cluster.</p><p>Eigene Cluster legst du im Graph an: „Auswählen“ einschalten, Komponenten antippen und zusammenfassen. Sie gelten in jeder Gruppierung und bleiben in diesem Browser gespeichert.</p>","Fokus und Subsysteme"));
+  $(".fb-in").appendChild(mkHelp("<p>Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner: eine Komponente, einen Cluster, eine Message oder eine Funktion.</p><p>Namen in Tabellen und Details lassen sich anklicken und setzen den Fokus direkt. Gelöst wird er mit dem Chip in der Kopfleiste.</p><p><b>Cluster</b> bündeln Komponenten. Standard ist <b>nach Präfix</b>: alle FCs mit gleichem Namensteil vor dem ersten Unterstrich bilden einen Cluster, <code>SCR_Dos</code> und <code>SCR_DosVlv</code> also <code>SCR</code>. Eine FC ohne Partner gleichen Präfixes bleibt einzeln. Alternativ nach Ordner (die Ebene, die tatsächlich trennt) oder automatisch nach Kopplung. Bei Kopplung landen Komponenten, die viele Messages und Aufrufe austauschen, im selben Cluster.</p><p>Eigene Cluster legst du im Graph an: „Auswählen“ einschalten, Komponenten antippen und zusammenfassen. Sie gelten in jeder Gruppierung und bleiben in diesem Browser gespeichert.</p>","Fokus und Cluster"));
   $(".cfg-btns").appendChild(mkHelp("<p><b>Alle Varianten</b> zeigt den Code aller Zweige zusammen. Bedingungen stehen trotzdem dabei: in der Spalte „Bedingung“, als „Variante“ und ◇ in der Exportliste und als „nur wenn …“.</p><p><b>Konkrete Konfiguration</b> wertet die Systemkonstanten aus. Abgeschaltete Zweige, Importe, Exporte und Aufrufe fehlen dann in allen Reitern. Ein geänderter Wert schaltet automatisch in diesen Modus.</p><p>Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code>, aus einer geladenen Wertedatei oder aus deiner Eingabe. Ohne Wert gilt eine Bedingung als „vielleicht“, der Code bleibt drin.</p><p><b>SyC-Muster</b> legt fest, woran Systemkonstanten erkannt werden, zum Beispiel <code>SY_*, *_SY, *_SC</code>. <code>*</code> steht für einen beliebigen Namensteil, Groß- und Kleinschreibung zählt.</p><p><b>Als A merken</b> hält die Werte fest, <b>Mit A vergleichen</b> zeigt, welche Schnittstellen, Exporte und Aufrufe sich unterscheiden.</p>","Konfiguration"));
 })();
 
@@ -5710,7 +5756,8 @@ $("#cfgCmp").onclick=()=>{
 /* ---- Gruppen (Subsysteme) und Fokus ---- */
 S.collapsed=new Set();S.focus=null;S.expSort={k:"comp",dir:1};S.expOpen=new Set();S.expShut=new Set();S.expLimit=200;S.ifLimit=300;S.groups=new Map();S.grpOf=new Map();
 function dirParts(c){const f=c.cFiles[0]||c.pvFiles[0]||"";const p=f.split(/[\\/]/);p.pop();return p}
-function prefixOf(n){let m=n.match(/^([A-Z]{2,})(?=[A-Z][a-z]|_|\d|$)/);if(m)return m[1];m=n.match(/^([A-Za-z][a-z0-9]*)(?=[A-Z_]|$)/);return m?m[1]:n}
+/* Cluster-Präfix: alles vor dem ersten Unterstrich (SCR_Dos, SCR_DosVlv → SCR) */
+function prefixOf(n){const i=n.indexOf("_");return i>0?n.slice(0,i):n}
 /* Eigene Cluster bleiben im Browser gespeichert */
 S.manual=new Map();try{const o=JSON.parse(localStorage.getItem("sp-cluster")||"{}");for(const k in o)S.manual.set(k,o[k])}catch(e){}
 function saveManual(){try{localStorage.setItem("sp-cluster",JSON.stringify(Object.fromEntries(S.manual)))}catch(e){}}
@@ -5767,7 +5814,7 @@ function computeGroups(){
 const realGroups=()=>[...new Set(S.grpOf.values())];
 const multiGroups=()=>realGroups().filter(k=>(S.groups.get(k)||[]).length>1);
 function initCollapse(){S.collapsed=new Set();const mg=multiGroups();if(mg.length>=2&&S.model.comps.size>12)mg.forEach(g=>S.collapsed.add(g))}
-$("#grpBy").addEventListener("change",()=>{S.grpTouched=true;try{localStorage.setItem("sp-grp",$("#grpBy").value)}catch(e){}computeGroups();initCollapse();if(S.focus&&S.focus.type==="grp")S.focus=null;renderFocus();renderGraph();drawExp();renderDyn()});
+$("#grpBy").addEventListener("change",()=>{S.grpTouched=true;try{localStorage.setItem("sp-grp2",$("#grpBy").value)}catch(e){}computeGroups();initCollapse();if(S.focus&&S.focus.type==="grp")S.focus=null;renderFocus();renderGraph();drawExp();renderDyn()});
 
 function focusSets(){
   const f=S.focus;if(!f||!S.model)return null;const M=S.model,core=new Set();let msg=null,fn=null;
@@ -5799,17 +5846,17 @@ function renderFocus(){
   const nb=[...F.view].filter(n=>!F.core.has(n)).length;
   $("#fqInfo").textContent=`Fokus auf ${KIND[S.focus.type]} ${S.focus.name}: ${F.core.size} Komponente${F.core.size===1?"":"n"} im Kern`+(nb?`, ${nb} direkte${nb===1?"r":""} Partner`:"")+".";
 }
-function setFocus(f){S.focus=f;S.expOpen.clear();S.expLimit=200;S.ifLimit=300;renderFocus();renderGraph();drawIf();drawExp();renderDyn();if(f)toast("Fokus: "+f.name)}
+function setFocus(f){S.focus=f;if(!f)$("#fq").value="";S.expOpen.clear();S.expLimit=200;S.ifLimit=300;renderFocus();renderGraph();drawIf();drawExp();renderDyn();if(f)toast("Fokus: "+f.name)}
 function parseFocus(v){
   v=v.trim();if(!v)return null;
-  const m=v.match(/^(Komponente|Subsystem|Message|Funktion):\s*(.+)$/);
+  const m=v.match(/^(Komponente|Cluster|Subsystem|Message|Funktion):\s*(.+)$/);
   const opts=focusOptions();
-  if(m){const type=Object.keys(KIND).find(k=>KIND[k]===m[1]);const name=m[2].replace(/\(\)$/,"");return opts.find(o=>o.type===type&&o.name===name)||null}
+  if(m){const type=m[1]==="Subsystem"?"grp":Object.keys(KIND).find(k=>KIND[k]===m[1]);const name=m[2].replace(/\(\)$/,"");return opts.find(o=>o.type===type&&o.name===name)||null}
   const name=v.replace(/\(\)$/,"");
   for(const t of ["comp","grp","msg","fn"]){const o=opts.find(x=>x.type===t&&x.name===name);if(o)return o}
   const lo=name.toLowerCase();return opts.find(x=>x.name.toLowerCase()===lo)||null;
 }
-$("#fq").addEventListener("change",e=>{const f=parseFocus(e.target.value);if(f)setFocus(f);else if(e.target.value.trim())toast("Nichts mit diesem Namen gefunden")});
+$("#fq").addEventListener("change",e=>{if(e.target.value===(S.focus?optLabel(S.focus):""))return;const f=parseFocus(e.target.value);if(f)setFocus(f);else if(e.target.value.trim())toast("Nichts mit diesem Namen gefunden")});
 $("#fq").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();const f=parseFocus(e.target.value);if(f)setFocus(f);else toast("Nichts mit diesem Namen gefunden")}});
 $("#fqClear").onclick=()=>setFocus(null);$("#fchip").onclick=()=>setFocus(null);
 document.addEventListener("click",e=>{
@@ -5920,7 +5967,7 @@ function showEdge(it){
     return;
   }
   const items=[...it.items].sort((x,y)=>x.m.localeCompare(y.m)),agg=it.a.startsWith("G:")||it.b.startsWith("G:");
-  $("#detail").innerHTML=`<h3>${esc(lab(it.a))} → ${esc(lab(it.b))}</h3><p class="sub">${items.length} Message${items.length>1?"s":""}${agg?" über die Subsystemgrenze":""}</p><ul class="msgl">`+
+  $("#detail").innerHTML=`<h3>${esc(lab(it.a))} → ${esc(lab(it.b))}</h3><p class="sub">${items.length} Message${items.length>1?"s":""}${agg?" über die Clustergrenze":""}</p><ul class="msgl">`+
    items.map(f=>{const w=procsOf(S.model.procW,f.m,f.from),r=procsOf(S.model.procR,f.m,f.to);
     return `<li><div>${fbtn("msg",f.m)} ${pill(f.st)}${f.multi?' <span class="st multi">mehrere Producer</span>':""}</div>
      <div class="sub">${agg?esc(lab(f.from))+" → "+esc(f.to)+"<br>":""}${f.icond||f.econd?`<span class="syc">${f.econd?"Export nur wenn "+esc(f.econd):""}${f.econd&&f.icond?" · ":""}${f.icond?"Import nur wenn "+esc(f.icond):""}</span><br>`:""}${w.length?"geschrieben in "+w.map(esc).join(", "):f.from===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`}).join("")+"</ul>";
@@ -6117,7 +6164,7 @@ function renderDyn(){
   const byG=new Map();for(const c of comps){const g=S.grpOf.get(c.name)??null;if(!byG.has(g))byG.set(g,[]);byG.get(g).push(c)}
   const gs=[...byG.keys()].sort((a,b)=>a==null?1:b==null?-1:a.localeCompare(b));
   $("#dyn").innerHTML=gs.map(g=>{
-    const head=gs.length>1||g!=null?`<div class="dgrp"><span class="t-idx">Subsystem</span><h3>${g==null?"ohne Subsystem":esc(g)}</h3><span class="acc">${byG.get(g).length} Komponente${byG.get(g).length===1?"":"n"}</span></div>`:"";
+    const head=gs.length>1||g!=null?`<div class="dgrp"><span class="t-idx">Cluster</span><h3>${g==null?"ohne Cluster":esc(g)}</h3><span class="acc">${byG.get(g).length} Komponente${byG.get(g).length===1?"":"n"}</span></div>`:"";
     return head+byG.get(g).map(c=>{
       if(!c.hasC)return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"><summary><h3>${esc(c.name)}</h3><span class="sub">nur PaVaSt</span></summary><p class="sub">Kein C-Code geladen. Aufrufketten brauchen die .c-Dateien.</p></details>`;
       const ps=c.procs.filter(procOk),treesOpen=ps.length<=3;
