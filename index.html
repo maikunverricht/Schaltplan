@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <!-- Keine Verbindung nach außen: der Browser blockiert jede externe Anfrage -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src data:; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta name="description" content="Schaltplan: Import- und Export-Schnittstellen aus C-Code und PaVaSt, Aufrufketten und Komponentengraph – läuft lokal im Browser."><meta name="theme-color" content="#06090E"><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='8'%20fill='%2306090E'/%3E%3Cg%20transform='translate%2816%2016%29%20scale%280.19%29%20translate%28-60%20-56%29'%3E%3Cpath%20d='M26%2C16%20V62%20A34%2C34%200%200%200%2094%2C62%20V16'%20fill='none'%20stroke='%23EDF0F3'%20stroke-width='22'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Ccircle%20cx='60'%20cy='64'%20r='18.5'%20fill='%23F2B33D'/%3E%3C/g%3E%3C/svg%3E"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src data:; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta name="description" content="Schaltplan: Import- und Export-Schnittstellen aus C-Code und PaVaSt, Aufrufketten und FC-Graph – läuft lokal im Browser."><meta name="theme-color" content="#06090E"><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='8'%20fill='%2306090E'/%3E%3Cg%20transform='translate%2816%2016%29%20scale%280.19%29%20translate%28-60%20-56%29'%3E%3Cpath%20d='M26%2C16%20V62%20A34%2C34%200%200%200%2094%2C62%20V16'%20fill='none'%20stroke='%23EDF0F3'%20stroke-width='22'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Ccircle%20cx='60'%20cy='64'%20r='18.5'%20fill='%23F2B33D'/%3E%3C/g%3E%3C/svg%3E"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Schaltplan</title>
 <!-- Schriften eingebettet: keine Anfrage an Google Fonts -->
 <style>
@@ -359,6 +359,10 @@ summary{cursor:pointer}
   background:var(--surface);border:1px solid var(--glass-edge);color:var(--text);padding:9px 16px;border-radius:100px;font-size:13px;box-shadow:var(--shadow);
   -webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px)}
 .cyfail{padding:20px;color:var(--text-3)}
+#wk{height:min(70vh,640px);min-height:380px;border:1px solid var(--line);border-radius:13px;background-color:var(--film);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px;margin-top:10px}
+.wkleg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:12px;color:var(--text-3)}
+.wkleg i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1.5px solid var(--line-strong)}
 
 footer.foot{position:relative;z-index:1;max-width:var(--max);margin:0 auto;padding:20px var(--pad) calc(150px + env(safe-area-inset-bottom,0px));
   display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:space-between;border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--text-3)}
@@ -419,7 +423,7 @@ footer.foot a:hover{color:var(--text)}
   <section class="card focusbar" aria-label="Fokus und Gruppierung">
     <div class="fb-row">
       <div class="fb-f"><label class="t-idx" for="fq">Fokus</label>
-        <div class="fb-in"><input id="fq" class="filter fq" list="fqList" placeholder="Komponente, Cluster, Message oder Funktion" autocomplete="off" spellcheck="false">
+        <div class="fb-in"><input id="fq" class="filter fq" list="fqList" placeholder="FC, Cluster, Message oder Funktionalität" autocomplete="off" spellcheck="false">
         <button class="pill" id="fqClear" type="button" hidden>Lösen</button></div>
         <datalist id="fqList"></datalist></div>
       <div class="fb-g"><label class="t-idx" for="grpBy">Cluster</label>
@@ -433,6 +437,7 @@ footer.foot a:hover{color:var(--text)}
       <div class="fb-g"><label class="t-idx" for="cfgMode">Konfiguration</label>
         <select id="cfgMode" class="filter"><option value="all">Alle Varianten</option><option value="cfg">Konkrete Konfiguration</option></select></div>
       <div class="fb-g fb-pre"><label class="t-idx" for="sycPre">SyC-Muster</label><input id="sycPre" class="filter" value="SY_*, Sy_*, *_SY, *_SC" spellcheck="false" autocomplete="off" title="Namensmuster der Systemkonstanten, mit Komma getrennt. * steht für einen beliebigen Namensteil."></div>
+      <div class="fb-g fb-pre"><label class="t-idx" for="calPre">Applikations-Muster</label><input id="calPre" class="filter" value="*_C, *_CUR, *_MAP, *_CA, *_AX, *_GAX" spellcheck="false" autocomplete="off" title="Namensmuster der Applikationsparameter (Kennwert, Kennlinie, Kennfeld …). Zusätzlich zählt alles, was eine PaVaSt als SW-CALPRM führt."></div>
       <div class="btns cfg-btns">
         <label class="pill" for="cfgFile">Werte laden</label><input type="file" id="cfgFile" hidden accept=".h,.txt,.csv,.syc,.cfg,.ini,.xml">
         <button class="pill" id="cfgReset" type="button">Vorgaben</button>
@@ -455,11 +460,11 @@ footer.foot a:hover{color:var(--text)}
     <div class="archgrid">
       <div class="sheet gsheet" id="gsheet">
         <div class="row">
-          <div><span class="t-idx">Statisch + Aufrufketten</span><h2>Komponentengraph</h2></div>
+          <div><span class="t-idx">Statisch + Aufrufketten</span><h2>FC-Graph</h2></div>
           <div class="btns">
-            <label class="toggle"><input type="checkbox" id="calls" checked> Funktionsaufrufe</label>
+            <label class="toggle"><input type="checkbox" id="calls" checked> Aufrufe</label>
             <select id="hood" class="filter mini" aria-label="Nachbarschaft beim Antippen"><option value="1">1 Stufe</option><option value="2">2 Stufen</option></select>
-            <button class="pill" id="bPick" type="button" aria-pressed="false" title="Komponenten antippen, um sie auszuwählen. Am Rechner auch mit Umschalt + Ziehen.">Auswählen</button>
+            <button class="pill" id="bPick" type="button" aria-pressed="false" title="FCs antippen, um sie auszuwählen. Am Rechner auch mit Umschalt + Ziehen.">Auswählen</button>
             <button class="pill" id="bCollapse" type="button" hidden>Cluster zuklappen</button>
             <button class="pill" id="bFit" type="button">Einpassen</button>
             <button class="pill" id="bMer" type="button">Mermaid kopieren</button>
@@ -468,29 +473,54 @@ footer.foot a:hover{color:var(--text)}
         </div>
         <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Antippen hebt die Nachbarschaft hervor und zeigt Details. Doppeltippen klappt einen Cluster auf oder zu.</p>
         <div class="cywrap">
-          <div id="cy" aria-label="Komponentengraph"></div>
+          <div id="cy" aria-label="FC-Graph"></div>
           <aside class="dpanel" id="dpanel" hidden aria-label="Details"><button class="pill icon-btn dclose" id="dclose" type="button" aria-label="Details schließen">✕</button><div id="detail"><p class="empty"></p></div></aside>
         </div>
         <template id="h-legend"><div class="legend">
           <span><i class="ln"></i>deklariert und genutzt</span>
           <span><i class="ln unused"></i>deklariert, nicht gelesen</span>
           <span><i class="ln undecl"></i>gelesen, nicht deklariert</span>
-          <span><i class="ln call"></i>Funktionsaufruf</span>
+          <span><i class="ln call"></i>Aufruf einer Funktionalität</span>
           <span>gestrichelter Knoten: Umgebung</span>
           <span>gestrichelter Rahmen: Cluster · Doppelrand: zugeklappt</span>
           <span>Cluster zuklappen: Doppeltippen auf den Rahmen, „Zuklappen“ im Detail oder „Cluster zuklappen“ für alle</span>
-          <span>Eigenen Cluster bilden: „Auswählen“, Komponenten antippen (am Rechner auch Umschalt + Ziehen), dann „Als Cluster zusammenfassen“</span>
+          <span>Eigenen Cluster bilden: „Auswählen“, FCs antippen (am Rechner auch Umschalt + Ziehen), dann „Als Cluster zusammenfassen“</span>
         </div></template>
       </div>
     </div>
   </section>
 
   <section class="panel" id="p-if" role="tabpanel" aria-labelledby="t-if" hidden>
+    <div class="sheet" id="sysif">
+      <div class="row">
+        <div><span class="t-idx">Aus dem C-Code</span><h2>Systemschnittstellen je Cluster</h2></div>
+        <div class="btns"><button class="pill" type="button" id="bSysCsv">CSV kopieren</button></div>
+      </div>
+      <p class="lede">Eine Systemschnittstelle ist ein Interface, das den Cluster verlässt, zusammen mit allen Interfaces, die es beeinflussen. Beeinflusst heißt: Die Funktionalität, die den Ausgang schreibt, liest die Message selbst oder über ihre Aufrufkette. Das wird rückwärts verfolgt, bis es an einem Eingang von außerhalb des Clusters endet. Ausgänge sind Messages mit Abnehmer außerhalb sowie Funktionalitäten, die der Cluster außerhalb aufruft. Aufrufe über die Grenze zählen auch als Eingang (ƒ), weil Argumente und Rückgabewerte wirken. Die Zuordnung ist funktionsweise, nicht zeilenweise, und deshalb eher großzügig: Liest eine Funktionalität A und schreibt B, gilt A als Einfluss auf B.</p>
+      <div id="sysifBody" style="margin-top:10px"></div>
+    </div>
+    <div class="sheet" id="wksheet">
+      <div class="row">
+        <div><span class="t-idx">Größe → Funktionalität → Größe</span><h2>Wirkkette</h2></div>
+        <div class="btns" style="flex:1 1 420px;justify-content:flex-end">
+          <input id="wkQ" class="filter" list="wkList" placeholder="Größe, z. B. eine exportierte Message" aria-label="Größe für die Wirkkette" autocomplete="off" spellcheck="false"><datalist id="wkList"></datalist>
+          <select id="wkDir" class="filter" aria-label="Richtung"><option value="back">rückwärts (woher)</option><option value="fwd">vorwärts (wohin)</option></select>
+          <label class="toggle"><input type="checkbox" id="wkAll"> über Clustergrenze</label>
+          <label class="toggle"><input type="checkbox" id="wkCal" checked> Applikation</label>
+          <button class="pill" type="button" id="wkFit">Einpassen</button>
+        </div>
+      </div>
+      <p class="lede">Die Wirkkette zeigt, über welche Funktionalitäten (C-Funktionen) eine Größe entsteht oder wohin sie wirkt. Rückwärts: Wer schreibt die Größe, was liest diese Funktionalität, wer schreibt das wiederum. Aufgerufene Funktionalitäten liefern ihren Rückgabewert an den Aufrufer. Vorwärts: Wer liest die Größe, was schreibt diese Funktionalität, und so weiter. Ohne „über Clustergrenze“ endet die Kette am Rand des Clusters, die Größe dort ist ein Eingang bzw. Ausgang. Funktionalitäten sind nach ihrer FC gruppiert. ◇ markiert Zugriffe und Funktionalitäten, die nur unter einer <code>#if</code>-Bedingung mit Systemkonstante existieren; Antippen zeigt die Bedingung. Mit „Konkrete Konfiguration“ oben verschwinden abgeschaltete Pfade ganz.</p>
+      <div class="wkleg"><span><i style="border-color:var(--amber);border-width:2.5px"></i>Ausgangsgröße</span><span><i style="border-radius:8px"></i>Größe (Message)</span><span><i style="border-style:dashed"></i>Größe am Clusterrand</span><span><i style="background:var(--film)"></i>Funktionalität, in ihrer FC</span><span><i style="transform:rotate(45deg) scale(.8)"></i>Applikationsparameter</span><span>gepunktet: Aufruf, Rückgabewert</span><span style="color:var(--amber)">◇ gestrichelt: nur in bestimmten Varianten (SyC)</span></div>
+      <div id="wk"><p class="cyfail">Größe wählen oder in den Systemschnittstellen auf „Wirkkette“ tippen.</p></div>
+      <p class="sub" id="wkInfo" style="margin-top:6px"></p>
+      <p class="sub" id="wkSel" style="margin-top:4px;min-height:1.4em"></p>
+    </div>
     <div class="sheet">
       <div class="row">
-        <div><span class="t-idx">Statisch</span><h2>Schnittstellen je Komponente</h2></div>
+        <div><span class="t-idx">Statisch</span><h2>Schnittstellen je FC</h2></div>
         <div class="btns" style="flex:1 1 300px;justify-content:flex-end">
-          <select id="ifComp" class="filter" aria-label="Komponente"></select>
+          <select id="ifComp" class="filter" aria-label="FC"></select>
           <input id="ifQ" class="filter" placeholder="Message filtern" aria-label="Message filtern">
         </div>
       </div>
@@ -510,10 +540,10 @@ footer.foot a:hover{color:var(--text)}
       </div>
       <p class="lede">Eine Zeile je Export. Antippen klappt die statische und dynamische Beschreibung auf, die Spaltenköpfe sortieren. Das Raster kommt aus dem Prozessnamen.</p>
       <div class="btns" style="margin-top:10px">
-        <select id="exComp" class="filter" aria-label="Komponente"></select>
+        <select id="exComp" class="filter" aria-label="FC"></select>
         <input id="exQ" class="filter" placeholder="Export filtern" aria-label="Export filtern">
         <label class="toggle"><input type="checkbox" id="exHint"> nur mit Hinweisen</label>
-        <label class="toggle"><input type="checkbox" id="exGroup" checked> nach Komponente gruppieren</label>
+        <label class="toggle"><input type="checkbox" id="exGroup" checked> nach FC gruppieren</label>
         <button class="pill" id="exAll" type="button">Alle auf/zu</button>
       </div>
     </div>
@@ -521,14 +551,14 @@ footer.foot a:hover{color:var(--text)}
   </section>
 
   <section class="panel" id="p-dyn" role="tabpanel" aria-labelledby="t-dyn" hidden>
-    <div class="sheet"><span class="t-idx">Dynamisch</span><h2>Aufrufketten je Prozess</h2><p class="lede">Prozesse sind Funktionen, die kein anderer Code aufruft oder deren Name auf <code>_Proc…</code>, <code>_Ini</code> oder <code>…ms</code> endet. Gelesene und geschriebene Messages werden über die ganze Kette gesammelt.</p></div>
+    <div class="sheet"><span class="t-idx">Dynamisch</span><h2>Aufrufketten je Prozess</h2><p class="lede">Prozesse sind Funktionalitäten, die kein anderer Code aufruft oder deren Name auf <code>_Proc…</code>, <code>_Ini</code> oder <code>…ms</code> endet. Gelesene und geschriebene Messages werden über die ganze Kette gesammelt.</p></div>
     <div id="dyn" class="panel"></div>
   </section>
 
   <section class="panel" id="p-files" role="tabpanel" aria-labelledby="t-files" hidden>
     <div class="sheet">
       <span class="t-idx">Eingelegt</span><h2>Dateien</h2>
-      <p class="lede">C-Dateien landen bei der Komponente mit gleichem Namen. <code>SCR_Dos_Calc.c</code> gehört zu <code>SCR_Dos</code>, wenn es dafür eine PaVaSt gibt.</p>
+      <p class="lede">C-Dateien landen bei der FC mit gleichem Namen. <code>SCR_Dos_Calc.c</code> gehört zu <code>SCR_Dos</code>, wenn es dafür eine PaVaSt gibt.</p>
       <ul class="flist" id="flist"></ul>
     </div>
     <template id="h-files"><p>PaVaSt: <code>SW-FEATURE</code> mit <code>SHORT-NAME</code>, alle <code>*-REF</code> unterhalb von <code>…IMPORT…</code> bzw. <code>…EXPORT…</code>. C: globale Definitionen (Export), <code>extern</code> (Import), direkte Zugriffe auf bekannte Messages, <code>Msg_Get/Msg_Set</code>-artige Makros und AUTOSAR <code>Rte_Read_/Rte_Write_</code>. Schreibzugriff heißt Zuweisung, <code>++/--</code> oder Übergabe per <code>&amp;</code>.</p>
@@ -4914,6 +4944,14 @@ function sycTest(cfg){
   const re=new RegExp("^(?:"+parts.map(x=>x.split("*").map(reEsc).join("\\w*")).join("|")+")$");
   const t=id=>re.test(id);sycCache.set(pat,t);return t;
 }
+/* Applikationsparameter (Kennwert, Kennlinie, Kennfeld …): aus PaVaSt (SW-CALPRM) oder per Namensmuster */
+const CAL_DEF="*_C, *_CUR, *_MAP, *_CA, *_AX, *_GAX";
+function calTest(cfg){
+  const pat=String((cfg&&cfg.calPre)||CAL_DEF).trim()||CAL_DEF,key="cal:"+pat;if(sycCache.has(key))return sycCache.get(key);
+  const parts=pat.split(/[\s,;|]+/).filter(Boolean);
+  const re=new RegExp("^(?:"+parts.map(x=>x.split("*").map(reEsc).join("\\w*")).join("|")+")$");
+  const t=id=>re.test(id);sycCache.set(key,t);return t;
+}
 function sycIds(e,test){return e?(e.match(/[A-Za-z_]\w*/g)||[]).filter(test):[]}
 /* Bedingung je Zeile; in einer konkreten Konfiguration werden inaktive Zeilen ausgeblendet */
 function ppScan(src,cfg,globals){
@@ -5080,7 +5118,7 @@ function parsePavast(name,text){
   const roots=feats.length?feats:[doc.documentElement];
   const features=roots.map(fe=>{
     const nm=feats.length?shortName(fe):(shortName(doc.documentElement)||baseName(name));
-    const imports=new Map(),exports=new Map();
+    const imports=new Map(),exports=new Map(),calImp=new Set(),calExp=new Set();
     const condOf=r=>{const cs=[];let e=r.parentElement;while(e){for(const ch of e.children)if(ln(ch)==="SW-SYSCOND"&&ch.textContent.trim())cs.push(ch.textContent.trim().replace(/\s+/g," "));if(e===fe)break;e=e.parentElement}return cs.length?cs.map(x=>cs.length>1?"("+x+")":x).join(" && "):null};
     const put=(mp,v,c)=>{if(!mp.has(v))mp.set(v,c);else{const o=mp.get(v);if(o===null||c===null)mp.set(v,null);else if(normCond(o)!==normCond(c))mp.set(v,"("+o+") || ("+c+")")}};
     for(const r of fe.getElementsByTagName("*")){
@@ -5089,9 +5127,10 @@ function parsePavast(name,text){
       while(near&&near!==fe.parentElement){const t=ln(near);if(t==="SW-FEATURE"&&near!==fe){dir="skip";break}if(!dir&&/IMPORT/.test(t))dir="i";else if(!dir&&/EXPORT/.test(t))dir="e";if(near===fe)break;near=near.parentElement}
       if(dir!=="i"&&dir!=="e")continue;
       const v=r.textContent.trim().split("/").pop();if(!v)continue;
+      if(/CALPRM/.test(ln(r))){(dir==="i"?calImp:calExp).add(v);continue}
       put(dir==="i"?imports:exports,v,condOf(r));
     }
-    return {name:nm,imports,exports};
+    return {name:nm,imports,exports,calImp,calExp};
   });
   const vars=new Map();
   for(const e of all){
@@ -5114,7 +5153,15 @@ function parsePavast(name,text){
     if(ln(e)!=="SW-SYSTEMCONST")continue;const nm=shortName(e);if(!nm)continue;
     for(const c of e.getElementsByTagName("*")){if(c.children.length)continue;if(/^(V|VT|VALUE|SW-VALUE)$/.test(ln(c))&&c.textContent.trim()){consts.set(nm,c.textContent.trim());break}}
   }
-  return {file:name,features,vars,consts};
+  const cals=new Map();
+  for(const e of all){
+    if(ln(e)!=="SW-CALPRM")continue;const nm=shortName(e);if(!nm)continue;
+    const o={};const take=(k,v)=>{v=v.trim().replace(/\s+/g," ");if(v&&!o[k])o[k]=v};
+    for(const c of e.getElementsByTagName("*")){const t=ln(c);if(c.children.length&&t!=="LONG-NAME")continue;const raw=c.textContent.trim(),v=raw.startsWith("/")?raw.split("/").pop():raw;
+      if(t==="LONG-NAME")take("lang",v);else if(t==="CATEGORY")take("kat",v);else if(/UNIT/.test(t))take("einheit",v);else if(t==="LOWER-LIMIT")take("min",v);else if(t==="UPPER-LIMIT")take("max",v)}
+    cals.set(nm,o);
+  }
+  return {file:name,features,vars,consts,cals};
 }
 
 function classify(name,text){
@@ -5146,7 +5193,12 @@ function analyze(files,cfg){
   for(const p of pv)for(const ft of p.features)for(const mp of [ft.imports,ft.exports])for(const c of mp.values())sycIds(c,pre).forEach(id=>useS(id,"pv",p.file));
   const comps=new Map();
   const C=n=>{if(!comps.has(n))comps.set(n,{name:n,pvFiles:[],cFiles:[],hasPV:false,hasC:false,imp:new Set(),exp:new Set(),impCond:new Map(),expCond:new Map(),defs:new Set(),ext:new Set(),reads:new Set(),writes:new Set(),funcs:[],procs:[]});return comps.get(n)};
+  const calInfo=new Map(),calT=calTest(cfg);
+  for(const p of pv){for(const [k,v] of (p.cals||[]))calInfo.set(k,Object.assign(calInfo.get(k)||{},v));for(const ft of p.features){ft.calImp.forEach(x=>{if(!calInfo.has(x))calInfo.set(x,{})});ft.calExp.forEach(x=>{if(!calInfo.has(x))calInfo.set(x,{})})}}
+  const isCal=x=>calInfo.has(x)||(calT(x)&&!pre(x));
   for(const p of pv)for(const ft of p.features){const c=C(ft.name);c.hasPV=true;c.pvFiles.push(p.file);
+    c.calOwn=c.calOwn||new Set();c.calDecl=c.calDecl||new Set();ft.calExp.forEach(x=>c.calOwn.add(x));ft.calImp.forEach(x=>c.calDecl.add(x));
+    if(p.features.length===1&&p.cals)for(const k of p.cals.keys())c.calOwn.add(k);
     for(const [x,cd] of ft.imports)if(keep(cd)){c.imp.add(x);c.impCond.set(x,cd)}
     for(const [x,cd] of ft.exports)if(keep(cd)){c.exp.add(x);c.expCond.set(x,cd)}}
   const pvNames=[...comps.keys()];
@@ -5162,12 +5214,15 @@ function analyze(files,cfg){
     for(const f of r.funcs){f.comp=c.name;c.funcs.push(f)}
   }
   for(const c of comps.values()){
+    for(const x of [...c.defs])if(isCal(x))c.defs.delete(x);for(const x of [...c.ext])if(isCal(x))c.ext.delete(x);
+    if(c.defInfo)for(const x of [...c.defInfo.keys()])if(isCal(x))c.defInfo.delete(x);
     if(c.macroDecl)for(const [k,v] of c.macroDecl)if(c.exp.has(k)&&!(c.defInfo&&c.defInfo.has(k))){c.defInfo=c.defInfo||new Map();c.defInfo.set(k,v);c.defs.add(k)}
     c.ext=new Set([...c.ext].filter(x=>!c.defs.has(x)));
   }
   // bekannte Messages
   const M=new Set();
   for(const c of comps.values()){c.imp.forEach(x=>M.add(x));c.exp.forEach(x=>M.add(x));c.defs.forEach(x=>M.add(x));c.ext.forEach(x=>M.add(x));for(const f of c.funcs){f.mR.forEach(x=>M.add(x));f.mW.forEach(x=>M.add(x))}}
+  for(const x of [...M])if(isCal(x))M.delete(x);
   // Funktionsindex
   const fnBy=new Map(),called=new Set();
   for(const c of comps.values())for(const f of c.funcs){if(!fnBy.has(f.name)||!f.isStatic)fnBy.set(f.name,f);f.calls.forEach(x=>called.add(x))}
@@ -5176,6 +5231,9 @@ function analyze(files,cfg){
     for(const [id,o] of f.occ)if(M.has(id)&&!fnBy.has(id)){if(o.r)f.R.add(id);if(o.w)f.W.add(id)}
   }
   for(const c of comps.values())for(const f of c.funcs){if(!f.R){f.R=new Set(f.mR);f.W=new Set(f.mW);for(const [id,o] of f.occ)if(M.has(id)){if(o.r)f.R.add(id);if(o.w)f.W.add(id)}}f.R.forEach(x=>c.reads.add(x));f.W.forEach(x=>c.writes.add(x))}
+  for(const c of comps.values()){c.cal=new Set();c.calOwn=c.calOwn||new Set();c.calDecl=c.calDecl||new Set();
+    for(const f of c.funcs){f.CAL=[...f.occ.keys()].filter(x=>isCal(x)&&!M.has(x)&&!fnBy.has(x)).sort();f.CAL.forEach(x=>{c.cal.add(x);if(!calInfo.has(x))calInfo.set(x,{})})}}
+  const cals=new Map();for(const [k,v] of calInfo)cals.set(k,{props:v,owner:[...comps.values()].filter(c=>c.calOwn.has(k)).map(c=>c.name),users:[...comps.values()].filter(c=>c.cal.has(k)).map(c=>c.name)});
   // transitiv (Aufrufkette)
   const memo=new Map();
   function trans(name,stack){
@@ -5223,7 +5281,7 @@ function analyze(files,cfg){
       for(const p of from){const pc=comps.get(p);flows.push({m,from:p,to:c.name,st,multi:ps.length>1,icond:c.impCond.get(m)??null,econd:pc?pc.expCond.get(m)??null:null})}
     }
   }
-  // Aufrufe über Komponentengrenzen
+  // Aufrufe über FC-Grenzen
   const calls=new Map();
   for(const c of comps.values())for(const f of c.funcs)for(const k of f.calls){const g=fnBy.get(k);if(g&&g.comp!==c.name){const key=c.name+"→"+g.comp;if(!calls.has(key))calls.set(key,{from:c.name,to:g.comp,fns:new Set()});calls.get(key).fns.add(k)}}
   // Exporte ohne Abnehmer
@@ -5235,17 +5293,17 @@ function analyze(files,cfg){
     const seen=new Set();(function walk(n){if(seen.has(n.name))return;seen.add(n.name);n.kids.forEach(walk)})(p.tree);
     for(const fn of seen){if(!reach.has(fn))reach.set(fn,[]);reach.get(fn).push({comp:c.name,proc:p.name,r:rasterOf(p.name)})}
   }
-  const exportsList=buildExports({comps,M,flows,calls:[...calls.values()],procR,reach,varProps,fnBy});
+  const exportsList=buildExports({comps,M,flows,calls:[...calls.values()],procR,reach,varProps,fnBy,isCal});
   for(const [id,o] of sycInfo){o.def=globals.get(id)??null;o.defFrom=gFrom.get(id)||null;o.eff=ctx.val(id)}
-  return {comps,M,prov,flows,calls:[...calls.values()],procW,procR,issues,fileComp,exportsList,reach,sycInfo,cfg};
+  return {comps,M,prov,flows,calls:[...calls.values()],procW,procR,issues,fileComp,exportsList,reach,sycInfo,cfg,cals,isCal};
 }
 
 /* Exportliste: je Export die statische und die dynamische Sicht */
-function buildExports({comps,flows,calls,procR,reach,varProps,fnBy}){
+function buildExports({comps,flows,calls,procR,reach,varProps,fnBy,isCal}){
   const out=[];
   const allFuncs=[];for(const c of comps.values())for(const f of c.funcs)allFuncs.push(f);
   for(const c of [...comps.values()].sort((a,b)=>a.name.localeCompare(b.name))){
-    const names=new Set([...c.exp,...(c.defInfo?[...c.defInfo.keys()]:[])]);
+    const names=new Set([...c.exp,...(c.defInfo?[...c.defInfo.keys()]:[])].filter(x=>!isCal||!isCal(x)));
     for(const m of [...names].sort()){
       const def=c.defInfo&&c.defInfo.get(m)||null, pvp=varProps.get(m)||{};
       const cons=flows.filter(f=>f.from===c.name&&f.m===m).map(f=>({comp:f.to,st:f.st}));
@@ -5258,8 +5316,8 @@ function buildExports({comps,flows,calls,procR,reach,varProps,fnBy}){
       const readers=[];for(const k of cons){for(const x of (procR.get(m)||[]).filter(x=>x.comp===k.comp))readers.push({comp:k.comp,proc:x.proc,r:rasterOf(x.proc)})}
       const hints=[];
       if(c.hasPV&&!c.exp.has(m))hints.push({lv:"warn",t:"nicht als Export in PaVaSt deklariert"});
-      if(c.hasC&&!def)hints.push(writes.length?{lv:"info",t:"keine Definition im Komponenten-Code, vermutlich zentral oder generiert"}:{lv:"warn",t:"im C-Code weder definiert noch geschrieben"});
-      if(!cons.length)hints.push({lv:"info",t:"ohne Abnehmer unter den geladenen Komponenten"});
+      if(c.hasC&&!def)hints.push(writes.length?{lv:"info",t:"keine Definition im FC-Code, vermutlich zentral oder generiert"}:{lv:"warn",t:"im C-Code weder definiert noch geschrieben"});
+      if(!cons.length)hints.push({lv:"info",t:"ohne Abnehmer unter den geladenen FCs"});
       if(c.hasC&&!writes.length)hints.push({lv:"warn",t:def&&def.init!=null?"nur Initialwert, zur Laufzeit nie geschrieben":"zur Laufzeit nie geschrieben"});
       if(writes.some(w=>w.fremd))hints.push({lv:"bad",t:"wird auch von "+[...new Set(writes.filter(w=>w.fremd).map(w=>w.comp))].join(", ")+" geschrieben"});
       const cyc=wProcs.filter(x=>x.r.ms!=null);
@@ -5273,13 +5331,13 @@ function buildExports({comps,flows,calls,procR,reach,varProps,fnBy}){
       out.push({kind:"Message",comp:c.name,name:m,pvCond,cCond,pv:c.hasPV?c.exp.has(m):null,hasC:c.hasC,def,pvp,cons,writes,wProcs,readers:uniqBy(readers,x=>x.proc),hints:uniqBy(hints,x=>x.t)});
     }
   }
-  /* Funktionen, die über die Komponentengrenze aufgerufen werden */
+  /* Funktionen, die über die FC-Grenze aufgerufen werden */
   const fnSeen=new Set();
   for(const k of calls)for(const fn of k.fns){
     if(fnSeen.has(fn))continue;fnSeen.add(fn);const f=fnBy.get(fn);if(!f)continue;
     const callers=allFuncs.filter(g=>g.calls.has(fn)&&g.comp!==f.comp).map(g=>({comp:g.comp,fn:g.name}));
     const procs=(reach.get(fn)||[]).filter(x=>x.comp!==f.comp);
-    const hints=[{lv:"info",t:"Funktionsschnittstelle, in PaVaSt nicht als Message sichtbar"}];
+    const hints=[{lv:"info",t:"Schnittstelle über Aufruf einer Funktionalität, in PaVaSt nicht als Message sichtbar"}];
     if(f.W&&f.W.size)hints.push({lv:"warn",t:"schreibt beim Aufruf "+[...f.W].join(", ")});
     out.push({kind:"Funktion",comp:f.comp,name:fn,sig:f.sig,file:f.file,line:f.line,callers,procs,R:f.R?[...f.R]:[],W:f.W?[...f.W]:[],hints});
   }
@@ -5292,10 +5350,10 @@ function uniqBy(a,k){const s=new Set();return a.filter(x=>{const v=k(x);if(s.has
 /* ===== Oberfläche ===== */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const S={files:[],model:null,cy:null,sel:null,cfg:{mode:"all",prefix:SYC_DEF,values:{}},cfgA:null};
+const S={files:[],model:null,cy:null,sel:null,cfg:{mode:"all",prefix:SYC_DEF,calPre:CAL_DEF,values:{}},cfgA:null};
 
 /* ---- Beispieldaten (Abgasnachbehandlung, frei erfunden) ---- */
-function pvXml(name,ex,im,vars){
+function pvXml(name,ex,im,vars,cals){
   const vx=(vars||[]).map(v=>`      <SW-VARIABLE>
         <SHORT-NAME>${v.n}</SHORT-NAME>
         <LONG-NAME><L-4 L="DE">${v.lang}</L-4></LONG-NAME>
@@ -5306,10 +5364,18 @@ function pvXml(name,ex,im,vars){
           <SW-DATA-CONSTR><LOWER-LIMIT>${v.min}</LOWER-LIMIT><UPPER-LIMIT>${v.max}</UPPER-LIMIT></SW-DATA-CONSTR>
         </SW-DATA-DEF-PROPS>
       </SW-VARIABLE>`).join("\n");
-  const dict=vx?`
-  <SW-DATA-DICTIONARY-SPEC><SW-VARIABLES>
+  const cx=(cals||[]).map(v=>`      <SW-CALPRM>
+        <SHORT-NAME>${v.n}</SHORT-NAME>
+        <LONG-NAME><L-4 L="DE">${v.lang}</L-4></LONG-NAME>
+        <CATEGORY>${v.kat}</CATEGORY>
+        <SW-DATA-DEF-PROPS><SW-UNIT-REF>${v.unit}</SW-UNIT-REF></SW-DATA-DEF-PROPS>
+      </SW-CALPRM>`).join("\n");
+  const dict=vx||cx?`
+  <SW-DATA-DICTIONARY-SPEC>${vx?`<SW-VARIABLES>
 ${vx}
-  </SW-VARIABLES></SW-DATA-DICTIONARY-SPEC>`:"";
+  </SW-VARIABLES>`:""}${cx?`<SW-CALPRMS>
+${cx}
+  </SW-CALPRMS>`:""}</SW-DATA-DICTIONARY-SPEC>`:"";
   const xe=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const refs=a=>a.map(x=>{const [n,c]=x.split("|");return c?`            <SW-VARIABLE-REF-SYSCOND><SW-VARIABLE-REF>${n}</SW-VARIABLE-REF><SW-SYSCOND>${xe(c)}</SW-SYSCOND></SW-VARIABLE-REF-SYSCOND>`:`            <SW-VARIABLE-REF>${n}</SW-VARIABLE-REF>`}).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -5344,10 +5410,11 @@ uint16 ExhTSens_tUs;          /* vor Kat [0.1 K] */
 uint16 ExhTSens_tDs;          /* nach Kat [0.1 K] */
 static uint16 ExhTSens_tFlt;
 extern uint16 Epm_nEng;
+extern const uint16 ExhTSens_facFlt_C;   /* Filterfaktor */
 
 static uint16 ExhTSens_Filter(uint16 raw)
 {
-    ExhTSens_tFlt = (ExhTSens_tFlt * 3u + raw) / 4u;
+    ExhTSens_tFlt = (ExhTSens_tFlt * ExhTSens_facFlt_C + raw) / (ExhTSens_facFlt_C + 1u);
     return ExhTSens_tFlt;
 }
 
@@ -5384,10 +5451,12 @@ extern uint16 ExhTSens_tUs;
 extern uint16 NOxSens_rNOxUs;
 #endif
 extern uint8  DosVlv_stVlv;
+extern const uint16 SCRDos_tMinDos_C;        /* Freigabetemperatur Dosierung */
+extern const CURVE_U16 SCRDos_facEff_CUR;   /* Wirkungsgrad über Temperatur */
 
 static uint16 SCRDos_CalcEff(void)
 {
-    return (uint16)((ExhTSens_tDs > 4730u) ? 900u : 400u);
+    return Srv_IpoCurveU16(&SCRDos_facEff_CUR, ExhTSens_tDs);
 }
 
 static uint16 SCRDos_CalcDem(uint16 eff)
@@ -5398,7 +5467,7 @@ static uint16 SCRDos_CalcDem(uint16 eff)
 #else
     dem = eff / 4u;                          /* gesteuert */
 #endif
-    if (ExhTSens_tUs < 4230u) { dem = 0u; }   /* nicht in PaVaSt importiert */
+    if (ExhTSens_tUs < SCRDos_tMinDos_C) { dem = 0u; }   /* nicht in PaVaSt importiert */
     return dem;
 }
 
@@ -5439,9 +5508,12 @@ void DosVlv_Proc10ms(void)
 `},
  {name:"Sensorik/Exh_TSens_pavast.xml",text:pvXml("Exh_TSens",["ExhTSens_tUs","ExhTSens_tDs|SY_SCRVAR > 0"],["Epm_nEng"],[
    {n:"ExhTSens_tUs",lang:"Abgastemperatur vor SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"},
-   {n:"ExhTSens_tDs",lang:"Abgastemperatur nach SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"}])},
+   {n:"ExhTSens_tDs",lang:"Abgastemperatur nach SCR-Kat",typ:"uint16",cm:"Temp_0p1K",unit:"K",min:"233.15",max:"1273.15"}],[
+   {n:"ExhTSens_facFlt_C",lang:"Filterfaktor Abgastemperatur",kat:"VALUE",unit:"-"}])},
  {name:"SCR/SCR_Dos_pavast.xml",text:pvXml("SCR_Dos",["SCRDos_mfDosDes"],["ExhTSens_tDs","NOxSens_rNOxUs|(SY_SCRVAR == 2) && (NOXSENS_SC == 1)","DosVlv_stVlv"],[
-   {n:"SCRDos_mfDosDes",lang:"Soll-Dosiermenge Harnstoff",typ:"uint16",cm:"Ident",unit:"mg/s",min:"0",max:"4000"}])},
+   {n:"SCRDos_mfDosDes",lang:"Soll-Dosiermenge Harnstoff",typ:"uint16",cm:"Ident",unit:"mg/s",min:"0",max:"4000"}],[
+   {n:"SCRDos_tMinDos_C",lang:"Freigabetemperatur Dosierung",kat:"VALUE",unit:"K"},
+   {n:"SCRDos_facEff_CUR",lang:"Wirkungsgrad über Temperatur nach Kat",kat:"CURVE",unit:"-"}])},
  {name:"SCR/SCR_DosVlv_pavast.xml",text:pvXml("SCR_DosVlv",["DosVlv_stVlv"],["SCRDos_mfDosDes","ExhTSens_tUs|SY_DOSVLVDIAG == SY_ON"],[
    {n:"DosVlv_stVlv",lang:"Status Dosierventil (0 = ok, 1 = Fehler)",typ:"uint8",cm:"Ident",unit:"-",min:"0",max:"1"}])},
  {name:"Konfig/sy_conf.h",text:`/* Beispiel: Systemkonstanten dieser Variante */
@@ -5631,6 +5703,7 @@ function showPanel(t){
   ["arch","if","exp","dyn","files"].forEach(k=>$("#p-"+k).hidden=k!==t);
   try{localStorage.setItem("ap-tab",t)}catch(e){}
   if(t==="arch"&&S.cy){S.cy.resize();S.cy.fit(undefined,30)}
+  if(t==="if"){if(S.wkCy){S.wkCy.resize();S.wkCy.fit(undefined,24)}else if(S.wk)drawWk()}
 }
 
 /* ---- Lauf ---- */
@@ -5640,7 +5713,7 @@ function run(){
   if(!S.grpTouched){let g=null;try{g=localStorage.getItem("sp-grp2")}catch(e){}$("#grpBy").value=g||"praefix"}
   computeGroups();initCollapse();S.expOpen.clear();S.expShut.clear();S.expLimit=200;S.ifLimit=300;
   if(S.focus&&!focusOptions().some(o=>o.type===S.focus.type&&o.name===S.focus.name))S.focus=null;
-  renderStats();renderCfg();renderFocus();renderGraph();renderIf();renderExp();renderDyn();renderFiles();
+  renderStats();renderCfg();renderFocus();renderGraph();renderIf();drawSysIf();if(S.wkCy){S.wkCy.destroy();S.wkCy=null}renderWkList();renderExp();renderDyn();renderFiles();
   $("#detail").innerHTML='<p class="empty"></p>';
 }
 function renderStats(){
@@ -5649,7 +5722,7 @@ function renderStats(){
   const sample=S.files.some(f=>f.sample);
   const cf=S.cfg.mode==="cfg"?'<span class="badge cfgb">Konfiguration</span>':"";
   $("#stats").innerHTML=(sample?'<span class="badge">Beispieldaten</span>':"")+cf+
-   `<span class="stat"><b>${nc}</b> Komponenten</span><span class="stat"><b>${m.M.size}</b> Messages</span><span class="stat"><b>${np}</b> Prozesse</span>`+
+   `<span class="stat"><b>${nc}</b> FCs</span><span class="stat"><b>${m.M.size}</b> Messages</span><span class="stat"><b>${np}</b> Prozesse</span>`+
    (und?`<span class="stat" style="color:var(--over)"><b>${und}</b> undeklariert</span>`:"")+(unu?`<span class="stat"><b>${unu}</b> ungenutzt</span>`:"");
   $("#c-arch").textContent=nc||"";$("#c-if").textContent=m.M.size||"";$("#c-dyn").textContent=np||"";$("#c-files").textContent=S.files.length||"";$("#c-exp").textContent=m.exportsList.length||"";try{DOCK.refresh()}catch(e){}
 }
@@ -5678,8 +5751,8 @@ addEventListener("resize",closeHelp);addEventListener("scroll",()=>{if(hpBtn&&Da
     h.appendChild(mkHelp(html,h.textContent));p.remove();
   });
   const lead=document.querySelector(".hero .lead");
-  if(lead){document.querySelector(".hero h1").appendChild(mkHelp("<p>"+lead.innerHTML+"</p><p>Die Leiste unten wechselt die Ansicht: antippen oder die Kugel ziehen.</p>","Schaltplan"));lead.remove()}
-  $(".fb-in").appendChild(mkHelp("<p>Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner: eine Komponente, einen Cluster, eine Message oder eine Funktion.</p><p>Namen in Tabellen und Details lassen sich anklicken und setzen den Fokus direkt. Gelöst wird er mit dem Chip in der Kopfleiste.</p><p><b>Cluster</b> bündeln Komponenten. Standard ist <b>nach Präfix</b>: alle FCs mit gleichem Namensteil vor dem ersten Unterstrich bilden einen Cluster, <code>SCR_Dos</code> und <code>SCR_DosVlv</code> also <code>SCR</code>. Eine FC ohne Partner gleichen Präfixes bleibt einzeln. Alternativ nach Ordner (die Ebene, die tatsächlich trennt) oder automatisch nach Kopplung. Bei Kopplung landen Komponenten, die viele Messages und Aufrufe austauschen, im selben Cluster.</p><p>Eigene Cluster legst du im Graph an: „Auswählen“ einschalten, Komponenten antippen und zusammenfassen. Sie gelten in jeder Gruppierung und bleiben in diesem Browser gespeichert.</p>","Fokus und Cluster"));
+  if(lead){document.querySelector(".hero h1").appendChild(mkHelp("<p>"+lead.innerHTML+"</p><p><b>Begriffe:</b> Eine <b>FC</b> ist eine Funktion mit C-Datei und PaVaSt. Eine <b>Funktionalität</b> ist eine C-Funktion darin. Eine <b>Größe</b> ist eine Message. Ein <b>Cluster</b> fasst FCs mit gleichem Präfix zusammen.</p><p>Die Leiste unten wechselt die Ansicht: antippen oder die Kugel ziehen.</p>","Schaltplan"));lead.remove()}
+  $(".fb-in").appendChild(mkHelp("<p>Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner: eine FC, einen Cluster, eine Message oder eine Funktionalität.</p><p>Namen in Tabellen und Details lassen sich anklicken und setzen den Fokus direkt. Gelöst wird er mit dem Chip in der Kopfleiste.</p><p><b>Cluster</b> bündeln FCs. Standard ist <b>nach Präfix</b>: alle FCs mit gleichem Namensteil vor dem ersten Unterstrich bilden einen Cluster, <code>SCR_Dos</code> und <code>SCR_DosVlv</code> also <code>SCR</code>. Eine FC ohne Partner gleichen Präfixes bleibt einzeln. Alternativ nach Ordner (die Ebene, die tatsächlich trennt) oder automatisch nach Kopplung. Bei Kopplung landen FCs, die viele Messages und Aufrufe austauschen, im selben Cluster.</p><p>Eigene Cluster legst du im Graph an: „Auswählen“ einschalten, FCs antippen und zusammenfassen. Sie gelten in jeder Gruppierung und bleiben in diesem Browser gespeichert.</p>","Fokus und Cluster"));
   $(".cfg-btns").appendChild(mkHelp("<p><b>Alle Varianten</b> zeigt den Code aller Zweige zusammen. Bedingungen stehen trotzdem dabei: in der Spalte „Bedingung“, als „Variante“ und ◇ in der Exportliste und als „nur wenn …“.</p><p><b>Konkrete Konfiguration</b> wertet die Systemkonstanten aus. Abgeschaltete Zweige, Importe, Exporte und Aufrufe fehlen dann in allen Reitern. Ein geänderter Wert schaltet automatisch in diesen Modus.</p><p>Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code>, aus einer geladenen Wertedatei oder aus deiner Eingabe. Ohne Wert gilt eine Bedingung als „vielleicht“, der Code bleibt drin.</p><p><b>SyC-Muster</b> legt fest, woran Systemkonstanten erkannt werden, zum Beispiel <code>SY_*, *_SY, *_SC</code>. <code>*</code> steht für einen beliebigen Namensteil, Groß- und Kleinschreibung zählt.</p><p><b>Als A merken</b> hält die Werte fest, <b>Mit A vergleichen</b> zeigt, welche Schnittstellen, Exporte und Aufrufe sich unterscheiden.</p>","Konfiguration"));
 })();
 
@@ -5727,6 +5800,7 @@ function drawSyc(){
 $("#sycList").addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.syc;if(!k)return;const v=e.target.value.trim();if(v)S.cfg.values[k]=v;else delete S.cfg.values[k];if(S.cfg.mode!=="cfg"){S.cfg.mode="cfg";}rerun()});
 $("#sycQ").addEventListener("input",drawSyc);$("#sycUnk").addEventListener("change",drawSyc);
 $("#cfgMode").addEventListener("change",e=>{S.cfg.mode=e.target.value;run();toast(S.cfg.mode==="cfg"?"Konkrete Konfiguration aktiv":"Alle Varianten")});
+$("#calPre").addEventListener("change",e=>{const v=e.target.value.trim();S.cfg.calPre=v||CAL_DEF;if(!v)e.target.value=CAL_DEF;run()});
 $("#sycPre").addEventListener("change",e=>{const v=e.target.value.trim();S.cfg.prefix=v||SYC_DEF;if(!v)e.target.value=SYC_DEF;run()});
 $("#cfgReset").onclick=()=>{S.cfg.values={};run();toast("Werte auf Vorgaben zurückgesetzt")};
 $("#cfgFile").addEventListener("change",async e=>{
@@ -5738,7 +5812,7 @@ $("#cfgFile").addEventListener("change",async e=>{
 $("#cfgA").onclick=()=>{S.cfgA={values:Object.assign({},S.cfg.values),prefix:S.cfg.prefix};$("#cfgCmp").hidden=false;$("#cfgDiff").innerHTML="";toast("Aktuelle Werte als A gemerkt")};
 $("#cfgCmp").onclick=()=>{
   if(!S.cfgA)return;
-  const A=analyze(S.files,{mode:"cfg",prefix:S.cfgA.prefix,values:S.cfgA.values}),B=analyze(S.files,Object.assign({},S.cfg,{mode:"cfg"}));
+  const A=analyze(S.files,{mode:"cfg",prefix:S.cfgA.prefix,calPre:S.cfg.calPre,values:S.cfgA.values}),B=analyze(S.files,Object.assign({},S.cfg,{mode:"cfg"}));
   const fk=M=>new Map(M.flows.map(f=>[(f.from===ENV?"Umgebung":f.from)+" → "+f.to+": "+f.m,f]));
   const ek=M=>new Map(M.exportsList.map(e=>[e.comp+": "+e.name+(e.kind==="Funktion"?"()":""),e]));
   const ck=M=>new Map(M.calls.flatMap(c=>[...c.fns].map(f=>[c.from+" ruft "+c.to+": "+f+"()",c])));
@@ -5761,7 +5835,7 @@ function prefixOf(n){const i=n.indexOf("_");return i>0?n.slice(0,i):n}
 /* Eigene Cluster bleiben im Browser gespeichert */
 S.manual=new Map();try{const o=JSON.parse(localStorage.getItem("sp-cluster")||"{}");for(const k in o)S.manual.set(k,o[k])}catch(e){}
 function saveManual(){try{localStorage.setItem("sp-cluster",JSON.stringify(Object.fromEntries(S.manual)))}catch(e){}}
-/* Louvain: Komponenten mit vielen gemeinsamen Messages und Aufrufen bilden einen Cluster */
+/* Louvain: FCs mit vielen gemeinsamen Messages und Aufrufen bilden einen Cluster */
 function louvain(N,E){
   const member=new Map(N.map(n=>[n,n]));let adj=new Map(N.map(n=>[n,new Map()]));
   for(const [a,b,w] of E){if(a===b||!adj.has(a)||!adj.has(b))continue;adj.get(a).set(b,(adj.get(a).get(b)||0)+w);adj.get(b).set(a,(adj.get(b).get(a)||0)+w)}
@@ -5814,7 +5888,7 @@ function computeGroups(){
 const realGroups=()=>[...new Set(S.grpOf.values())];
 const multiGroups=()=>realGroups().filter(k=>(S.groups.get(k)||[]).length>1);
 function initCollapse(){S.collapsed=new Set();const mg=multiGroups();if(mg.length>=2&&S.model.comps.size>12)mg.forEach(g=>S.collapsed.add(g))}
-$("#grpBy").addEventListener("change",()=>{S.grpTouched=true;try{localStorage.setItem("sp-grp2",$("#grpBy").value)}catch(e){}computeGroups();initCollapse();if(S.focus&&S.focus.type==="grp")S.focus=null;renderFocus();renderGraph();drawExp();renderDyn()});
+$("#grpBy").addEventListener("change",()=>{S.grpTouched=true;try{localStorage.setItem("sp-grp2",$("#grpBy").value)}catch(e){}computeGroups();initCollapse();if(S.focus&&S.focus.type==="grp")S.focus=null;renderFocus();renderGraph();drawIf();drawExp();renderDyn()});
 
 function focusSets(){
   const f=S.focus;if(!f||!S.model)return null;const M=S.model,core=new Set();let msg=null,fn=null;
@@ -5826,7 +5900,7 @@ function focusSets(){
   if(!msg&&!fn){M.flows.forEach(x=>{if(core.has(x.from))view.add(x.to);if(core.has(x.to)&&x.from!==ENV)view.add(x.from)});M.calls.forEach(x=>{if(core.has(x.from))view.add(x.to);if(core.has(x.to))view.add(x.from)})}
   return {core,view,msg,fn};
 }
-const KIND={comp:"Komponente",grp:"Cluster",msg:"Message",fn:"Funktion"};
+const KIND={comp:"FC",grp:"Cluster",msg:"Message",fn:"Funktionalität"};
 function focusOptions(){
   const M=S.model,o=[];
   realGroups().sort().forEach(g=>o.push({type:"grp",name:g}));
@@ -5844,14 +5918,14 @@ function renderFocus(){
   chip.innerHTML=`<span class="fdot"></span>${esc(S.focus.name)}<span class="fx" aria-hidden="true">✕</span>`;chip.setAttribute("aria-label","Fokus "+S.focus.name+" lösen");
   $("#fq").value=optLabel(S.focus);
   const nb=[...F.view].filter(n=>!F.core.has(n)).length;
-  $("#fqInfo").textContent=`Fokus auf ${KIND[S.focus.type]} ${S.focus.name}: ${F.core.size} Komponente${F.core.size===1?"":"n"} im Kern`+(nb?`, ${nb} direkte${nb===1?"r":""} Partner`:"")+".";
+  $("#fqInfo").textContent=`Fokus auf ${KIND[S.focus.type]} ${S.focus.name}: ${F.core.size} FC${F.core.size===1?"":"s"} im Kern`+(nb?`, ${nb} direkte${nb===1?"r":""} Partner`:"")+".";
 }
 function setFocus(f){S.focus=f;if(!f)$("#fq").value="";S.expOpen.clear();S.expLimit=200;S.ifLimit=300;renderFocus();renderGraph();drawIf();drawExp();renderDyn();if(f)toast("Fokus: "+f.name)}
 function parseFocus(v){
   v=v.trim();if(!v)return null;
-  const m=v.match(/^(Komponente|Cluster|Subsystem|Message|Funktion):\s*(.+)$/);
+  const m=v.match(/^(FC|Komponente|Cluster|Subsystem|Message|Funktionalität|Funktion):\s*(.+)$/);
   const opts=focusOptions();
-  if(m){const type=m[1]==="Subsystem"?"grp":Object.keys(KIND).find(k=>KIND[k]===m[1]);const name=m[2].replace(/\(\)$/,"");return opts.find(o=>o.type===type&&o.name===name)||null}
+  if(m){const type={Subsystem:"grp",Komponente:"comp",Funktion:"fn"}[m[1]]||Object.keys(KIND).find(k=>KIND[k]===m[1]);const name=m[2].replace(/\(\)$/,"");return opts.find(o=>o.type===type&&o.name===name)||null}
   const name=v.replace(/\(\)$/,"");
   for(const t of ["comp","grp","msg","fn"]){const o=opts.find(x=>x.type===t&&x.name===name);if(o)return o}
   const lo=name.toLowerCase();return opts.find(x=>x.name.toLowerCase()===lo)||null;
@@ -5898,7 +5972,7 @@ function renderGraph(){
   const add=(kind,a,b,item)=>{const k=kind+"|"+a+"|"+b;if(!agg.has(k))agg.set(k,{kind,a,b,items:[]});agg.get(k).items.push(item)};
   for(const x of flows){const a=nid(x.from),b=nid(x.to);if(a===b){intern.set(a,(intern.get(a)||0)+1);continue}add("f",a,b,x)}
   for(const c of calls){const a=nid(c.from),b=nid(c.to);if(a!==b)add("c",a,b,c)}
-  for(const [g,n] of closed){const i=intern.get("G:"+g)||0;els.push({data:{id:"G:"+g,label:g+"\n"+n+" Komponente"+(n>1?"n":"")+(i?" · "+i+" intern":"")},classes:"grp"})}
+  for(const [g,n] of closed){const i=intern.get("G:"+g)||0;els.push({data:{id:"G:"+g,label:g+"\n"+n+" FC"+(n>1?"s":"")+(i?" · "+i+" intern":"")},classes:"grp"})}
   if([...agg.values()].some(e=>e.a===ENV))els.push({data:{id:ENV,label:"Umgebung\n(Producer fehlt)"},classes:"env"});
   let i=0;
   for(const e of agg.values()){
@@ -5953,7 +6027,7 @@ function hood(n){
 $("#calls").addEventListener("change",renderGraph);
 $("#bFit").onclick=()=>S.cy&&S.cy.fit(undefined,30);
 $("#bCollapse").onclick=()=>{const mg=multiGroups();if(S.collapsed.size<mg.length)mg.forEach(g=>S.collapsed.add(g));else S.collapsed.clear();renderGraph()};
-const reTheme=()=>{if(S.model)renderGraph()};
+const reTheme=()=>{if(S.model){renderGraph();if(S.wkCy)drawWk()}};
 try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",reTheme)}catch(e){}
 new MutationObserver(reTheme).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 
@@ -5963,7 +6037,7 @@ function showEdge(it){
   if(!it)return;
   if(it.kind==="c"){
     const fns=uniqBy(it.items.flatMap(c=>[...c.fns].map(f=>({f,from:c.from,to:c.to}))),x=>x.f+x.from);
-    $("#detail").innerHTML=`<h3>${esc(lab(it.a))} ruft ${esc(lab(it.b))}</h3><p class="sub">Funktionsaufrufe über die Grenze. In der PaVaSt-Message-Schnittstelle tauchen sie nicht auf.</p><ul class="msgl">${fns.map(x=>`<li>${fbtn("fn",x.f,esc(x.f)+"()")}${it.a.startsWith("G:")||it.b.startsWith("G:")?` <span class="sub">${esc(x.from)} → ${esc(x.to)}</span>`:""}</li>`).join("")}</ul>`;
+    $("#detail").innerHTML=`<h3>${esc(lab(it.a))} ruft ${esc(lab(it.b))}</h3><p class="sub">Aufrufe von Funktionalitäten über die Grenze. In der PaVaSt-Message-Schnittstelle tauchen sie nicht auf.</p><ul class="msgl">${fns.map(x=>`<li>${fbtn("fn",x.f,esc(x.f)+"()")}${it.a.startsWith("G:")||it.b.startsWith("G:")?` <span class="sub">${esc(x.from)} → ${esc(x.to)}</span>`:""}</li>`).join("")}</ul>`;
     return;
   }
   const items=[...it.items].sort((x,y)=>x.m.localeCompare(y.m)),agg=it.a.startsWith("G:")||it.b.startsWith("G:");
@@ -5974,14 +6048,14 @@ function showEdge(it){
 }
 function picked(){return S.cy?S.cy.nodes(":selected").filter(n=>{const i=n.id();return !i.startsWith("G:")&&!i.startsWith("P:")&&i!==ENV}).map(n=>n.id()):[]}
 function showPick(){
-  const l=picked();if(!l.length){if(S.pick)$("#detail").innerHTML='<p class="sub">Komponenten antippen, um sie auszuwählen.</p>';return}
+  const l=picked();if(!l.length){if(S.pick)$("#detail").innerHTML='<p class="sub">FCs antippen, um sie auszuwählen.</p>';return}
   let i=1;const ex=new Set([...S.manual.values()]);while(ex.has("Cluster "+i))i++;
-  $("#detail").innerHTML=`<span class="t-idx">Auswahl</span><h3>${l.length} Komponente${l.length===1?"":"n"}</h3>
+  $("#detail").innerHTML=`<span class="t-idx">Auswahl</span><h3>${l.length} FC${l.length===1?"":"s"}</h3>
    <div class="chips">${l.sort().map(n=>`<span class="chip">${esc(n)}</span>`).join("")}</div>
    <label class="t-idx" for="clName" style="display:block;margin-top:12px">Name des Clusters</label>
    <input id="clName" class="filter" value="Cluster ${i}" style="width:100%;max-width:none;margin-top:5px;height:36px">
    <div class="btns" style="margin-top:10px"><button class="pill primary" type="button" id="clMake">Als Cluster zusammenfassen</button><button class="pill" type="button" id="clClear">Auswahl aufheben</button></div>`;
-  $("#clMake").onclick=()=>{const nm=$("#clName").value.trim()||("Cluster "+i);l.forEach(n=>S.manual.set(n,nm));saveManual();computeGroups();S.collapsed.delete("✎ "+nm);setPick(false);renderFocus();renderGraph();drawExp();renderDyn();showGroup("✎ "+nm,false);toast("Cluster „"+nm+"“ angelegt")};
+  $("#clMake").onclick=()=>{const nm=$("#clName").value.trim()||("Cluster "+i);l.forEach(n=>S.manual.set(n,nm));saveManual();computeGroups();S.collapsed.delete("✎ "+nm);setPick(false);renderFocus();renderGraph();drawSysIf();drawExp();renderDyn();showGroup("✎ "+nm,false);toast("Cluster „"+nm+"“ angelegt")};
   $("#clClear").onclick=()=>{S.cy.nodes().unselect();$("#detail").innerHTML='<p class="empty"></p>'};
 }
 function setPick(on){S.pick=on;$("#bPick").setAttribute("aria-pressed",on);$("#bPick").classList.toggle("on",on);$("#bPick").textContent=on?"Auswahl fertig":"Auswählen";
@@ -5992,13 +6066,13 @@ function showGroup(g,isClosed){
   const out=S.model.flows.filter(f=>set.has(f.from)&&!set.has(f.to)),inn=S.model.flows.filter(f=>set.has(f.to)&&!set.has(f.from)),intern=S.model.flows.filter(f=>set.has(f.from)&&set.has(f.to));
   const own=g.startsWith("✎ ");
   $("#detail").innerHTML=`<span class="t-idx">${own?"Eigener Cluster":"Cluster"}</span><h3>${esc(own?g.slice(2):g)}</h3>
-   <dl class="kv"><dt>Komponenten</dt><dd>${members.length}</dd><dt>Nach außen</dt><dd>${new Set(out.map(f=>f.m)).size} Messages</dd><dt>Von außen</dt><dd>${new Set(inn.map(f=>f.m)).size} Messages</dd><dt>Intern</dt><dd>${new Set(intern.map(f=>f.m)).size} Messages</dd></dl>
+   <dl class="kv"><dt>FCs</dt><dd>${members.length}</dd><dt>Nach außen</dt><dd>${new Set(out.map(f=>f.m)).size} Messages</dd><dt>Von außen</dt><dd>${new Set(inn.map(f=>f.m)).size} Messages</dd><dt>Intern</dt><dd>${new Set(intern.map(f=>f.m)).size} Messages</dd></dl>
    <div class="chips">${members.sort().map(n=>fbtn("comp",n,`<span class="chip">${esc(n)}</span>`)).join("")}</div>
    <div class="btns" style="margin-top:12px">${!S.focus?`<button class="pill" type="button" data-grp="${esc(g)}" data-act="${isClosed?"open":"close"}">${isClosed?"Aufklappen":"Zuklappen"}</button>`:""}${fbtn("grp",g,"Fokus auf Cluster").replace('class="lnk"','class="pill"')}${own?`<button class="pill" type="button" id="clDrop">Auflösen</button>`:""}</div>`;
-  if(own)$("#clDrop").onclick=()=>{const nm=g.slice(2);for(const [k,v] of [...S.manual])if(v===nm)S.manual.delete(k);saveManual();if(S.focus&&S.focus.name===g)S.focus=null;computeGroups();renderFocus();renderGraph();drawExp();renderDyn();$("#detail").innerHTML='<p class="empty"></p>';toast("Cluster „"+nm+"“ aufgelöst")};
+  if(own)$("#clDrop").onclick=()=>{const nm=g.slice(2);for(const [k,v] of [...S.manual])if(v===nm)S.manual.delete(k);saveManual();if(S.focus&&S.focus.name===g)S.focus=null;computeGroups();renderFocus();renderGraph();drawSysIf();drawExp();renderDyn();$("#detail").innerHTML='<p class="empty"></p>';toast("Cluster „"+nm+"“ aufgelöst")};
 }
 function showComp(n){
-  if(n===ENV){const ms=S.model.flows.filter(f=>f.from===ENV);$("#detail").innerHTML=`<h3>Umgebung</h3><p class="sub">Messages, die importiert oder gelesen werden, aber von keiner geladenen Komponente stammen.</p><div class="chips">${[...new Set(ms.map(f=>f.m))].map(m=>fbtn("msg",m,`<span class="chip">${esc(m)}</span>`)).join("")}</div>`;return}
+  if(n===ENV){const ms=S.model.flows.filter(f=>f.from===ENV);$("#detail").innerHTML=`<h3>Umgebung</h3><p class="sub">Messages, die importiert oder gelesen werden, aber von keiner geladenen FC stammen.</p><div class="chips">${[...new Set(ms.map(f=>f.m))].map(m=>fbtn("msg",m,`<span class="chip">${esc(m)}</span>`)).join("")}</div>`;return}
   const c=S.model.comps.get(n);if(!c)return;
   const out=S.model.flows.filter(f=>f.from===n),inn=S.model.flows.filter(f=>f.to===n);
   const iss=S.model.issues.filter(i=>i.comp===n),g=S.grpOf.get(n);
@@ -6007,9 +6081,11 @@ function showComp(n){
    <dt>Prozesse</dt><dd>${c.procs.map(p=>esc(p.name)).join(", ")||"—"}</dd></dl>
    <h3>Exporte</h3><div class="chips">${[...new Set([...c.exp,...out.map(f=>f.m)])].sort().map(m=>fbtn("msg",m,`<span class="chip w">${esc(m)}</span>`)).join("")||'<span class="sub">keine</span>'}</div>
    <h3>Importe</h3><ul class="msgl">${inn.sort((x,y)=>x.m.localeCompare(y.m)).map(f=>`<li>${fbtn("msg",f.m)} <span class="sub">von ${esc(lab(f.from))}</span> ${pill(f.st)}</li>`).join("")||'<li class="sub">keine</li>'}</ul>
+   <h3>Applikationsparameter</h3><div class="chips">${[...c.cal].sort().map(x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`).join("")||'<span class="sub">keine erkannt</span>'}</div>
    ${iss.length?`<h3>Auffällig</h3><ul class="msgl">${iss.map(i=>`<li class="mono">${esc(i.m)} <span class="sub">${esc(i.kind)}</span></li>`).join("")}</ul>`:""}
-   <div class="btns" style="margin-top:12px">${fbtn("comp",n,"Fokus auf Komponente").replace('class="lnk"','class="pill"')}<button class="pill" type="button" onclick="gotoDyn('${esc(n).replace(/'/g,"\\'")}')">Aufrufketten</button></div>`;
+   <div class="btns" style="margin-top:12px">${fbtn("comp",n,"Fokus auf FC").replace('class="lnk"','class="pill"')}<button class="pill" type="button" onclick="gotoDyn('${esc(n).replace(/'/g,"\\'")}')">Aufrufketten</button></div>`;
 }
+function calTip(x){const o=S.model.cals.get(x);if(!o)return "";const p=o.props||{};return [p.lang,p.kat,p.einheit,o.owner.length?"definiert in "+o.owner.join(", "):"",o.users.length?"genutzt in "+o.users.join(", "):""].filter(Boolean).join(" · ")}
 function gotoDyn(n){openTab("dyn");const el=document.getElementById("dyn-"+n);if(el){el.open=true;el.scrollIntoView({behavior:"smooth",block:"start"})}}
 
 $("#bMer").onclick=async()=>{
@@ -6030,10 +6106,10 @@ const more=(n,id)=>n>0?`<p style="margin-top:10px"><button class="pill" type="bu
 function renderIf(){
   const sel=$("#ifComp"),cur=sel.value;
   const names=[...S.model.comps.keys()].sort();
-  sel.innerHTML='<option value="">Alle Komponenten</option>'+names.map(n=>`<option${n===cur?" selected":""}>${esc(n)}</option>`).join("");
+  sel.innerHTML='<option value="">Alle FCs</option>'+names.map(n=>`<option${n===cur?" selected":""}>${esc(n)}</option>`).join("");
   drawIf();
 }
-function drawIf(){
+function drawIf(){drawSysIf();
   const q=$("#ifQ").value.trim().toLowerCase(),only=$("#ifComp").value,rows=[],F=focusSets();
   for(const c of [...S.model.comps.values()].sort((a,b)=>a.name.localeCompare(b.name))){
     if(only&&c.name!==only)continue;if(F&&!F.view.has(c.name))continue;
@@ -6045,7 +6121,7 @@ function drawIf(){
   const filt=rows.filter(r=>(!q||r.m.toLowerCase().includes(q))&&(!F||(F.msg?r.m===F.msg:F.fn?F.core.has(r.c.name):(F.core.has(r.c.name)||r.partner.some(p=>F.core.has(p))))));
   const yn=(b,has)=>!has?'<span class="no">n/a</span>':b?'<span class="yes">✓</span>':'<span class="no">–</span>';
   const vis=filt.slice(0,S.ifLimit);
-  $("#ifTbl").innerHTML=filt.length?`<table><thead><tr><th>Komponente</th><th>Message</th><th>Richtung</th><th>PaVaSt</th><th>C-Code</th><th>Bedingung</th><th>Partner</th><th>Status</th></tr></thead><tbody>`+
+  $("#ifTbl").innerHTML=filt.length?`<table><thead><tr><th>FC</th><th>Message</th><th>Richtung</th><th>PaVaSt</th><th>C-Code</th><th>Bedingung</th><th>Partner</th><th>Status</th></tr></thead><tbody>`+
    vis.map(r=>{const st=r.dir==="Import"?r.st:(r.c.hasPV&&!r.pv?"undecl":r.c.hasC&&!r.cd?"unused":"ok");
     const ccs=[...new Set(r.cc.map(normCond))],mis=r.pc!==undefined&&r.cc.length&&(ccs.length>1||ccs[0]!==normCond(r.pc));
     const bed=(r.pc?`<span class="syc">PaVaSt: ${esc(r.pc)}</span>`:"")+(r.cc.some(x=>x)?`${r.pc?"<br>":""}<span class="syc">C: ${r.cc.map(x=>esc(x||"immer")).join(" | ")}</span>`:"");
@@ -6055,11 +6131,208 @@ function drawIf(){
 }
 $("#ifQ").addEventListener("input",()=>{S.ifLimit=300;drawIf()});$("#ifComp").addEventListener("change",()=>{S.ifLimit=300;drawIf()});
 
+/* ---- Systemschnittstellen: Ausgänge eines Clusters und alles, was sie beeinflusst ---- */
+const retOf=f=>!/^(?:[\w\s]*\s)?void\s+[A-Za-z_]\w*\s*\(/.test(f.sig||"");
+function sysIfaces(){
+  const M=S.model,fn=new Map(),clOf=n=>S.grpOf.get(n)??n;
+  for(const c of M.comps.values())for(const f of c.funcs)if(!fn.has(f.name)||!f.isStatic)fn.set(f.name,f);
+  const names=new Map();for(const c of M.comps.values())names.set(clOf(c.name),[...(names.get(clOf(c.name))||[]),c.name]);
+  const out=[];
+  for(const [cl,members] of names){
+    const set=new Set(members);
+    /* Aufrufe über die Clustergrenze zählen als Eingang: Rückgabewert bzw. Argumente */
+    const inCall=new Map(),outCall=new Map();
+    for(const k of M.calls){
+      if(set.has(k.to)&&!set.has(k.from))for(const g of k.fns){if(!inCall.has(g))inCall.set(g,new Set());inCall.get(g).add(k.from)}
+      if(set.has(k.from)&&!set.has(k.to))for(const g of k.fns){if(!outCall.has(g))outCall.set(g,{to:new Set(),from:new Set()});outCall.get(g).to.add(k.to);outCall.get(g).from.add(k.from)}
+    }
+    const memo=new Map();
+    function tr(name,stack){
+      if(memo.has(name))return memo.get(name);const f=fn.get(name);
+      if(!f||!set.has(f.comp)||stack.has(name))return {R:new Set(),fns:new Set(),C:new Set()};
+      stack.add(name);const R=new Set(f.R||[]),fns=new Set([name]),C=new Set(f.CAL||[]);
+      if(inCall.has(name))R.add("ƒ "+name+"()");
+      for(const k of f.calls){const g=fn.get(k);if(!g||!retOf(g))continue;
+        if(!set.has(g.comp)){R.add("ƒ "+k+"()");continue}
+        const t=tr(k,stack);t.R.forEach(x=>R.add(x));t.fns.forEach(x=>fns.add(x));t.C.forEach(x=>C.add(x))}
+      stack.delete(name);const r={R,fns,C};memo.set(name,r);return r;
+    }
+    const outF=M.flows.filter(f=>f.from!==ENV&&set.has(f.from)&&!set.has(f.to));
+    const inF=M.flows.filter(f=>set.has(f.to)&&(f.from===ENV||!set.has(f.from)));
+    const inputs=new Map();for(const f of inF){if(!inputs.has(f.m))inputs.set(f.m,new Set());inputs.get(f.m).add(f.from===ENV?"Umgebung":f.from)}
+    for(const [g,fr] of inCall)inputs.set("ƒ "+g+"()",new Set([...fr]));
+    for(const [g,o] of outCall)inputs.set("ƒ "+g+"()",new Set([...o.to]));
+    /* Abhängigkeiten innerhalb des Clusters: geschriebene Message → gelesene Messages */
+    const calDep=new Map(),dep=new Map(),wfn=new Map(),add=(w,r,f,cs)=>{if(!calDep.has(w))calDep.set(w,new Set());cs.forEach(x=>calDep.get(w).add(x));if(!dep.has(w))dep.set(w,new Set());for(const x of r)if(x!==w)dep.get(w).add(x);if(!wfn.has(w))wfn.set(w,new Set());wfn.get(w).add(f.comp+"."+f.name)};
+    for(const c of M.comps.values()){if(!set.has(c.name))continue;
+      for(const f of c.funcs){const t=tr(f.name,new Set());for(const w of (f.W||[]))add(w,t.R,f,t.C)}}
+    const back=(start,extra)=>{
+      const seenI=new Set(),seenN=new Set(),fns=new Set(),todo=[...start];const seen=new Set(todo);
+      while(todo.length){const m=todo.pop();
+        for(const x of (dep.get(m)||[])){if(seen.has(x))continue;seen.add(x);
+          if(inputs.has(x)){seenI.add(x)}else{seenN.add(x);todo.push(x)}}
+        (wfn.get(m)||[]).forEach(y=>fns.add(y))}
+      for(const x of (extra||[]))if(!seen.has(x)){seen.add(x);if(inputs.has(x))seenI.add(x);else{seenN.add(x);todo.push(x);while(todo.length){const m=todo.pop();for(const y of (dep.get(m)||[])){if(seen.has(y))continue;seen.add(y);if(inputs.has(y))seenI.add(y);else{seenN.add(y);todo.push(y)}}}}}
+      const cal=new Set();for(const m of [...start,...seenN])(calDep.get(m)||[]).forEach(x=>cal.add(x));
+      return {inputs:[...seenI].sort(),inner:[...seenN].sort(),fns:[...fns].sort(),cal:[...cal].sort()};
+    };
+    const rows=[];
+    const byM=new Map();for(const f of outF){if(!byM.has(f.m))byM.set(f.m,{m:f.m,to:new Set(),st:[]});const o=byM.get(f.m);o.to.add(f.to);o.st.push(f.st)}
+    for(const o of [...byM.values()].sort((a,b)=>a.m.localeCompare(b.m))){
+      const b=back([o.m]);rows.push({kind:"Message",name:o.m,to:[...new Set([...o.to].map(clOf))].sort(),...b});
+    }
+    /* Funktionen, die FCs außerhalb aufrufen */
+    for(const [g,o] of [...outCall].sort((a,b)=>a[0].localeCompare(b[0]))){
+      const callers=[];for(const c of M.comps.values())if(o.from.has(c.name))for(const f of c.funcs)if(f.calls.has(g))callers.push(f.name);
+      const R=new Set(),CC=new Set();callers.forEach(n=>{const t=tr(n,new Set());t.R.forEach(x=>{if(x!=="ƒ "+g+"()")R.add(x)});t.C.forEach(x=>CC.add(x))});
+      const b=back([],R);CC.forEach(x=>{if(!b.cal.includes(x))b.cal.push(x)});b.cal.sort();rows.push({kind:"Funktion",name:g+"()",to:[...new Set([...o.to].map(clOf))].sort(),...b,fns:[...new Set([...b.fns,...callers.map(n=>fn.get(n)?fn.get(n).comp+"."+n:n)])].sort()});
+    }
+    /* Eingänge ohne Wirkung auf einen Ausgang */
+    const used=new Set(rows.flatMap(r=>r.inputs));
+    out.push({cl,members:members.sort(),rows,inputs:[...inputs.keys()].sort(),idle:[...inputs.keys()].filter(x=>!used.has(x)).sort(),inSrc:inputs,real:S.grpOf.has(members[0])});
+  }
+  return out.sort((a,b)=>a.cl.localeCompare(b.cl));
+}
+function drawSysIf(){
+  const box=$("#sysifBody");if(!S.model||!S.model.comps.size){box.innerHTML='<p class="sub">Noch keine Dateien eingelegt.</p>';return}
+  const F=focusSets();let all=sysIfaces().filter(c=>c.rows.length||c.inputs.length);
+  if(F&&S.focus.type==="grp")all=all.filter(c=>c.cl===S.focus.name);
+  else if(F)all=all.filter(c=>c.members.some(n=>F.view.has(n)));
+  if(!all.length){box.innerHTML='<p class="sub">Kein Cluster hat Schnittstellen nach außen.</p>';return}
+  const ch=(l,cls)=>l.length?l.map(x=>x.startsWith("ƒ ")?fbtn("fn",x.slice(2).replace(/\(\)$/,""),`<span class="chip">${esc(x)}</span>`):fbtn("msg",x,`<span class="chip${cls?" "+cls:""}">${esc(x)}</span>`)).join(" "):'<span class="sub">—</span>';
+  const open=all.length<=3;
+  box.innerHTML=all.map(c=>`<details class="sheet dcomp" ${open?"open":""}><summary><h3>${esc(c.cl)}</h3><span class="sub">${c.members.length} FC${c.members.length===1?"":"s"} · ${c.rows.length} Ausgang${c.rows.length===1?"":"e"} · ${c.inputs.length} Eingang${c.inputs.length===1?"":"e"}</span></summary>
+    ${c.rows.length?`<div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Ausgang</th><th>Abnehmer</th><th>beeinflusst von (Eingänge)</th><th>intern beteiligt</th><th>Applikation</th><th>Funktionalitäten</th></tr></thead><tbody>${c.rows.map(r=>`<tr><td class="mono" style="white-space:nowrap">${r.kind==="Message"?fbtn("msg",r.name):fbtn("fn",r.name.replace(/\(\)$/,""),esc(r.name))}${r.kind==="Message"?`<br><button class="lnk sub" type="button" data-wk="${esc(r.name)}">Wirkkette ›</button>`:""}</td><td>${r.to.map(esc).join(", ")}</td><td><div class="chips">${ch(r.inputs)}</div></td><td><div class="chips">${ch(r.inner,"w")}</div></td><td><div class="chips">${r.cal.length?r.cal.map(x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`).join(" "):'<span class="sub">—</span>'}</div></td><td class="mono sub">${r.fns.map(esc).join(", ")||"—"}</td></tr>`).join("")}</tbody></table></div>`:'<p class="sub" style="margin-top:8px">Dieser Cluster liefert nichts nach außen.</p>'}
+    ${c.idle.length?`<p class="sub" style="margin-top:8px">Eingänge ohne erkennbare Wirkung auf einen Ausgang: ${c.idle.map(esc).join(", ")}</p>`:""}</details>`).join("");
+}
+$("#bSysCsv").onclick=()=>{
+  const q=v=>/[;"\n]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v,rows=[["Cluster","Art","Ausgang","Abnehmer","Eingänge","Intern beteiligt","Applikationsparameter","Funktionalitäten"]];
+  for(const c of sysIfaces())for(const r of c.rows)rows.push([c.cl,r.kind,r.name,r.to.join(", "),r.inputs.join(", "),r.inner.join(", "),r.cal.join(", "),r.fns.join(", ")]);
+  copyText(rows.map(r=>r.map(q).join(";")).join("\n"),"CSV");
+};
+
+/* ---- Wirkkette: Größe → Funktionalität → Größe ---- */
+S.wk=null;
+function wkGraph(target,dir,all,withCal){
+  const M=S.model,fn=new Map(),clOf=n=>S.grpOf.get(n)??n;
+  for(const c of M.comps.values())for(const f of c.funcs)if(!fn.has(f.name)||!f.isStatic)fn.set(f.name,f);
+  const callers=new Map();for(const f of fn.values())for(const k of f.calls)if(fn.has(k)){if(!callers.has(k))callers.set(k,new Set());callers.get(k).add(f.name)}
+  /* void-Funktionalitäten liefern keinen Rückgabewert an den Aufrufer */
+  const ret=f=>!/^(?:[\w\s]*\s)?void\s+[A-Za-z_]\w*\s*\(/.test(f.sig||"");
+  const writers=new Map(),readers=new Map();
+  for(const f of fn.values()){(f.W||[]).forEach(m=>{if(!writers.has(m))writers.set(m,[]);writers.get(m).push(f)});(f.R||[]).forEach(m=>{if(!readers.has(m))readers.set(m,[]);readers.get(m).push(f)})}
+  const prov=m=>(M.prov.get(m)||[]);
+  const home=prov(target)[0]||(writers.get(target)||[])[0]?.comp||(readers.get(target)||[])[0]?.comp||null;
+  const scope=home?clOf(home):null,inScope=comp=>all||comp==null||clOf(comp)===scope;
+  const N=new Map(),E=new Map(),LIM=320;let cut=false;
+  const node=(id,data,cls)=>{if(!N.has(id)){if(N.size>=LIM){cut=true;return false}N.set(id,{data:Object.assign({id},data),classes:cls})}return true};
+  const edge=(a,b,cls,lab,cond)=>{const k=a+"|"+b;if(!E.has(k))E.set(k,{data:{id:"x"+E.size,source:a,target:b,label:(lab||"")+(cond?(lab?" ":"")+"◇":""),cond:cond||null},classes:(cls||"")+(cond?" cond":"")})};
+  const orC=l=>{l=[...new Set(l)];return l.includes("")||!l.length?null:l.length>1?l.map(x=>"("+x+")").join(" || "):l[0]};
+  const condW=(f,m)=>orC((f.wpos||[]).filter(w=>w.id===m).map(w=>w.syc||""));
+  const condR=(f,m)=>{const st=f.rsyc&&f.rsyc.get(m);return st?orC([...st]):null};
+  const fid=f=>"F:"+f.comp+"."+f.name,mid=m=>"M:"+m,cid=c=>"C:"+c;
+  const fcNode=comp=>{node("P:"+comp,{label:comp+(scope&&clOf(comp)!==scope&&S.grpOf.has(comp)?"  ·  "+clOf(comp):"")},"fc"+(scope&&clOf(comp)!==scope?" foreign":""))};
+  const fnNode=f=>{fcNode(f.comp);return node(fid(f),{label:f.name+"()"+(f.syc?" ◇":""),parent:"P:"+f.comp,cond:f.syc||null,where:f.file+":"+f.line},"fn"+(PROC_RE.test(f.name)?" proc":"")+(f.syc?" cond":""))};
+  const msgNode=(m,edgeCls)=>node(mid(m),{label:m},"msg"+(m===target?" target":"")+(edgeCls?" "+edgeCls:""));
+  const calNodes=f=>{if(!withCal)return;for(const c of (f.CAL||[]))if(node(cid(c),{label:c},"cal"))edge(cid(c),fid(f),"cal")};
+  msgNode(target);
+  const seenM=new Set(),seenF=new Set(),todo=[];
+  if(dir==="back"){
+    todo.push({t:"m",m:target});
+    while(todo.length){const it=todo.shift();
+      if(it.t==="m"){if(seenM.has(it.m))continue;seenM.add(it.m);
+        const ws=(writers.get(it.m)||[]).filter(f=>inScope(f.comp));
+        if(!ws.length&&it.m!==target){N.get(mid(it.m)).classes+=" edge";continue}
+        for(const f of ws){if(!fnNode(f))break;edge(fid(f),mid(it.m),"w","",condW(f,it.m));todo.push({t:"f",f})}}
+      else{const f=it.f;if(seenF.has(f.name))continue;seenF.add(f.name);calNodes(f);
+        for(const r of (f.R||[])){if(!msgNode(r))break;edge(mid(r),fid(f),"r","",condR(f,r));
+          const p=prov(r),outside=p.length?p.every(c=>!inScope(c)):!(writers.get(r)||[]).some(g=>inScope(g.comp));
+          if(outside)N.get(mid(r)).classes+=" edge";else todo.push({t:"m",m:r})}
+        for(const k of f.calls){const g=fn.get(k);if(!g||!ret(g))continue;if(!inScope(g.comp)){fcNode(g.comp);if(fnNode(g)){N.get(fid(g)).classes+=" edge";edge(fid(g),fid(f),"call","ƒ")}continue}
+          if(fnNode(g)){edge(fid(g),fid(f),"call","ƒ");todo.push({t:"f",f:g})}}}
+    }
+  }else{
+    todo.push({t:"m",m:target});
+    while(todo.length){const it=todo.shift();
+      if(it.t==="m"){if(seenM.has(it.m))continue;seenM.add(it.m);
+        const rs=readers.get(it.m)||[];let stop=false;
+        for(const f of rs){if(!inScope(f.comp)){stop=true;continue}if(!fnNode(f))break;edge(mid(it.m),fid(f),"r","",condR(f,it.m));todo.push({t:"f",f})}
+        if(stop&&it.m!==target){N.get(mid(it.m)).classes+=" edge"}else if(stop){const o=[...new Set(rs.filter(f=>!inScope(f.comp)).map(f=>f.comp))];N.get(mid(it.m)).data.label+="\n→ "+o.join(", ")}}
+      else{const f=it.f;if(seenF.has(f.name))continue;seenF.add(f.name);calNodes(f);
+        for(const w of (f.W||[])){if(w===target&&it.f)continue;if(!msgNode(w))break;edge(fid(f),mid(w),"w","",condW(f,w));todo.push({t:"m",m:w})}
+        for(const k of (ret(f)?(callers.get(f.name)||[]):[])){const g=fn.get(k);if(!g)continue;if(!inScope(g.comp)){if(fnNode(g)){N.get(fid(g)).classes+=" edge";edge(fid(f),fid(g),"call","ƒ")}continue}
+          if(fnNode(g)){edge(fid(f),fid(g),"call","ƒ");todo.push({t:"f",f:g})}}}
+    }
+  }
+  /* Größen ohne Schreiber/Leser innerhalb des Bereichs am Rand markieren (Eingang bzw. Ausgang) */
+  if(dir==="fwd")for(const [id,n] of N)if(id.startsWith("M:")&&id!==mid(target)){const m=id.slice(2);const p=prov(m);if(!(readers.get(m)||[]).some(f=>inScope(f.comp))&&M.flows.some(f=>f.m===m&&!inScope(f.to)))n.classes+=" edge"}
+  const conds=[...[...N.values()].map(n=>n.data.cond),...[...E.values()].map(e=>e.data.cond)].filter(Boolean);
+  const sycs=[...new Set(conds.flatMap(c=>sycIds(c,sycTest(S.cfg))))].filter(x=>!/(^|_)(ON|OFF|TRUE|FALSE|YES|NO|ENABLED?|DISABLED?)$/i.test(x)).sort();
+  return {els:[...N.values(),...E.values()],scope,cut,sycs,nCond:conds.length,nF:[...N.keys()].filter(k=>k.startsWith("F:")).length,nM:[...N.keys()].filter(k=>k.startsWith("M:")).length,nC:[...N.keys()].filter(k=>k.startsWith("C:")).length,
+    edgeIn:[...N.entries()].filter(([k,n])=>k.startsWith("M:")&&/\bedge\b/.test(n.classes)).map(([k])=>k.slice(2))};
+}
+function drawWk(){
+  const box=$("#wk"),info=$("#wkInfo");
+  if(S.wkCy){S.wkCy.destroy();S.wkCy=null}
+  if(!S.wk||!S.model||!S.model.M.has(S.wk)){box.innerHTML='<p class="cyfail">'+(S.wk?"„"+esc(S.wk)+"“ ist keine bekannte Größe.":"Größe wählen oder in den Systemschnittstellen auf „Wirkkette“ tippen.")+'</p>';info.textContent="";return}
+  if(typeof cytoscape==="undefined"){box.innerHTML='<p class="cyfail">Die Grafik-Bibliothek fehlt.</p>';return}
+  const dir=$("#wkDir").value,G=wkGraph(S.wk,dir,$("#wkAll").checked,$("#wkCal").checked),T=tok();
+  box.innerHTML="";const font='"JetBrains Mono", ui-monospace, Menlo, monospace';
+  const opts={container:box,elements:G.els,wheelSensitivity:.25,minZoom:.1,maxZoom:3,
+    style:[
+      {selector:"node",style:{label:"data(label)","font-family":font,"font-size":11,color:T.text,"text-wrap":"wrap","text-valign":"center","text-halign":"center",width:"label",height:"label",padding:"9px","background-color":T.surface,"border-width":1.5,"border-color":T.line}},
+      {selector:"node.msg",style:{shape:"round-rectangle","corner-radius":"14px"}},
+      {selector:"node.msg.edge",style:{"border-style":"dashed",color:T.text2}},
+      {selector:"node.target",style:{"border-color":T.amber,"border-width":3,"font-weight":700}},
+      {selector:"node.fn",style:{shape:"rectangle","background-color":T.void,"font-size":11.5}},
+      {selector:"node.fn.proc",style:{"font-weight":700}},
+      {selector:"node.fn.edge",style:{"border-style":"dashed",color:T.text2}},
+      {selector:"node.cal",style:{shape:"tag","font-size":10,color:T.text2,"border-color":T.info,"background-opacity":.6,padding:"6px"}},
+      {selector:"node.fc",style:{"background-opacity":.22,"border-style":"dashed","text-valign":"top","text-halign":"center","text-margin-y":-5,color:T.text2,"font-weight":600,padding:"12px"}},
+      {selector:"node.fc.foreign",style:{"background-opacity":.08,color:T.text3}},
+      {selector:"edge",style:{"curve-style":"bezier","target-arrow-shape":"triangle",width:1.5,"line-color":T.free,"target-arrow-color":T.free,"arrow-scale":.9,label:"data(label)","font-size":10,color:T.info,"text-background-color":T.void,"text-background-opacity":1,"text-background-padding":"2px"}},
+      {selector:"edge.r",style:{"line-color":T.text3,"target-arrow-color":T.text3}},
+      {selector:"edge.call",style:{"line-style":"dotted","line-color":T.info,"target-arrow-color":T.info,"target-arrow-shape":"vee"}},
+      {selector:"edge.cal",style:{"line-style":"dashed","line-color":T.info,"target-arrow-color":T.info,width:1,"line-dash-pattern":[3,4]}},
+      {selector:"edge.cond",style:{"line-style":"dashed","line-dash-pattern":[7,4],"line-color":T.amber,"target-arrow-color":T.amber,color:T.amber,width:1.8}},
+      {selector:"node.fn.cond",style:{"border-color":T.amber,"border-style":"dashed","border-width":2}},
+      {selector:":selected",style:{"overlay-opacity":0,"border-width":3}},
+      {selector:".faded",style:{opacity:.15}}
+    ],
+    layout:S.dagreOk&&window.cytoscapeDagre?{name:"dagre",rankDir:"LR",nodeSep:18,rankSep:70,edgeSep:10,padding:24}:{name:"breadthfirst",directed:true,padding:24}};
+  try{S.wkCy=cytoscape(opts)}catch(err){opts.layout={name:"cose",animate:false,padding:24};S.wkCy=cytoscape(opts)}
+  S.wkCy.on("tap",e=>{const t=e.target;if(t===S.wkCy){S.wkCy.elements().removeClass("faded");$("#wkSel").innerHTML="";return}
+    $("#wkSel").innerHTML=wkSelTxt(t);
+    const set=t.isNode()?t.closedNeighborhood().union(t.descendants()).union(t.ancestors()):t.union(t.connectedNodes());S.wkCy.elements().addClass("faded");set.union(set.nodes().ancestors()).removeClass("faded")});
+  S.wkCy.on("dbltap","node.msg",e=>{const m=e.target.id().slice(2);if(m!==S.wk)setWk(m)});
+  const ein=G.edgeIn.filter(m=>m!==S.wk);
+  info.innerHTML=`${dir==="back"?"Rückwärts":"Vorwärts"} ab <b class="mono">${esc(S.wk)}</b>${G.scope&&!$("#wkAll").checked?" im Cluster "+esc(G.scope):" über alle Cluster"}: ${G.nF} Funktionalitäten, ${G.nM} Größen${$("#wkCal").checked?", "+G.nC+" Applikationsparameter":""}.`+
+    (ein.length?` ${dir==="back"?"Eingänge":"Ausgänge"} am Rand: ${ein.map(esc).join(", ")}.`:"")+(G.sycs.length?` <span class="syc">Variantenabhängig über ${G.sycs.map(esc).join(", ")} (${G.nCond} Stelle${G.nCond===1?"":"n"} ◇).</span>`:" Keine Variantenabhängigkeit.")+(S.cfg.mode==="cfg"?" Konkrete Konfiguration aktiv: abgeschaltete Zweige fehlen bereits.":"")+(G.cut?" <b class=\"warnt\">Gekürzt auf 320 Knoten.</b>":"")+" Doppeltippen auf eine Größe macht sie zum neuen Startpunkt.";
+}
+function wkSelTxt(t){
+  const lab=x=>x.isNode()?(x.id().startsWith("F:")?x.id().slice(2).split(".").slice(1).join(".")+"()":x.id().slice(2)):"";
+  const c=t.data("cond");
+  if(t.isEdge()){const a=lab(t.source()),b=lab(t.target()),k=t.hasClass("call")?"ruft, Rückgabewert an":t.hasClass("cal")?"Applikationsparameter in":t.source().id().startsWith("M:")?"wird gelesen in":"schreibt";
+    return `<b class="mono">${esc(a)}</b> ${k} <b class="mono">${esc(b)}</b>: `+(c?`<span class="syc">nur wenn ${esc(c)}</span>`:"in allen Varianten")}
+  const id=t.id();
+  if(id.startsWith("F:"))return `Funktionalität <b class="mono">${esc(lab(t))}</b> in ${esc(t.data("parent").slice(2))}, ${esc(t.data("where")||"")}: `+(c?`<span class="syc">nur vorhanden wenn ${esc(c)}</span>`:"in allen Varianten vorhanden");
+  if(id.startsWith("C:"))return `Applikationsparameter <b class="mono">${esc(id.slice(2))}</b>`+(calTip(id.slice(2))?": "+esc(calTip(id.slice(2))):"");
+  if(id.startsWith("M:"))return `Größe <b class="mono">${esc(id.slice(2))}</b>`+((S.model.prov.get(id.slice(2))||[]).length?", erzeugt in "+esc(S.model.prov.get(id.slice(2)).join(", ")):", kein Erzeuger geladen");
+  return esc(t.data("label")||"");
+}
+function setWk(m){S.wk=m;$("#wkQ").value=m;drawWk()}
+function renderWkList(){$("#wkList").innerHTML=S.model?[...S.model.M].sort().map(m=>`<option value="${esc(m)}"></option>`).join(""):"";if(S.wk&&S.model&&!S.model.M.has(S.wk))S.wk=null;if(!$("#p-if").hidden)drawWk()}
+$("#wkQ").addEventListener("change",e=>{const v=e.target.value.trim();if(!v)return;const m=S.model&&([...S.model.M].find(x=>x===v)||[...S.model.M].find(x=>x.toLowerCase()===v.toLowerCase()));if(m)setWk(m);else toast("Keine Größe mit diesem Namen")});
+$("#wkQ").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.target.dispatchEvent(new Event("change"))}});
+["wkDir","wkAll","wkCal"].forEach(id=>$("#"+id).addEventListener("change",drawWk));
+$("#wkFit").onclick=()=>S.wkCy&&S.wkCy.fit(undefined,24);
+document.addEventListener("click",e=>{const b=e.target.closest("[data-wk]");if(!b)return;e.preventDefault();openTab("if");setWk(b.dataset.wk);$("#wksheet").scrollIntoView({behavior:"smooth",block:"start"})});
+
 /* ---- Exportliste: kompakte Tabelle, Zeile klappt auf ---- */
 const procTxt=x=>esc(x.proc)+' <span class="acc">'+esc(x.r.txt)+'</span>';
 function renderExp(){
   const sel=$("#exComp"),cur=sel.value;
-  sel.innerHTML='<option value="">Alle Komponenten</option>'+[...S.model.comps.keys()].sort().map(n=>`<option${n===cur?" selected":""}>${esc(n)}</option>`).join("");
+  sel.innerHTML='<option value="">Alle FCs</option>'+[...S.model.comps.keys()].sort().map(n=>`<option${n===cur?" selected":""}>${esc(n)}</option>`).join("");
   drawExp();
 }
 const sev=e=>e.hints.some(h=>h.lv==="bad")?3:e.hints.some(h=>h.lv==="warn")?2:e.hints.length?1:0;
@@ -6085,7 +6358,7 @@ function expDetail(e){
   const wr=e.writes.map(w=>`${esc(w.fn)}() <span class="acc">${esc(w.file)}:${w.line}${w.cond?" · bedingt":""}</span>${w.syc?' <span class="syc">nur wenn '+esc(w.syc)+'</span>':""}${w.fremd?' <span class="st multi">'+esc(w.comp)+'</span>':""}`).join("<br>");
   return `${p.lang?`<p class="sub" style="margin:0 0 6px">${esc(p.lang)}</p>`:""}<div class="exp-b"><section><span class="t-idx">Statisch</span><dl class="kv">
       ${dd("Typ",typ)}${dd("Bereich",range)}${dd("Umrechnung",p.umrechnung&&esc(p.umrechnung))}
-      ${dd("Definiert",d?esc(d.file)+":"+d.line+(d.macro?' <span class="acc">'+esc(d.type)+'</span>':""):(e.hasC?'<span class="acc">nicht im Komponenten-Code</span>':'<span class="acc">kein C-Code geladen</span>'))}
+      ${dd("Definiert",d?esc(d.file)+":"+d.line+(d.macro?' <span class="acc">'+esc(d.type)+'</span>':""):(e.hasC?'<span class="acc">nicht im FC-Code</span>':'<span class="acc">kein C-Code geladen</span>'))}
       ${dd("Variante",e.pvCond||e.cCond?[e.pvCond&&'<span class="syc">PaVaSt: '+esc(e.pvCond)+'</span>',e.cCond&&'<span class="syc">C: '+esc(e.cCond)+'</span>'].filter(Boolean).join("<br>"):"")}
       ${dd("Initialwert",d&&d.init!=null?'<span class="mono">'+esc(d.init)+'</span>':(p.init?esc(p.init):""))}
       ${dd("Abnehmer",e.cons.map(c=>esc(c.comp)+" "+pill(c.st)).join("<br>")||'<span class="acc">keiner</span>')}
@@ -6094,13 +6367,13 @@ function expDetail(e){
       ${dd("Erzeugt in",e.wProcs.map(procTxt).join("<br>")||(e.hasC?'<span class="acc">keinem Prozess</span>':'<span class="acc">—</span>'))}
       ${dd("Schreibstellen",wr)}
       ${dd("Gelesen in",e.readers.map(r=>esc(r.comp)+" · "+procTxt(r)).join("<br>")||(e.cons.length?'<span class="acc">Leser ohne C-Code</span>':""))}
-    </dl></section></div>${hint}<p style="margin-top:8px">${fbtn(e.kind==="Funktion"?"fn":"msg",e.name,"Fokus auf "+(e.kind==="Funktion"?"Funktion":"Message"))}</p>`;
+    </dl></section></div>${hint}<p style="margin-top:8px">${fbtn(e.kind==="Funktion"?"fn":"msg",e.name,"Fokus auf "+(e.kind==="Funktion"?"Funktionalität":"Message"))}</p>`;
 }
 function drawExp(){
   const rows=expRows(),box=$("#exList");
   if(!rows.length){box.innerHTML='<p class="sub">'+(S.model.exportsList.length?"Kein Export passt zum Filter.":"Noch keine Exporte gefunden. Lege C- und PaVaSt-Dateien ein.")+'</p>';return}
   const grp=$("#exGroup").checked,{k,dir}=S.expSort;
-  const cols=[["name","Name"],["comp","Komponente"],["kind","Art"],["pv","PaVaSt"],["raster","Erzeugt"],["cons","Abnehmer"],["hint","Hinweise"]];
+  const cols=[["name","Name"],["comp","FC"],["kind","Art"],["pv","PaVaSt"],["raster","Erzeugt"],["cons","Abnehmer"],["hint","Hinweise"]];
   const th=cols.map(([c,t])=>`<th aria-sort="${k===c?(dir>0?"ascending":"descending"):"none"}"><button class="sortb" type="button" data-sort="${c}">${t}${k===c?(dir>0?" ↑":" ↓"):""}</button></th>`).join("");
   let html=`<table class="xt"><thead><tr><th class="cv"></th>${th}</tr></thead><tbody>`,shown=0;
   const order=grp?[...new Set(rows.map(e=>e.comp))].sort():[null];
@@ -6116,7 +6389,7 @@ function drawExp(){
       const rast=[...new Set((e.kind==="Funktion"?e.procs:e.wProcs).map(x=>x.r.txt))].join(", ")||'<span class="no">—</span>';
       const cons=e.kind==="Funktion"?e.callers.map(c=>c.comp):e.cons.map(c=>c.comp);
       const hc=e.hints.length?`<span class="hc s${s}">${e.hints.length}</span>`:'<span class="no">—</span>';
-      html+=`<tr class="xr${open?" open":""}" data-k="${esc(key)}" tabindex="0" aria-expanded="${open}"><td class="cv">${open?"▾":"▸"}</td><td class="mono">${esc(e.name)}${e.kind==="Funktion"?"()":""}${e.pvCond||e.cCond?` <span class="vmark" title="variantenabhängig: ${esc(e.pvCond||e.cCond)}">◇</span>`:""}</td><td>${esc(e.comp)}</td><td>${e.kind}</td><td class="c">${pv}</td><td>${rast}</td><td>${cons.length?`<b>${cons.length}</b> <span class="acc">${esc(cons.slice(0,2).join(", "))}${cons.length>2?" …":""}</span>`:'<span class="no">keiner</span>'}</td><td>${hc}</td></tr>`;
+      html+=`<tr class="xr${open?" open":""}" data-k="${esc(key)}" tabindex="0" aria-expanded="${open}"><td class="cv">${open?"▾":"▸"}</td><td class="mono">${esc(e.name)}${e.kind==="Funktion"?"()":""}${e.pvCond||e.cCond?` <span class="vmark" title="variantenabhängig: ${esc(e.pvCond||e.cCond)}">◇</span>`:""}</td><td>${esc(e.comp)}</td><td>${e.kind==="Funktion"?"Funktionalität":e.kind}</td><td class="c">${pv}</td><td>${rast}</td><td>${cons.length?`<b>${cons.length}</b> <span class="acc">${esc(cons.slice(0,2).join(", "))}${cons.length>2?" …":""}</span>`:'<span class="no">keiner</span>'}</td><td>${hc}</td></tr>`;
       if(open)html+=`<tr class="xd"><td></td><td colspan="7">${expDetail(e)}</td></tr>`;
     }
   }
@@ -6134,8 +6407,8 @@ $("#exList").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e
 $("#exQ").addEventListener("input",()=>{S.expLimit=200;drawExp()});$("#exComp").addEventListener("change",()=>{S.expLimit=200;drawExp()});$("#exHint").addEventListener("change",drawExp);$("#exGroup").addEventListener("change",drawExp);
 $("#exAll").onclick=()=>{const rows=expRows();const allOpen=rows.every(e=>S.expOpen.has(ekey(e)));if(allOpen)S.expOpen.clear();else rows.slice(0,S.expLimit).forEach(e=>S.expOpen.add(ekey(e)));S.expShut.clear();drawExp()};
 function expTable(){
-  const H=["Komponente","Art","Name","Langname","PaVaSt","Typ C","Typ PaVaSt","Einheit","Min","Max","Definiert","Initialwert","Abnehmer","Erzeugt in (Raster)","Schreibstellen","Gelesen in (Raster)","Hinweise"];
-  const rows=expRows().map(e=>e.kind==="Funktion"?[e.comp,"Funktion",e.name+"()","",  "", e.sig,"","","","",e.file+":"+e.line,"",e.callers.map(c=>c.comp+"."+c.fn+"()").join(", "),e.procs.map(x=>x.proc+" ("+x.r.txt+")").join(", "),"W: "+e.W.join(", "),"R: "+e.R.join(", "),e.hints.map(h=>h.t).join(" | ")]
+  const H=["FC","Art","Name","Langname","PaVaSt","Typ C","Typ PaVaSt","Einheit","Min","Max","Definiert","Initialwert","Abnehmer","Erzeugt in (Raster)","Schreibstellen","Gelesen in (Raster)","Hinweise"];
+  const rows=expRows().map(e=>e.kind==="Funktion"?[e.comp,"Funktionalität",e.name+"()","",  "", e.sig,"","","","",e.file+":"+e.line,"",e.callers.map(c=>c.comp+"."+c.fn+"()").join(", "),e.procs.map(x=>x.proc+" ("+x.r.txt+")").join(", "),"W: "+e.W.join(", "),"R: "+e.R.join(", "),e.hints.map(h=>h.t).join(" | ")]
     :[e.comp,"Message",e.name,e.pvp.lang||"",e.pv===null?"":e.pv?"ja":"nein",e.def?e.def.type:"",e.pvp.typ||"",e.pvp.einheit||"",e.pvp.min||"",e.pvp.max||"",e.def?e.def.file+":"+e.def.line:"",e.def&&e.def.init!=null?e.def.init:"",
       e.cons.map(c=>c.comp).join(", "),e.wProcs.map(x=>x.proc+" ("+x.r.txt+")").join(", "),e.writes.map(w=>w.fn+"() "+w.file+":"+w.line+(w.cond?" bedingt":"")).join(", "),e.readers.map(r=>r.comp+"."+r.proc+" ("+r.r.txt+")").join(", "),e.hints.map(h=>h.t).join(" | ")]);
   return {H,rows};
@@ -6144,7 +6417,7 @@ async function copyText(txt,what){try{await navigator.clipboard.writeText(txt);t
 $("#bCsv").onclick=()=>{const {H,rows}=expTable();const q=v=>/[;"\n]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v;copyText([H,...rows].map(r=>r.map(q).join(";")).join("\n"),"CSV")};
 $("#bMd").onclick=()=>{const {H,rows}=expTable();const c=v=>String(v).replace(/\|/g,"\\|");copyText(["| "+H.join(" | ")+" |","|"+H.map(()=>"---").join("|")+"|",...rows.map(r=>"| "+r.map(c).join(" | ")+" |")].join("\n"),"Markdown")};
 
-/* ---- Aufrufketten: nach Subsystem, Komponenten klappen auf ---- */
+/* ---- Aufrufketten: nach Subsystem, FCs klappen auf ---- */
 function srcOf(m){const p=S.model.prov.get(m);return p&&p.length?p.join(", "):"Umgebung"}
 function treeHtml(n){
   const acc=[...n.R.map(x=>"r:"+x),...n.W.map(x=>"w:"+x)];
@@ -6164,7 +6437,7 @@ function renderDyn(){
   const byG=new Map();for(const c of comps){const g=S.grpOf.get(c.name)??null;if(!byG.has(g))byG.set(g,[]);byG.get(g).push(c)}
   const gs=[...byG.keys()].sort((a,b)=>a==null?1:b==null?-1:a.localeCompare(b));
   $("#dyn").innerHTML=gs.map(g=>{
-    const head=gs.length>1||g!=null?`<div class="dgrp"><span class="t-idx">Cluster</span><h3>${g==null?"ohne Cluster":esc(g)}</h3><span class="acc">${byG.get(g).length} Komponente${byG.get(g).length===1?"":"n"}</span></div>`:"";
+    const head=gs.length>1||g!=null?`<div class="dgrp"><span class="t-idx">Cluster</span><h3>${g==null?"ohne Cluster":esc(g)}</h3><span class="acc">${byG.get(g).length} FC${byG.get(g).length===1?"":"s"}</span></div>`:"";
     return head+byG.get(g).map(c=>{
       if(!c.hasC)return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"><summary><h3>${esc(c.name)}</h3><span class="sub">nur PaVaSt</span></summary><p class="sub">Kein C-Code geladen. Aufrufketten brauchen die .c-Dateien.</p></details>`;
       const ps=c.procs.filter(procOk),treesOpen=ps.length<=3;
@@ -6173,7 +6446,7 @@ function renderDyn(){
         <div><div class="sub">liest</div><div class="chips">${p.R.map(m=>`<span class="chip${F&&F.msg===m?" hl":""}" title="Producer: ${esc(srcOf(m))}">${esc(m)} <span class="acc">← ${esc(srcOf(m))}</span></span>`).join("")||'<span class="sub">nichts</span>'}</div></div></div>
         <details style="margin-top:8px"${treesOpen?" open":""}><summary class="sub">Aufrufbaum</summary><ul class="tree">${treeHtml(p.tree)}</ul>
         ${p.tree.extCalls&&p.tree.extCalls.length?`<p class="sub">Externe Aufrufe direkt: ${p.tree.extCalls.map(esc).join(", ")}</p>`:""}</details></div>`).join("");
-      return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"${many?"":" open"}><summary><h3>${esc(c.name)}</h3><span class="sub">${c.funcs.length} Funktionen · ${ps.length}${ps.length!==c.procs.length?" von "+c.procs.length:""} Prozesse</span></summary><div style="margin-top:8px">${procs||'<p class="sub">Keine Prozesse erkannt.</p>'}</div></details>`;
+      return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"${many?"":" open"}><summary><h3>${esc(c.name)}</h3><span class="sub">${c.funcs.length} Funktionalitäten · ${ps.length}${ps.length!==c.procs.length?" von "+c.procs.length:""} Prozesse</span></summary><div style="margin-top:8px">${procs||'<p class="sub">Keine Prozesse erkannt.</p>'}</div></details>`;
     }).join("");
   }).join("");
 }
