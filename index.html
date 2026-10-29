@@ -361,6 +361,7 @@ summary{cursor:pointer}
 .cyfail{padding:20px;color:var(--text-3)}
 #wk{height:min(70vh,640px);min-height:380px;border:1px solid var(--line);border-radius:13px;background-color:var(--film);
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px;margin-top:10px}
+.chip.dfc{border-color:var(--over);color:var(--over)}
 .wkleg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:12px;color:var(--text-3)}
 .wkleg i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1.5px solid var(--line-strong)}
 
@@ -496,14 +497,14 @@ footer.foot a:hover{color:var(--text)}
         <div><span class="t-idx">Aus dem C-Code</span><h2>Systemschnittstellen je Cluster</h2></div>
         <div class="btns"><button class="pill" type="button" id="bSysCsv">CSV kopieren</button></div>
       </div>
-      <p class="lede">Eine Systemschnittstelle ist ein Interface, das den Cluster verlässt, zusammen mit allen Interfaces, die es beeinflussen. Beeinflusst heißt: Die Funktionalität, die den Ausgang schreibt, liest die Message selbst oder über ihre Aufrufkette. Das wird rückwärts verfolgt, bis es an einem Eingang von außerhalb des Clusters endet. Ausgänge sind Messages mit Abnehmer außerhalb sowie Funktionalitäten, die der Cluster außerhalb aufruft. Aufrufe über die Grenze zählen auch als Eingang (ƒ), weil Argumente und Rückgabewerte wirken. Die Zuordnung ist funktionsweise, nicht zeilenweise, und deshalb eher großzügig: Liest eine Funktionalität A und schreibt B, gilt A als Einfluss auf B.</p>
+      <p class="lede">Eine Systemschnittstelle ist ein Interface, das den Cluster verlässt, zusammen mit allen Interfaces, die es beeinflussen. Beeinflusst heißt: Die Funktionalität, die den Ausgang schreibt, liest die Message selbst oder über ihre Aufrufkette. Das wird rückwärts verfolgt, bis es an einem Eingang von außerhalb des Clusters endet. Ausgänge sind Messages mit Abnehmer außerhalb, gesetzte Fehlerpfade (<code>DFC_…</code>) sowie Funktionalitäten, die der Cluster außerhalb aufruft. Aufrufe über die Grenze zählen auch als Eingang (ƒ), weil Argumente und Rückgabewerte wirken. Die Zuordnung ist funktionsweise, nicht zeilenweise, und deshalb eher großzügig: Liest eine Funktionalität A und schreibt B, gilt A als Einfluss auf B.</p>
       <div id="sysifBody" style="margin-top:10px"></div>
     </div>
     <div class="sheet" id="wksheet">
       <div class="row">
         <div><span class="t-idx">Größe → Funktionalität → Größe</span><h2>Wirkkette</h2></div>
         <div class="btns" style="flex:1 1 420px;justify-content:flex-end">
-          <input id="wkQ" class="filter" list="wkList" placeholder="Größe, z. B. eine exportierte Message" aria-label="Größe für die Wirkkette" autocomplete="off" spellcheck="false"><datalist id="wkList"></datalist>
+          <input id="wkQ" class="filter" list="wkList" placeholder="Größe oder DFC_…" aria-label="Größe für die Wirkkette" autocomplete="off" spellcheck="false"><datalist id="wkList"></datalist>
           <select id="wkDir" class="filter" aria-label="Richtung"><option value="back">rückwärts (woher)</option><option value="fwd">vorwärts (wohin)</option></select>
           <label class="toggle"><input type="checkbox" id="wkAll"> über Clustergrenze</label>
           <label class="toggle"><input type="checkbox" id="wkCal" checked> Applikation</label>
@@ -511,7 +512,7 @@ footer.foot a:hover{color:var(--text)}
         </div>
       </div>
       <p class="lede">Die Wirkkette zeigt, über welche Funktionalitäten (C-Funktionen) eine Größe entsteht oder wohin sie wirkt. Rückwärts: Wer schreibt die Größe, was liest diese Funktionalität, wer schreibt das wiederum. Aufgerufene Funktionalitäten liefern ihren Rückgabewert an den Aufrufer. Vorwärts: Wer liest die Größe, was schreibt diese Funktionalität, und so weiter. Ohne „über Clustergrenze“ endet die Kette am Rand des Clusters, die Größe dort ist ein Eingang bzw. Ausgang. Funktionalitäten sind nach ihrer FC gruppiert. ◇ markiert Zugriffe und Funktionalitäten, die nur unter einer <code>#if</code>-Bedingung mit Systemkonstante existieren; Antippen zeigt die Bedingung. Mit „Konkrete Konfiguration“ oben verschwinden abgeschaltete Pfade ganz.</p>
-      <div class="wkleg"><span><i style="border-color:var(--amber);border-width:2.5px"></i>Ausgangsgröße</span><span><i style="border-radius:8px"></i>Größe (Message)</span><span><i style="border-style:dashed"></i>Größe am Clusterrand</span><span><i style="background:var(--film)"></i>Funktionalität, in ihrer FC</span><span><i style="transform:rotate(45deg) scale(.8)"></i>Applikationsparameter</span><span>gepunktet: Aufruf, Rückgabewert</span><span style="color:var(--amber)">◇ gestrichelt: nur in bestimmten Varianten (SyC)</span></div>
+      <div class="wkleg"><span><i style="border-color:var(--amber);border-width:2.5px"></i>Ausgangsgröße</span><span><i style="border-radius:8px"></i>Größe (Message)</span><span><i style="border-style:dashed"></i>Größe am Clusterrand</span><span><i style="background:var(--film)"></i>Funktionalität, in ihrer FC</span><span><i style="transform:rotate(45deg) scale(.8)"></i>Applikationsparameter</span><span><i style="border-color:var(--over)"></i>DFC (Fehlerpfad)</span><span>gepunktet: Aufruf, Rückgabewert</span><span style="color:var(--amber)">◇ gestrichelt: nur in bestimmten Varianten (SyC)</span></div>
       <div id="wk"><p class="cyfail">Größe wählen oder in den Systemschnittstellen auf „Wirkkette“ tippen.</p></div>
       <p class="sub" id="wkInfo" style="margin-top:6px"></p>
       <p class="sub" id="wkSel" style="margin-top:4px;min-height:1.4em"></p>
@@ -5195,7 +5196,7 @@ function analyze(files,cfg){
   const C=n=>{if(!comps.has(n))comps.set(n,{name:n,pvFiles:[],cFiles:[],hasPV:false,hasC:false,imp:new Set(),exp:new Set(),impCond:new Map(),expCond:new Map(),defs:new Set(),ext:new Set(),reads:new Set(),writes:new Set(),funcs:[],procs:[]});return comps.get(n)};
   const calInfo=new Map(),calT=calTest(cfg);
   for(const p of pv){for(const [k,v] of (p.cals||[]))calInfo.set(k,Object.assign(calInfo.get(k)||{},v));for(const ft of p.features){ft.calImp.forEach(x=>{if(!calInfo.has(x))calInfo.set(x,{})});ft.calExp.forEach(x=>{if(!calInfo.has(x))calInfo.set(x,{})})}}
-  const isCal=x=>calInfo.has(x)||(calT(x)&&!pre(x));
+  const isCal=x=>calInfo.has(x)||(calT(x)&&!pre(x)),isDfc=x=>/^DFC_\w+$/.test(x),noMsg=x=>isCal(x)||isDfc(x);
   for(const p of pv)for(const ft of p.features){const c=C(ft.name);c.hasPV=true;c.pvFiles.push(p.file);
     c.calOwn=c.calOwn||new Set();c.calDecl=c.calDecl||new Set();ft.calExp.forEach(x=>c.calOwn.add(x));ft.calImp.forEach(x=>c.calDecl.add(x));
     if(p.features.length===1&&p.cals)for(const k of p.cals.keys())c.calOwn.add(k);
@@ -5214,15 +5215,16 @@ function analyze(files,cfg){
     for(const f of r.funcs){f.comp=c.name;c.funcs.push(f)}
   }
   for(const c of comps.values()){
-    for(const x of [...c.defs])if(isCal(x))c.defs.delete(x);for(const x of [...c.ext])if(isCal(x))c.ext.delete(x);
-    if(c.defInfo)for(const x of [...c.defInfo.keys()])if(isCal(x))c.defInfo.delete(x);
+    for(const x of [...c.defs])if(noMsg(x))c.defs.delete(x);for(const x of [...c.ext])if(noMsg(x))c.ext.delete(x);
+    for(const x of [...c.exp])if(isDfc(x))c.exp.delete(x);for(const x of [...c.imp])if(isDfc(x))c.imp.delete(x);
+    if(c.defInfo)for(const x of [...c.defInfo.keys()])if(noMsg(x))c.defInfo.delete(x);
     if(c.macroDecl)for(const [k,v] of c.macroDecl)if(c.exp.has(k)&&!(c.defInfo&&c.defInfo.has(k))){c.defInfo=c.defInfo||new Map();c.defInfo.set(k,v);c.defs.add(k)}
     c.ext=new Set([...c.ext].filter(x=>!c.defs.has(x)));
   }
   // bekannte Messages
   const M=new Set();
   for(const c of comps.values()){c.imp.forEach(x=>M.add(x));c.exp.forEach(x=>M.add(x));c.defs.forEach(x=>M.add(x));c.ext.forEach(x=>M.add(x));for(const f of c.funcs){f.mR.forEach(x=>M.add(x));f.mW.forEach(x=>M.add(x))}}
-  for(const x of [...M])if(isCal(x))M.delete(x);
+  for(const x of [...M])if(noMsg(x))M.delete(x);
   // Funktionsindex
   const fnBy=new Map(),called=new Set();
   for(const c of comps.values())for(const f of c.funcs){if(!fnBy.has(f.name)||!f.isStatic)fnBy.set(f.name,f);f.calls.forEach(x=>called.add(x))}
@@ -5232,7 +5234,10 @@ function analyze(files,cfg){
   }
   for(const c of comps.values())for(const f of c.funcs){if(!f.R){f.R=new Set(f.mR);f.W=new Set(f.mW);for(const [id,o] of f.occ)if(M.has(id)){if(o.r)f.R.add(id);if(o.w)f.W.add(id)}}f.R.forEach(x=>c.reads.add(x));f.W.forEach(x=>c.writes.add(x))}
   for(const c of comps.values()){c.cal=new Set();c.calOwn=c.calOwn||new Set();c.calDecl=c.calDecl||new Set();
-    for(const f of c.funcs){f.CAL=[...f.occ.keys()].filter(x=>isCal(x)&&!M.has(x)&&!fnBy.has(x)).sort();f.CAL.forEach(x=>{c.cal.add(x);if(!calInfo.has(x))calInfo.set(x,{})})}}
+    c.dfc=new Set();
+    for(const f of c.funcs){f.CAL=[...f.occ.keys()].filter(x=>isCal(x)&&!M.has(x)&&!fnBy.has(x)).sort();f.CAL.forEach(x=>{c.cal.add(x);if(!calInfo.has(x))calInfo.set(x,{})});
+      f.DFC=[...f.occ.keys()].filter(isDfc).sort();f.DFC.forEach(x=>c.dfc.add(x))}}
+  const dfcs=new Map();for(const c of comps.values())for(const f of c.funcs)for(const d of f.DFC){if(!dfcs.has(d))dfcs.set(d,[]);const st=f.rsyc&&f.rsyc.get(d);dfcs.get(d).push({comp:c.name,fn:f.name,file:f.file,line:f.line,cond:st&&!st.has("")?[...st].join(" || "):null})}
   const cals=new Map();for(const [k,v] of calInfo)cals.set(k,{props:v,owner:[...comps.values()].filter(c=>c.calOwn.has(k)).map(c=>c.name),users:[...comps.values()].filter(c=>c.cal.has(k)).map(c=>c.name)});
   // transitiv (Aufrufkette)
   const memo=new Map();
@@ -5295,7 +5300,7 @@ function analyze(files,cfg){
   }
   const exportsList=buildExports({comps,M,flows,calls:[...calls.values()],procR,reach,varProps,fnBy,isCal});
   for(const [id,o] of sycInfo){o.def=globals.get(id)??null;o.defFrom=gFrom.get(id)||null;o.eff=ctx.val(id)}
-  return {comps,M,prov,flows,calls:[...calls.values()],procW,procR,issues,fileComp,exportsList,reach,sycInfo,cfg,cals,isCal};
+  return {comps,M,prov,flows,calls:[...calls.values()],procW,procR,issues,fileComp,exportsList,reach,sycInfo,cfg,cals,isCal,dfcs};
 }
 
 /* Exportliste: je Export die statische und die dynamische Sicht */
@@ -5303,7 +5308,7 @@ function buildExports({comps,flows,calls,procR,reach,varProps,fnBy,isCal}){
   const out=[];
   const allFuncs=[];for(const c of comps.values())for(const f of c.funcs)allFuncs.push(f);
   for(const c of [...comps.values()].sort((a,b)=>a.name.localeCompare(b.name))){
-    const names=new Set([...c.exp,...(c.defInfo?[...c.defInfo.keys()]:[])].filter(x=>!isCal||!isCal(x)));
+    const names=new Set([...c.exp,...(c.defInfo?[...c.defInfo.keys()]:[])].filter(x=>!/^DFC_/.test(x)&&(!isCal||!isCal(x))));
     for(const m of [...names].sort()){
       const def=c.defInfo&&c.defInfo.get(m)||null, pvp=varProps.get(m)||{};
       const cons=flows.filter(f=>f.from===c.name&&f.m===m).map(f=>({comp:f.to,st:f.st}));
@@ -5421,6 +5426,9 @@ static uint16 ExhTSens_Filter(uint16 raw)
 static void ExhTSens_Plaus(void)
 {
     if (Epm_nEng < 500u) { ExhTSens_tDs = ExhTSens_tUs; }
+    if ((ExhTSens_tDs > ExhTSens_tUs) && (Epm_nEng < 500u)) {
+        Dem_SetEventStatus(DFC_ExhTSensPlaus, DEM_EVENT_STATUS_FAILED);
+    }
 }
 
 uint16 ExhTSens_GetTMax(void)
@@ -5495,7 +5503,10 @@ static void DosVlv_Drive(uint16 duty)
 static void DosVlv_Protect(void)
 {
 #if (SY_DOSVLVDIAG == SY_ON)
-    if (ExhTSens_GetTMax() > 9730u) { DosVlv_stVlv = 1u; }
+    if (ExhTSens_GetTMax() > 9730u) {
+        DosVlv_stVlv = 1u;
+        Dem_SetEventStatus(DFC_DosVlvOvrTemp, DEM_EVENT_STATUS_FAILED);
+    }
 #endif
 }
 
@@ -6082,6 +6093,7 @@ function showComp(n){
    <h3>Exporte</h3><div class="chips">${[...new Set([...c.exp,...out.map(f=>f.m)])].sort().map(m=>fbtn("msg",m,`<span class="chip w">${esc(m)}</span>`)).join("")||'<span class="sub">keine</span>'}</div>
    <h3>Importe</h3><ul class="msgl">${inn.sort((x,y)=>x.m.localeCompare(y.m)).map(f=>`<li>${fbtn("msg",f.m)} <span class="sub">von ${esc(lab(f.from))}</span> ${pill(f.st)}</li>`).join("")||'<li class="sub">keine</li>'}</ul>
    <h3>Applikationsparameter</h3><div class="chips">${[...c.cal].sort().map(x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`).join("")||'<span class="sub">keine erkannt</span>'}</div>
+   <h3>Diagnose</h3><div class="chips">${[...(c.dfc||[])].sort().map(d=>`<button class="lnk" type="button" data-wk="${esc(d)}"><span class="chip dfc">${esc(d)}</span></button>`).join("")||'<span class="sub">kein DFC gesetzt</span>'}</div>
    ${iss.length?`<h3>Auffällig</h3><ul class="msgl">${iss.map(i=>`<li class="mono">${esc(i.m)} <span class="sub">${esc(i.kind)}</span></li>`).join("")}</ul>`:""}
    <div class="btns" style="margin-top:12px">${fbtn("comp",n,"Fokus auf FC").replace('class="lnk"','class="pill"')}<button class="pill" type="button" onclick="gotoDyn('${esc(n).replace(/'/g,"\\'")}')">Aufrufketten</button></div>`;
 }
@@ -6187,6 +6199,15 @@ function sysIfaces(){
       const R=new Set(),CC=new Set();callers.forEach(n=>{const t=tr(n,new Set());t.R.forEach(x=>{if(x!=="ƒ "+g+"()")R.add(x)});t.C.forEach(x=>CC.add(x))});
       const b=back([],R);CC.forEach(x=>{if(!b.cal.includes(x))b.cal.push(x)});b.cal.sort();rows.push({kind:"Funktion",name:g+"()",to:[...new Set([...o.to].map(clOf))].sort(),...b,fns:[...new Set([...b.fns,...callers.map(n=>fn.get(n)?fn.get(n).comp+"."+n:n)])].sort()});
     }
+    /* DFCs: Ausgang Richtung Diagnose, beeinflusst von allem, was die meldende Funktionalität liest */
+    const dfcBy=new Map();
+    for(const c of M.comps.values()){if(!set.has(c.name))continue;for(const f of c.funcs)for(const d of (f.DFC||[])){if(!dfcBy.has(d))dfcBy.set(d,[]);dfcBy.get(d).push(f)}}
+    for(const [d,fs] of [...dfcBy].sort((a,b)=>a[0].localeCompare(b[0]))){
+      const R=new Set(),CC=new Set();fs.forEach(f=>{const t=tr(f.name,new Set());t.R.forEach(x=>R.add(x));t.C.forEach(x=>CC.add(x))});
+      const b=back([],R);CC.forEach(x=>{if(!b.cal.includes(x))b.cal.push(x)});b.cal.sort();
+      const cond=(M.dfcs.get(d)||[]).filter(x=>set.has(x.comp)).map(x=>x.cond);
+      rows.push({kind:"DFC",name:d,to:["Diagnose"],...b,fns:[...new Set([...b.fns,...fs.map(f=>f.comp+"."+f.name)])].sort(),cond:cond.every(Boolean)?[...new Set(cond)].join(" || "):null});
+    }
     /* Eingänge ohne Wirkung auf einen Ausgang */
     const used=new Set(rows.flatMap(r=>r.inputs));
     out.push({cl,members:members.sort(),rows,inputs:[...inputs.keys()].sort(),idle:[...inputs.keys()].filter(x=>!used.has(x)).sort(),inSrc:inputs,real:S.grpOf.has(members[0])});
@@ -6201,8 +6222,8 @@ function drawSysIf(){
   if(!all.length){box.innerHTML='<p class="sub">Kein Cluster hat Schnittstellen nach außen.</p>';return}
   const ch=(l,cls)=>l.length?l.map(x=>x.startsWith("ƒ ")?fbtn("fn",x.slice(2).replace(/\(\)$/,""),`<span class="chip">${esc(x)}</span>`):fbtn("msg",x,`<span class="chip${cls?" "+cls:""}">${esc(x)}</span>`)).join(" "):'<span class="sub">—</span>';
   const open=all.length<=3;
-  box.innerHTML=all.map(c=>`<details class="sheet dcomp" ${open?"open":""}><summary><h3>${esc(c.cl)}</h3><span class="sub">${c.members.length} FC${c.members.length===1?"":"s"} · ${c.rows.length} Ausgang${c.rows.length===1?"":"e"} · ${c.inputs.length} Eingang${c.inputs.length===1?"":"e"}</span></summary>
-    ${c.rows.length?`<div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Ausgang</th><th>Abnehmer</th><th>beeinflusst von (Eingänge)</th><th>intern beteiligt</th><th>Applikation</th><th>Funktionalitäten</th></tr></thead><tbody>${c.rows.map(r=>`<tr><td class="mono" style="white-space:nowrap">${r.kind==="Message"?fbtn("msg",r.name):fbtn("fn",r.name.replace(/\(\)$/,""),esc(r.name))}${r.kind==="Message"?`<br><button class="lnk sub" type="button" data-wk="${esc(r.name)}">Wirkkette ›</button>`:""}</td><td>${r.to.map(esc).join(", ")}</td><td><div class="chips">${ch(r.inputs)}</div></td><td><div class="chips">${ch(r.inner,"w")}</div></td><td><div class="chips">${r.cal.length?r.cal.map(x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`).join(" "):'<span class="sub">—</span>'}</div></td><td class="mono sub">${r.fns.map(esc).join(", ")||"—"}</td></tr>`).join("")}</tbody></table></div>`:'<p class="sub" style="margin-top:8px">Dieser Cluster liefert nichts nach außen.</p>'}
+  box.innerHTML=all.map(c=>`<details class="sheet dcomp" ${open?"open":""}><summary><h3>${esc(c.cl)}</h3><span class="sub">${c.members.length} FC${c.members.length===1?"":"s"} · ${c.rows.filter(r=>r.kind!=="DFC").length} Ausgang${c.rows.filter(r=>r.kind!=="DFC").length===1?"":"e"}${c.rows.some(r=>r.kind==="DFC")?" · "+c.rows.filter(r=>r.kind==="DFC").length+" DFC":""} · ${c.inputs.length} Eingang${c.inputs.length===1?"":"e"}</span></summary>
+    ${c.rows.length?`<div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Ausgang</th><th>Abnehmer</th><th>beeinflusst von (Eingänge)</th><th>intern beteiligt</th><th>Applikation</th><th>Funktionalitäten</th></tr></thead><tbody>${c.rows.map(r=>`<tr><td class="mono" style="white-space:nowrap">${r.kind==="Message"?fbtn("msg",r.name):r.kind==="DFC"?esc(r.name):fbtn("fn",r.name.replace(/\(\)$/,""),esc(r.name))}${r.kind==="DFC"?`<span class="chip dfc" style="margin-left:4px">DFC</span>`:""}${r.cond?`<br><span class="syc">nur wenn ${esc(r.cond)}</span>`:""}${r.kind!=="Funktion"?`<br><button class="lnk sub" type="button" data-wk="${esc(r.name)}">Wirkkette ›</button>`:""}</td><td>${r.to.map(esc).join(", ")}</td><td><div class="chips">${ch(r.inputs)}</div></td><td><div class="chips">${ch(r.inner,"w")}</div></td><td><div class="chips">${r.cal.length?r.cal.map(x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`).join(" "):'<span class="sub">—</span>'}</div></td><td class="mono sub">${r.fns.map(esc).join(", ")||"—"}</td></tr>`).join("")}</tbody></table></div>`:'<p class="sub" style="margin-top:8px">Dieser Cluster liefert nichts nach außen.</p>'}
     ${c.idle.length?`<p class="sub" style="margin-top:8px">Eingänge ohne erkennbare Wirkung auf einen Ausgang: ${c.idle.map(esc).join(", ")}</p>`:""}</details>`).join("");
 }
 $("#bSysCsv").onclick=()=>{
@@ -6220,20 +6241,20 @@ function wkGraph(target,dir,all,withCal){
   /* void-Funktionalitäten liefern keinen Rückgabewert an den Aufrufer */
   const ret=f=>!/^(?:[\w\s]*\s)?void\s+[A-Za-z_]\w*\s*\(/.test(f.sig||"");
   const writers=new Map(),readers=new Map();
-  for(const f of fn.values()){(f.W||[]).forEach(m=>{if(!writers.has(m))writers.set(m,[]);writers.get(m).push(f)});(f.R||[]).forEach(m=>{if(!readers.has(m))readers.set(m,[]);readers.get(m).push(f)})}
-  const prov=m=>(M.prov.get(m)||[]);
+  for(const f of fn.values()){(f.DFC||[]).forEach(m=>{if(!writers.has(m))writers.set(m,[]);writers.get(m).push(f)});(f.W||[]).forEach(m=>{if(!writers.has(m))writers.set(m,[]);writers.get(m).push(f)});(f.R||[]).forEach(m=>{if(!readers.has(m))readers.set(m,[]);readers.get(m).push(f)})}
+  const prov=m=>(M.prov.get(m)||(M.dfcs.get(m)||[]).map(x=>x.comp));
   const home=prov(target)[0]||(writers.get(target)||[])[0]?.comp||(readers.get(target)||[])[0]?.comp||null;
   const scope=home?clOf(home):null,inScope=comp=>all||comp==null||clOf(comp)===scope;
   const N=new Map(),E=new Map(),LIM=320;let cut=false;
   const node=(id,data,cls)=>{if(!N.has(id)){if(N.size>=LIM){cut=true;return false}N.set(id,{data:Object.assign({id},data),classes:cls})}return true};
   const edge=(a,b,cls,lab,cond)=>{const k=a+"|"+b;if(!E.has(k))E.set(k,{data:{id:"x"+E.size,source:a,target:b,label:(lab||"")+(cond?(lab?" ":"")+"◇":""),cond:cond||null},classes:(cls||"")+(cond?" cond":"")})};
   const orC=l=>{l=[...new Set(l)];return l.includes("")||!l.length?null:l.length>1?l.map(x=>"("+x+")").join(" || "):l[0]};
-  const condW=(f,m)=>orC((f.wpos||[]).filter(w=>w.id===m).map(w=>w.syc||""));
+  const condW=(f,m)=>/^DFC_/.test(m)?condR(f,m):orC((f.wpos||[]).filter(w=>w.id===m).map(w=>w.syc||""));
   const condR=(f,m)=>{const st=f.rsyc&&f.rsyc.get(m);return st?orC([...st]):null};
   const fid=f=>"F:"+f.comp+"."+f.name,mid=m=>"M:"+m,cid=c=>"C:"+c;
   const fcNode=comp=>{node("P:"+comp,{label:comp+(scope&&clOf(comp)!==scope&&S.grpOf.has(comp)?"  ·  "+clOf(comp):"")},"fc"+(scope&&clOf(comp)!==scope?" foreign":""))};
   const fnNode=f=>{fcNode(f.comp);return node(fid(f),{label:f.name+"()"+(f.syc?" ◇":""),parent:"P:"+f.comp,cond:f.syc||null,where:f.file+":"+f.line},"fn"+(PROC_RE.test(f.name)?" proc":"")+(f.syc?" cond":""))};
-  const msgNode=(m,edgeCls)=>node(mid(m),{label:m},"msg"+(m===target?" target":"")+(edgeCls?" "+edgeCls:""));
+  const msgNode=(m,edgeCls)=>node(mid(m),{label:m},(/^DFC_/.test(m)?"msg dfc":"msg")+(m===target?" target":"")+(edgeCls?" "+edgeCls:""));
   const calNodes=f=>{if(!withCal)return;for(const c of (f.CAL||[]))if(node(cid(c),{label:c},"cal"))edge(cid(c),fid(f),"cal")};
   msgNode(target);
   const seenM=new Set(),seenF=new Set(),todo=[];
@@ -6274,7 +6295,8 @@ function wkGraph(target,dir,all,withCal){
 function drawWk(){
   const box=$("#wk"),info=$("#wkInfo");
   if(S.wkCy){S.wkCy.destroy();S.wkCy=null}
-  if(!S.wk||!S.model||!S.model.M.has(S.wk)){box.innerHTML='<p class="cyfail">'+(S.wk?"„"+esc(S.wk)+"“ ist keine bekannte Größe.":"Größe wählen oder in den Systemschnittstellen auf „Wirkkette“ tippen.")+'</p>';info.textContent="";return}
+  if(S.wk&&/^DFC_/.test(S.wk)&&$("#wkDir").value!=="back")$("#wkDir").value="back";
+  if(!S.wk||!S.model||!(S.model.M.has(S.wk)||S.model.dfcs.has(S.wk))){box.innerHTML='<p class="cyfail">'+(S.wk?"„"+esc(S.wk)+"“ ist keine bekannte Größe.":"Größe wählen oder in den Systemschnittstellen auf „Wirkkette“ tippen.")+'</p>';info.textContent="";return}
   if(typeof cytoscape==="undefined"){box.innerHTML='<p class="cyfail">Die Grafik-Bibliothek fehlt.</p>';return}
   const dir=$("#wkDir").value,G=wkGraph(S.wk,dir,$("#wkAll").checked,$("#wkCal").checked),T=tok();
   box.innerHTML="";const font='"JetBrains Mono", ui-monospace, Menlo, monospace';
@@ -6283,6 +6305,7 @@ function drawWk(){
       {selector:"node",style:{label:"data(label)","font-family":font,"font-size":11,color:T.text,"text-wrap":"wrap","text-valign":"center","text-halign":"center",width:"label",height:"label",padding:"9px","background-color":T.surface,"border-width":1.5,"border-color":T.line}},
       {selector:"node.msg",style:{shape:"round-rectangle","corner-radius":"14px"}},
       {selector:"node.msg.edge",style:{"border-style":"dashed",color:T.text2}},
+      {selector:"node.dfc",style:{shape:"cut-rectangle","border-color":T.over,color:T.over}},
       {selector:"node.target",style:{"border-color":T.amber,"border-width":3,"font-weight":700}},
       {selector:"node.fn",style:{shape:"rectangle","background-color":T.void,"font-size":11.5}},
       {selector:"node.fn.proc",style:{"font-weight":700}},
@@ -6317,12 +6340,13 @@ function wkSelTxt(t){
   const id=t.id();
   if(id.startsWith("F:"))return `Funktionalität <b class="mono">${esc(lab(t))}</b> in ${esc(t.data("parent").slice(2))}, ${esc(t.data("where")||"")}: `+(c?`<span class="syc">nur vorhanden wenn ${esc(c)}</span>`:"in allen Varianten vorhanden");
   if(id.startsWith("C:"))return `Applikationsparameter <b class="mono">${esc(id.slice(2))}</b>`+(calTip(id.slice(2))?": "+esc(calTip(id.slice(2))):"");
+  if(id.startsWith("M:DFC_")){const l=S.model.dfcs.get(id.slice(2))||[];return `Fehlerpfad <b class="mono">${esc(id.slice(2))}</b>, gesetzt in `+l.map(x=>esc(x.comp+"."+x.fn+"()")+(x.cond?` <span class="syc">nur wenn ${esc(x.cond)}</span>`:"")).join(", ")}
   if(id.startsWith("M:"))return `Größe <b class="mono">${esc(id.slice(2))}</b>`+((S.model.prov.get(id.slice(2))||[]).length?", erzeugt in "+esc(S.model.prov.get(id.slice(2)).join(", ")):", kein Erzeuger geladen");
   return esc(t.data("label")||"");
 }
 function setWk(m){S.wk=m;$("#wkQ").value=m;drawWk()}
-function renderWkList(){$("#wkList").innerHTML=S.model?[...S.model.M].sort().map(m=>`<option value="${esc(m)}"></option>`).join(""):"";if(S.wk&&S.model&&!S.model.M.has(S.wk))S.wk=null;if(!$("#p-if").hidden)drawWk()}
-$("#wkQ").addEventListener("change",e=>{const v=e.target.value.trim();if(!v)return;const m=S.model&&([...S.model.M].find(x=>x===v)||[...S.model.M].find(x=>x.toLowerCase()===v.toLowerCase()));if(m)setWk(m);else toast("Keine Größe mit diesem Namen")});
+function renderWkList(){$("#wkList").innerHTML=S.model?[...S.model.M,...S.model.dfcs.keys()].sort().map(m=>`<option value="${esc(m)}"></option>`).join(""):"";if(S.wk&&S.model&&!S.model.M.has(S.wk)&&!S.model.dfcs.has(S.wk))S.wk=null;if(!$("#p-if").hidden)drawWk()}
+$("#wkQ").addEventListener("change",e=>{const v=e.target.value.trim();if(!v)return;const all=S.model?[...S.model.M,...S.model.dfcs.keys()]:[],m=all.find(x=>x===v)||all.find(x=>x.toLowerCase()===v.toLowerCase());if(m)setWk(m);else toast("Keine Größe mit diesem Namen")});
 $("#wkQ").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.target.dispatchEvent(new Event("change"))}});
 ["wkDir","wkAll","wkCal"].forEach(id=>$("#"+id).addEventListener("change",drawWk));
 $("#wkFit").onclick=()=>S.wkCy&&S.wkCy.fit(undefined,24);
