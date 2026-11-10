@@ -6458,7 +6458,7 @@ function findLoops(){
   const U=(a,b)=>{const o=new Set(a);b.forEach(x=>o.add(x));return o};
   const findAsg=t=>{let d=0;for(let i=0;i<t.length;i++){const c=t[i];if(c==="("||c==="["||c==="{")d++;else if(c===")"||c==="]"||c==="}")d--;else if(d===0){
       const m=t.slice(i,i+3).match(/^(<<=|>>=|[+\-*\/%&|^]=|=(?!=))/);if(m&&!(m[1]==="="&&/[=!<>]/.test(t[i-1]||""))&&!(m[1].length===2&&t[i+2]==="="&&m[1]!=="<<="&&m[1]!==">>="))return {i,op:m[1]}}}return null};
-  const retMemo=new Map(),argAcc=new Map(),edges=new Map();let pDeps=new Map();
+  const retMemo=new Map(),argAcc=new Map(),edges=new Map(),wd=new Map();let pDeps=new Map();
   function retDeps(g){if(retMemo.has(g.name))return retMemo.get(g.name);retMemo.set(g.name,new Set());const r=run1(g,"ret");retMemo.set(g.name,r);return r}
   function run1(f,mode){
     const s=f.body,loc=new Map(),ret=new Set(),pd=mode==="edges"?pDeps.get(f.name):null;
@@ -6470,10 +6470,12 @@ function findLoops(){
           const rr=id.match(/^Rte_I?Read_(\w+)$/);if(rr&&M.M.has(rr[1]))out.add(rr[1]);
           if(g&&mode==="collect"){const po=re.lastIndex+after[0].length-1,pc=matchClose(t,po,"(",")");if(pc>0){const ps=params(g);splitTop(t.slice(po+1,pc),",").forEach((a,i)=>{if(!ps[i])return;const d=reads(a);if(!d.size)return;if(!argAcc.has(g.name))argAcc.set(g.name,new Map());const mp=argAcc.get(g.name);if(!mp.has(ps[i]))mp.set(ps[i],new Set());d.forEach(x=>mp.get(ps[i]).add(x))})}}
           continue}
-        if(M.M.has(id))out.add(id);else if(loc.has(id))loc.get(id).forEach(x=>out.add(x))}
+        if(M.M.has(id))out.add(id);else if(loc.has(id))loc.get(id).forEach(x=>out.add(x));else if(M.isCal&&M.isCal(id))out.add("§"+id)}
       return out}
     function write(tgt,deps){
-      if(M.M.has(tgt)){if(mode==="edges")deps.forEach(r=>{const k=r+"\u0001"+tgt;if(!edges.has(k))edges.set(k,{r,w:tgt,fns:new Set()});edges.get(k).fns.add(f)})}
+      if(M.M.has(tgt)||/^DFC_/.test(tgt)){if(mode==="edges"){
+          if(!wd.has(f))wd.set(f,new Map());const mp=wd.get(f);if(!mp.has(tgt))mp.set(tgt,new Set());deps.forEach(r=>mp.get(tgt).add(r));
+          if(M.M.has(tgt))deps.forEach(r=>{if(!M.M.has(r))return;const k=r+"\u0001"+tgt;if(!edges.has(k))edges.set(k,{r,w:tgt,fns:new Set()});edges.get(k).fns.add(f)})}}
       else{if(!loc.has(tgt))loc.set(tgt,new Set());deps.forEach(x=>loc.get(tgt).add(x))}}
     function stmt(st,cd){
       const t=st.trim().replace(/;$/,"");if(!t)return;
@@ -6484,6 +6486,7 @@ function findLoops(){
       if(!a){const rr=t.match(/\bRte_I?Read_(\w+)\s*\(\s*&?\s*([A-Za-z_]\w*)/);if(rr){write(rr[2],U(M.M.has(rr[1])?[rr[1]]:[],cd));return}
         const gm=t.match(/\b(?:Msg_Get|MSG_GET|GET_MSG|GetMsg|Message_Get|Mes_Get)\s*\(\s*&?\s*([A-Za-z_]\w*)\s*,\s*&?\s*([A-Za-z_]\w*)/);if(gm){write(gm[2],U(M.M.has(gm[1])?[gm[1]]:[],cd));return}
         const inc=t.match(/^(?:\+\+|--)\s*([A-Za-z_]\w*)|^([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*(?:\+\+|--)$/);if(inc){const g=inc[1]||inc[2];write(g,U(reads(g),cd));return}
+        const dfc=t.match(/\bDFC_\w+/g);if(dfc){const d=U(reads(t),cd);dfc.forEach(x=>write(x,d));return}
         reads(t);return}
       const lhs=t.slice(0,a.i),rhs=t.slice(a.i+a.op.length),lm=lhs.match(/([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*|\.\s*\w+\s*|->\s*\w+\s*)*$/);
       if(findAsg(rhs))stmt(rhs,cd);
@@ -6545,7 +6548,9 @@ function findLoops(){
     return {vars:[...c].sort(),cyc,fns:[...fs],comps,cls,procs,level:comps.length===1?"fc":cls.length===1?"cl":"x"};
   }).sort((a,b)=>({x:0,cl:1,fc:2}[a.level]-{x:0,cl:1,fc:2}[b.level])||b.vars.length-a.vars.length||a.vars[0].localeCompare(b.vars[0]));
   const selfs=[...edges.values()].filter(e=>e.r===e.w).map(e=>({v:e.r,fns:[...e.fns]})).sort((a,b)=>a.v.localeCompare(b.v));
-  return {loops,selfs};
+  const ret=new Map();for(const f of fn.values())ret.set(f,retDeps(f));
+  const scc=new Map();sccs.forEach((c,i)=>c.forEach(v=>scc.set(v,"L"+i)));selfs.forEach(x=>{if(!scc.has(x.v))scc.set(x.v,"S:"+x.v)});
+  return {loops,selfs,flow:{wd,ret,scc}};
 }
 function loopVerdict(l){
   const ps=[...new Set(l.procs.map(x=>x.proc))],r=[...new Set(l.procs.map(x=>x.r.txt))];
@@ -6604,12 +6609,16 @@ function wkGraph(target,dir,maxO,withCal){
   const condR=(f,m)=>{const st=f.rsyc&&f.rsyc.get(m);return st?orC([...st]):null};
   const fid=f=>"F:"+f.comp+"."+f.name,mid=m=>"M:"+m,cid=c=>"C:"+c;
   const fcNode=comp=>{node("P:"+comp,{label:comp+(scope&&clOf(comp)!==scope&&S.grpOf.has(comp)?"  ·  "+clOf(comp):"")},"fc"+(scope&&clOf(comp)!==scope?" foreign":""))};
-  const fnNode=(f,o)=>{noteO(f.comp,o||1);fcNode(f.comp);return node(fid(f),{label:f.name+"()"+(f.syc?" ◇":""),parent:"P:"+f.comp,cond:f.syc||null,where:f.file+":"+f.line},"fn"+(PROC_RE.test(f.name)?" proc":"")+(f.syc?" cond":""))};
+  const fnOf=new Map();
+  const fnNode=(f,o)=>{noteO(f.comp,o||1);fcNode(f.comp);fnOf.set(fid(f),f);return node(fid(f),{label:f.name+"()"+(f.syc?" ◇":""),parent:"P:"+f.comp,cond:f.syc||null,where:f.file+":"+f.line},"fn"+(PROC_RE.test(f.name)?" proc":"")+(f.syc?" cond":""))};
   const msgNode=(m,edgeCls)=>node(mid(m),{label:m},(/^DFC_/.test(m)?"msg dfc":"msg")+(m===target?" target":"")+(edgeCls?" "+edgeCls:""));
   const calNodes=f=>{if(!withCal)return;for(const c of (f.CAL||[]))if(node(cid(c),{label:c},"cal"))edge(cid(c),fid(f),"cal")};
   msgNode(target);
   const seenM=new Map(),seenF=new Map(),todo=[];
   const better=(mp,k,o)=>{if(mp.has(k)&&mp.get(k)<=o)return false;mp.set(k,o);return true};
+  /* Genau je Anweisung: welche Größen fließen in genau diese Schreibstelle (aus findLoops). Ohne Daten grob wie bisher. */
+  const FL=S.loops&&S.loops.flow,wdOf=(f,m)=>{const x=FL&&FL.wd.get(f);return x?(x.get(m)||null):null},rdOf=f=>FL&&FL.ret.get(f)||null;
+  const has=(st,x)=>st&&(st.has?st.has(x):st.includes(x));
   if(dir==="back"){
     todo.push({t:"m",m:target,o:1,cl:scope});
     while(todo.length){const it=todo.shift();
@@ -6617,45 +6626,63 @@ function wkGraph(target,dir,maxO,withCal){
         const all=writers.get(it.m)||[],ws=all.filter(f=>step(it.o,it.cl,f.comp)<=maxO);
         if(!ws.length){if(it.m!==target)addC(mid(it.m),"edge");continue}
         delC(mid(it.m),"edge");
-        for(const f of ws){const o=step(it.o,it.cl,f.comp);if(!fnNode(f,o))break;edge(fid(f),mid(it.m),"w","",condW(f,it.m));todo.push({t:"f",f,o})}}
-      else{const f=it.f;if(!better(seenF,f.name,it.o))continue;calNodes(f);const cl=clOf(f.comp);
-        for(const r of (f.R||[])){if(!msgNode(r))break;edge(mid(r),fid(f),"r","",condR(f,r));todo.push({t:"m",m:r,o:it.o,cl})}
-        for(const k of f.calls){const g=fn.get(k);if(!g||!ret(g))continue;const o=step(it.o,cl,g.comp);
+        for(const f of [...new Set(ws)]){const o=step(it.o,it.cl,f.comp);if(!fnNode(f,o))break;edge(fid(f),mid(it.m),"w","",condW(f,it.m));todo.push({t:"f",f,o,rel:wdOf(f,it.m)})}}
+      else{const f=it.f,rel=it.rel,key=f.name+"|"+(rel?[...rel].sort().join(","):"*");if(!better(seenF,key,it.o))continue;calNodes(f);const cl=clOf(f.comp),viaCall=new Set();
+        for(const k of f.calls){const g=fn.get(k);if(!g||!ret(g))continue;let sub=null;
+          if(rel){const rg=rdOf(g);if(rg){sub=new Set([...rel].filter(x=>rg.has(x)));if(!sub.size)continue;sub.forEach(x=>viaCall.add(x))}}
+          const o=step(it.o,cl,g.comp);
           if(o>maxO){if(fnNode(g,o)){addC(fid(g),"edge");edge(fid(g),fid(f),"call","ƒ")}continue}
-          if(fnNode(g,o)){edge(fid(g),fid(f),"call","ƒ");todo.push({t:"f",f:g,o})}}}
+          if(fnNode(g,o)){edge(fid(g),fid(f),"call","ƒ");todo.push({t:"f",f:g,o,rel:sub})}}
+        for(const r of (f.R||[])){if(rel&&!rel.has(r))continue;if(!msgNode(r))break;edge(mid(r),fid(f),"r","",condR(f,r));todo.push({t:"m",m:r,o:it.o,cl})}
+        /* über Parameter von der Aufrufstelle */
+        if(rel)for(const r of rel)if(!has(f.R,r)&&!viaCall.has(r)&&M.M.has(r)){if(!msgNode(r))break;edge(mid(r),fid(f),"r arg","Arg");todo.push({t:"m",m:r,o:it.o,cl})}}
     }
   }else{
     todo.push({t:"m",m:target,o:1,cl:scope});
     while(todo.length){const it=todo.shift();
       if(it.t==="m"){if(!better(seenM,it.m,it.o))continue;
         const rs=readers.get(it.m)||[],far=[];
-        for(const f of rs){const o=step(it.o,it.cl,f.comp);if(o>maxO){far.push(f.comp);continue}if(!fnNode(f,o))break;edge(mid(it.m),fid(f),"r","",condR(f,it.m));todo.push({t:"f",f,o})}
+        for(const f of rs){const o=step(it.o,it.cl,f.comp);if(o>maxO){far.push(f.comp);continue}if(!fnNode(f,o))break;edge(mid(it.m),fid(f),"r","",condR(f,it.m));todo.push({t:"f",f,o,m:it.m})}
         if(far.length){if(it.m!==target)addC(mid(it.m),"edge");const n=N.get(mid(it.m));const t="\n→ "+[...new Set(far)].join(", ");if(n&&!n.data.label.includes(t))n.data.label+=t}}
-      else{const f=it.f;if(!better(seenF,f.name,it.o))continue;calNodes(f);const cl=clOf(f.comp);
-        for(const w of (f.W||[])){if(w===target)continue;if(!msgNode(w))break;edge(fid(f),mid(w),"w","",condW(f,w));todo.push({t:"m",m:w,o:it.o,cl})}
-        for(const k of (ret(f)?(callers.get(f.name)||[]):[])){const g=fn.get(k);if(!g)continue;const o=step(it.o,cl,g.comp);
+      else{const f=it.f;if(!better(seenF,f.name+"|"+it.m,it.o))continue;calNodes(f);const cl=clOf(f.comp);
+        for(const w of [...(f.W||[]),...(f.DFC||[])]){if(w===target)continue;const d=wdOf(f,w);if(FL&&FL.wd.has(f)&&!(d&&d.has(it.m)))continue;
+          if(!msgNode(w))break;edge(fid(f),mid(w),"w","",condW(f,w));if(!/^DFC_/.test(w))todo.push({t:"m",m:w,o:it.o,cl})}
+        const rg=rdOf(f);
+        if(ret(f)&&(!rg||rg.has(it.m)))for(const k of (callers.get(f.name)||[])){const g=fn.get(k);if(!g)continue;const o=step(it.o,cl,g.comp);
           if(o>maxO){if(fnNode(g,o)){addC(fid(g),"edge");edge(fid(f),fid(g),"call","ƒ")}continue}
-          if(fnNode(g,o)){edge(fid(f),fid(g),"call","ƒ");todo.push({t:"f",f:g,o})}}}
+          if(fnNode(g,o)){edge(fid(f),fid(g),"call","ƒ");todo.push({t:"f",f:g,o,m:it.m})}}}
     }
   }
   /* Rahmen der FCs: Cluster und Ordnung anzeigen */
   for(const [comp,o] of cOrd){const n=N.get("P:"+comp);if(n){n.data.label=comp+(scope&&clOf(comp)!==scope&&S.grpOf.has(comp)?"  ·  "+clOf(comp):"")+"  ·  "+o+". Ordnung";n.data.ord=o}}
   const conds=[...[...N.values()].map(n=>n.data.cond),...[...E.values()].map(e=>e.data.cond)].filter(Boolean);
   const sycs=[...new Set(conds.flatMap(c=>sycIds(c,sycTest(S.cfg))))].filter(x=>!/(^|_)(ON|OFF|TRUE|FALSE|YES|NO|ENABLED?|DISABLED?)$/i.test(x)).sort();
-  return {els:[...N.values(),...E.values()],scope,cut,sycs,nCond:conds.length,nF:[...N.keys()].filter(k=>k.startsWith("F:")).length,nM:[...N.keys()].filter(k=>k.startsWith("M:")).length,nC:[...N.keys()].filter(k=>k.startsWith("C:")).length,
+  return {els:[...N.values(),...E.values()],fnOf,scope,cut,sycs,nCond:conds.length,nF:[...N.keys()].filter(k=>k.startsWith("F:")).length,nM:[...N.keys()].filter(k=>k.startsWith("M:")).length,nC:[...N.keys()].filter(k=>k.startsWith("C:")).length,
     edgeIn:[...N.entries()].filter(([k,n])=>k.startsWith("M:")&&/\bedge\b/.test(n.classes)).map(([k])=>k.slice(2))};
 }
 /* Loops in der Wirkkette: Tiefensuche ab der Startgröße in Laufrichtung; Kanten zu einem Knoten,
    der gerade auf dem Pfad liegt, führen die Kette zu sich selbst zurück. Ausblenden entfernt sie
    und alles, was danach vom Start aus nicht mehr erreichbar ist. */
 function wkLoops(G,target,dir,hide){
+  /* Eine Rückführung im Bild ist nur dann ein Loop, wenn die Größen auch je Anweisung im Kreis hängen
+     (gleicher Loop oder Selbstbezug). Sonst teilen sich nur zwei Wege denselben Funktionsknoten. */
+  const FL=S.loops&&S.loops.flow,sc=v=>FL&&FL.scc.get(v)||null,same=(a,b)=>sc(a)!=null&&sc(a)===sc(b);
+  const wdm=f=>FL&&FL.wd.get(f)||new Map();
+  function realLoop(e){
+    if(!FL)return true;const a=e.data.source,b=e.data.target;
+    if(a.startsWith("M:")&&b.startsWith("F:")){const x=a.slice(2),f=G.fnOf.get(b);if(!f)return true;for(const [w,d] of wdm(f))if(d.has(x)&&same(x,w))return true;
+      for(const [,d] of wdm(f))if(d.has(x))return false;return !!sc(x)}
+    if(a.startsWith("F:")&&b.startsWith("M:")){const w=b.slice(2),f=G.fnOf.get(a);if(!f)return true;const d=wdm(f).get(w);if(!d)return !!sc(w);return [...d].some(x=>same(x,w))}
+    if(a.startsWith("F:")&&b.startsWith("F:")){const g=G.fnOf.get(a),r=g&&FL.ret.get(g);return !r||[...r].some(x=>sc(x))}
+    return false;
+  }
   const isE=e=>e.data.source!=null,edges=G.els.filter(isE),start="M:"+target;
   const nb=new Map(),add=(a,e)=>{if(!nb.has(a))nb.set(a,[]);nb.get(a).push(e)};
   const src=e=>dir==="back"?e.data.target:e.data.source,nxt=e=>dir==="back"?e.data.source:e.data.target;
   for(const e of edges)if(!/\bcal\b/.test(e.classes))add(src(e),e);
   const st=new Map([[start,1]]),back=new Set(),stack=[[start,0]];
   while(stack.length){const fr=stack[stack.length-1],l=nb.get(fr[0])||[];
-    if(fr[1]<l.length){const e=l[fr[1]++],w=nxt(e),k=st.get(w);if(k===1)back.add(e);else if(!k){st.set(w,1);stack.push([w,0])}}
+    if(fr[1]<l.length){const e=l[fr[1]++],w=nxt(e),k=st.get(w);if(k===1){if(realLoop(e))back.add(e)}else if(!k){st.set(w,1);stack.push([w,0])}}
     else{st.set(fr[0],2);stack.pop()}}
   if(!back.size)return {n:0,hide};
   if(!hide){back.forEach(e=>{e.classes=(e.classes||"")+" loopback";e.data.label=(e.data.label?e.data.label+" ":"")+"⟲"});return {n:back.size,hide}}
@@ -6699,6 +6726,7 @@ function drawWk(){
       {selector:"edge",style:{"curve-style":"bezier","target-arrow-shape":"triangle",width:1.5,"line-color":T.free,"target-arrow-color":T.free,"arrow-scale":.9,label:"data(label)","font-size":10,color:T.info,"text-background-color":T.void,"text-background-opacity":1,"text-background-padding":"2px"}},
       {selector:"edge.r",style:{"line-color":T.text3,"target-arrow-color":T.text3}},
       {selector:"edge.call",style:{"line-style":"dotted","line-color":T.info,"target-arrow-color":T.info,"target-arrow-shape":"vee"}},
+      {selector:"edge.arg",style:{"line-style":"dashed","line-color":T.text3,"target-arrow-color":T.text3,width:1.2}},
       {selector:"edge.cal",style:{"line-style":"dashed","line-color":T.info,"target-arrow-color":T.info,width:1,"line-dash-pattern":[3,4]}},
       {selector:"edge.cond",style:{"line-style":"dashed","line-dash-pattern":[7,4],"line-color":T.amber,"target-arrow-color":T.amber,color:T.amber,width:1.8}},
       {selector:"node.fn.cond",style:{"border-color":T.amber,"border-style":"dashed","border-width":2}},
