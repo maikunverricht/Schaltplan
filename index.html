@@ -380,6 +380,59 @@ footer.foot a:hover{color:var(--text)}
   #cy{height:56vh}
 }
 @media (max-width:820px),(pointer:coarse){.bg i{filter:blur(38px)}}
+
+/* Ablage: schmale Leiste, Plus/Minus klappt die Fläche auf */
+.dropbox{position:relative;z-index:1;border:1px dashed var(--line-strong);border-radius:22px;background:transparent;transition:border-color var(--t-s),background var(--t-s)}
+.dropbox[open]{background:var(--glass);-webkit-backdrop-filter:blur(15px) saturate(1.3);backdrop-filter:blur(15px) saturate(1.3);border-style:solid;border-color:var(--line)}
+.dropsum{list-style:none;display:flex;align-items:center;gap:10px;min-height:40px;padding:4px 14px 4px 8px;cursor:pointer;font-size:13.5px;color:var(--text-2);border-radius:22px}
+.dropsum::-webkit-details-marker{display:none}
+.dropsum:hover{color:var(--text)}.dropsum:hover .dsym{border-color:var(--amber);color:var(--amber)}
+.dsym{width:24px;height:24px;flex:none;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;font-family:var(--mono);font-size:15px;line-height:1;transition:border-color var(--t-s),color var(--t-s),transform var(--t-s)}
+.dsym::before{content:"+"}
+.dropbox[open] .dsym::before{content:"−"}
+.dlab{font-weight:600;white-space:nowrap}
+@media (max-width:480px){.dcount{font-size:10.5px}}
+.dcount{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dropbox .drop{margin:0 10px 10px;min-height:0;padding:18px 16px;gap:10px}
+.dropbox .drop .drop-ic{width:28px;height:28px}
+.dropbox .drop strong{font-size:14.5px}
+/* Wegweiser im Reiter Schnittstellen */
+.ifnav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ifn{display:flex;flex-direction:column;gap:1px;padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:var(--glass);text-decoration:none;transition:border-color var(--t-s),background var(--t-s)}
+.ifn:hover{border-color:var(--line-hi);background:var(--amber-soft)}
+.ifn b{font-size:14px;font-variation-settings:'wdth' 106}
+.ifn small{font-size:12px;color:var(--text-3);line-height:1.4}
+@media (max-width:640px){.ifnav{grid-template-columns:minmax(0,1fr)}.ifn small{display:none}}
+.panel .sheet{scroll-margin-top:84px}
+.intro{margin:4px 0 0;max-width:72ch}
+/* Labels mit gleichem Präfix: aufklappbare Gruppe */
+.lg{display:inline-block;vertical-align:top}
+.lg[open]{display:block;flex-basis:100%;width:100%;border-left:2px solid var(--line-hi);padding:2px 0 4px 8px;margin:2px 0}
+.lg>summary{list-style:none;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11.5px;padding:1px 9px;border-radius:100px;border:1px solid var(--line-strong);background:var(--film);cursor:pointer;white-space:nowrap}
+.lg>summary::-webkit-details-marker{display:none}
+.lg>summary::before{content:"+";color:var(--text-3)}
+.lg[open]>summary::before{content:"−"}
+.lg>summary:hover{border-color:var(--line-hi)}
+.lg .lgn{color:var(--text-3)}
+.lg>.chips{margin-top:5px}
+.lgh{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--text-3);padding-top:8px!important}
+/* Tabellen: sichtbarer Rollbalken, erste Spalte bleibt stehen, mit der Maus ziehbar */
+.tbl-wrap{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;padding-bottom:4px}
+.tbl-wrap::-webkit-scrollbar{height:9px}
+.tbl-wrap::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:9px}
+.tbl-wrap::-webkit-scrollbar-track{background:transparent}
+.tbl-wrap.can-x{cursor:grab}.tbl-wrap.dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
+.tbl-wrap table tr>:first-child{position:sticky;left:0;z-index:1;background:var(--surface-solid)}
+.tbl-wrap .xt tr>:nth-child(2){position:sticky;left:22px;z-index:1;background:var(--surface-solid)}
+.tbl-wrap .xt tr.xg>td,.tbl-wrap .xt tr.xd>td:first-child+td{position:static}
+.tbl-wrap .xr:hover>td,.tbl-wrap .xr.open>td{background:linear-gradient(var(--film),var(--film)),var(--surface-solid)}
+.tbl-wrap .xr.open>td{background:linear-gradient(var(--amber-soft),var(--amber-soft)),var(--surface-solid)}
+.tbl-wrap tr.xd>td:first-child{background:var(--surface-solid)}
+.tbl-wrap .xd>td{background:linear-gradient(var(--film),var(--film)),var(--surface-solid)}
+.xscroll-hint{display:none;font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin:4px 0 0;text-align:right}
+.tbl-wrap.can-x+.xscroll-hint{display:block}
+/* Innere Tafeln ohne eigenen Glasfilter (sonst rollt Safari darin nicht zuverlässig) */
+.sheet .sheet{-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;background:var(--film)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 </style>
 
@@ -407,20 +460,21 @@ footer.foot a:hover{color:var(--text)}
     <div class="stats" id="stats"></div>
   </section>
 
-  <section class="card" aria-label="Dateien einlegen">
+  <details class="dropbox" id="dropBox">
+    <summary class="dropsum"><span class="dsym" aria-hidden="true"></span><span class="dlab">Dateien &amp; Ordner einlegen</span><span class="dcount" id="dcount"></span></summary>
     <div class="drop" id="drop" tabindex="0" role="button" aria-label="Dateien oder Ordner hierher ziehen oder klicken, um sie auszuwählen">
       <svg class="drop-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
-      <div><strong>Dateien oder Ordner hier ablegen</strong><small><code>.c</code> <code>.h</code> und PaVaSt (<code>.xml</code>, <code>.pavast</code>) · ganze Ordner inkl. Unterordner · oder klicken zum Auswählen</small></div>
+      <div><strong>Dateien oder Ordner hier ablegen</strong><small><code>.c</code> <code>.h</code> und PaVaSt (<code>.xml</code>, <code>.pavast</code>) · ganze Ordner inkl. Unterordner · <code>.zip</code> · oder irgendwo auf die Seite ziehen</small></div>
       <div class="btns">
         <label class="pill primary" for="fin">Dateien wählen</label>
-        <label class="pill" for="din">Ordner</label>
+        <label class="pill" for="din" id="dinLbl">Ordner</label>
         <button class="pill" id="bSample" type="button">Beispiel</button>
         <button class="pill" id="bClear" type="button">Leeren</button>
       </div>
-      <input type="file" id="fin" multiple hidden accept=".c,.h,.xml,.pavast,.pvs,.txt">
+      <input type="file" id="fin" multiple hidden accept=".c,.h,.xml,.pavast,.pvs,.txt,.zip">
       <input type="file" id="din" multiple hidden webkitdirectory>
     </div>
-  </section>
+  </details>
 
   <section class="card focusbar" aria-label="Fokus und Gruppierung">
     <div class="fb-row">
@@ -465,15 +519,14 @@ footer.foot a:hover{color:var(--text)}
           <div><span class="t-idx">Statisch + Aufrufketten</span><h2>FC-Graph</h2></div>
           <div class="btns">
             <label class="toggle"><input type="checkbox" id="calls" checked> Aufrufe</label>
-            <select id="hood" class="filter mini" aria-label="Nachbarschaft beim Antippen"><option value="1">1 Stufe</option><option value="2">2 Stufen</option></select>
+            <select id="lvl" class="filter mini" aria-label="Ebene" title="Stufe 1: Cluster zugeklappt. Stufe 2: Cluster aufgeklappt, die FCs stehen darin."><option value="1">Stufe 1 · Cluster</option><option value="2">Stufe 2 · FCs</option><option value="mix" disabled>gemischt</option></select>
             <button class="pill" id="bPick" type="button" aria-pressed="false" title="FCs antippen, um sie auszuwählen. Am Rechner auch mit Umschalt + Ziehen.">Auswählen</button>
-            <button class="pill" id="bCollapse" type="button" hidden>Cluster zuklappen</button>
             <button class="pill" id="bFit" type="button">Einpassen</button>
             <button class="pill" id="bMer" type="button">Mermaid kopieren</button>
             <button class="pill icon-btn" id="bFull" type="button" aria-label="Graph im Vollbild" aria-pressed="false" title="Vollbild (Esc beendet)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="fo" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="fc" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
           </div>
         </div>
-        <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Antippen hebt die Nachbarschaft hervor und zeigt Details. Doppeltippen klappt einen Cluster auf oder zu.</p>
+        <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Antippen hebt die direkten Partner hervor und zeigt Details. Stufe 1 zeigt nur die Cluster, Stufe 2 klappt alle Cluster auf und zeigt die FCs darin. Doppeltippen klappt einen einzelnen Cluster auf oder zu.</p>
         <div class="cywrap">
           <div id="cy" aria-label="FC-Graph"></div>
           <aside class="dpanel" id="dpanel" hidden aria-label="Details"><button class="pill icon-btn dclose" id="dclose" type="button" aria-label="Details schließen">✕</button><div id="detail"><p class="empty"></p></div></aside>
@@ -493,6 +546,11 @@ footer.foot a:hover{color:var(--text)}
   </section>
 
   <section class="panel" id="p-if" role="tabpanel" aria-labelledby="t-if" hidden>
+    <nav class="ifnav" aria-label="Bereiche dieses Reiters">
+      <a class="ifn" href="#sysif"><span class="t-idx">1 · je Cluster</span><b>Systemschnittstellen</b><small>Was verlässt den Cluster, und welche Eingänge wirken darauf</small></a>
+      <a class="ifn" href="#wksheet"><span class="t-idx">2 · je Größe</span><b>Wirkkette</b><small>Eine Größe rückwärts (woher) oder vorwärts (wohin) verfolgen</small></a>
+      <a class="ifn" href="#ifsheet"><span class="t-idx">3 · je FC</span><b>Imports und Exports</b><small>PaVaSt-Deklaration gegen tatsächliche Zugriffe im C-Code</small></a>
+    </nav>
     <div class="sheet" id="sysif">
       <div class="row">
         <div><span class="t-idx">Aus dem C-Code</span><h2>Systemschnittstellen je Cluster</h2></div>
@@ -520,12 +578,13 @@ footer.foot a:hover{color:var(--text)}
       <div class="sub" id="wkEvalInfo" style="margin-top:6px"></div>
       <p class="sub" id="wkSel" style="margin-top:4px;min-height:1.4em"></p>
     </div>
-    <div class="sheet">
+    <div class="sheet" id="ifsheet">
       <div class="row">
         <div><span class="t-idx">Statisch</span><h2>Schnittstellen je FC</h2></div>
         <div class="btns" style="flex:1 1 300px;justify-content:flex-end">
           <select id="ifComp" class="filter" aria-label="FC"></select>
           <input id="ifQ" class="filter" placeholder="Message filtern" aria-label="Message filtern">
+          <label class="toggle"><input type="checkbox" id="ifGrp" checked> Labels nach Präfix</label>
         </div>
       </div>
       <p class="lede">PaVaSt liefert die Deklaration, der C-Code die tatsächlichen Lese- und Schreibzugriffe.</p>
@@ -547,7 +606,7 @@ footer.foot a:hover{color:var(--text)}
         <select id="exComp" class="filter" aria-label="FC"></select>
         <input id="exQ" class="filter" placeholder="Export filtern" aria-label="Export filtern">
         <label class="toggle"><input type="checkbox" id="exHint"> nur mit Hinweisen</label>
-        <label class="toggle"><input type="checkbox" id="exGroup" checked> nach FC gruppieren</label>
+        <select id="exGroup" class="filter mini" aria-label="Gruppierung" style="max-width:200px"><option value="fc">nach FC gruppieren</option><option value="pre">nach Label-Präfix</option><option value="">ohne Gruppen</option></select>
         <button class="pill" id="exAll" type="button">Alle auf/zu</button>
       </div>
     </div>
@@ -555,7 +614,7 @@ footer.foot a:hover{color:var(--text)}
   </section>
 
   <section class="panel" id="p-dyn" role="tabpanel" aria-labelledby="t-dyn" hidden>
-    <div class="sheet"><span class="t-idx">Dynamisch</span><h2>Aufrufketten je Prozess</h2><p class="lede">Prozesse sind Funktionalitäten, die kein anderer Code aufruft oder deren Name auf <code>_Proc…</code>, <code>_Ini</code> oder <code>…ms</code> endet. Gelesene und geschriebene Messages werden über die ganze Kette gesammelt.</p></div>
+    <div class="sheet"><span class="t-idx">Dynamisch</span><h2>Aufrufketten je Prozess</h2><p class="sub intro">Je FC die Einstiegspunkte (z. B. <code>…_Proc10ms</code>, <code>…_Ini</code>), was sie aufrufen und welche Größen die ganze Kette liest und schreibt, samt Raster.</p><p class="lede">Prozesse sind Funktionalitäten, die kein anderer Code aufruft oder deren Name auf <code>_Proc…</code>, <code>_Ini</code> oder <code>…ms</code> endet. Gelesene und geschriebene Messages werden über die ganze Kette gesammelt.</p></div>
     <div id="dyn" class="panel"></div>
   </section>
 
@@ -5543,30 +5602,69 @@ void DosVlv_Proc10ms(void)
 
 /* ---- Dateien ---- */
 function loadSample(){S.files=SAMPLE.map(f=>({name:f.name,text:f.text,kind:classify(f.name,f.text),sample:true}));run()}
-async function addFiles(list){
-  if(!list.length){toast("Keine C-/PaVaSt-Dateien gefunden");return}
-  if(S.files.some(f=>f.sample))S.files=[];
-  let skipped=0;
-  for(const it of list){
-    const file=it.file||it;
-    if(file.size>8e6){skipped++;continue}
-    const text=await file.text();
-    const name=it.path||file.webkitRelativePath||file.name;
-    const kind=classify(name,text);
-    if(!kind){skipped++;continue}
-    S.files=S.files.filter(f=>f.name!==name);S.files.push({name,text,kind,sample:false});
+/* ZIP ohne Bibliothek: Zentralverzeichnis lesen, deflate über DecompressionStream des Browsers */
+async function unzip(file){
+  const buf=new Uint8Array(await file.arrayBuffer()),dv=new DataView(buf.buffer),out=[];
+  let e=-1;for(let i=buf.length-22;i>=Math.max(0,buf.length-65557);i--)if(dv.getUint32(i,true)===0x06054b50){e=i;break}
+  if(e<0)throw new Error("kein gültiges ZIP");
+  let p=dv.getUint32(e+16,true);const n=dv.getUint16(e+10,true),td=new TextDecoder();
+  for(let k=0;k<n;k++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const meth=dv.getUint16(p+10,true),csz=dv.getUint32(p+20,true),usz=dv.getUint32(p+24,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);
+    const name=td.decode(buf.subarray(p+46,p+46+nl));p+=46+nl+xl+cl;
+    if(name.endsWith("/")||!SRC_RE.test(name)||name.split("/").some(x=>SKIP_DIR.test(x)||x==="__MACOSX")||usz>8e6)continue;
+    const lo=off+30+dv.getUint16(off+26,true)+dv.getUint16(off+28,true),raw=buf.subarray(lo,lo+csz);
+    let data;
+    if(meth===0)data=raw;
+    else if(meth===8){if(typeof DecompressionStream==="undefined")throw new Error("Browser kann ZIP nicht entpacken");
+      data=new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer())}
+    else continue;
+    out.push({path:name.replace(/\/+/g,"/"),text:td.decode(data)});
   }
-  run();toast(`${list.length-skipped} Dateien eingelegt`+(skipped?`, ${skipped} übersprungen (kein C/PaVaSt)`:""));
+  return out;
+}
+async function addFiles(list){
+  if(!list.length){toast("Keine Dateien gewählt");return}
+  /* Vor dem Lesen nach Endung sortieren: große Ordner enthalten viel, was nicht gebraucht wird */
+  const items=[];let skipped=0,zips=0;
+  for(const it of list){const file=it.file||it,name=it.path||file.webkitRelativePath||file.name;
+    if(name.split(/[\\/]/).some(x=>SKIP_DIR.test(x))){skipped++;continue}
+    if(/\.zip$/i.test(name)){zips++;try{(await unzip(file)).forEach(z=>items.push({name:z.path,text:z.text}))}catch(err){toast(name+": "+err.message);skipped++}continue}
+    if(!SRC_RE.test(name)||file.size>8e6){skipped++;continue}
+    items.push({name,file});}
+  if(items.length>40)toast(`Lese ${items.length} Dateien …`);
+  let added=0;const add=[];
+  for(const it of items){
+    const text=it.text??await it.file.text();
+    const kind=classify(it.name,text);
+    if(!kind){skipped++;continue}
+    add.push({name:it.name,text,kind,sample:false});added++;
+  }
+  if(!added){toast("Keine C-/PaVaSt-Dateien gefunden"+(skipped?` (${skipped} übersprungen)`:""));return}
+  if(S.files.some(f=>f.sample))S.files=[];
+  const names=new Set(add.map(f=>f.name));S.files=S.files.filter(f=>!names.has(f.name)).concat(add);
+  run();$("#dropBox").open=false;toast(`${added} Dateien eingelegt`+(zips?` aus ${zips} ZIP`:"")+(skipped?`, ${skipped} übersprungen`:""));
+}
+/* Ordnerwahl gibt es am Telefon nicht: dort ZIP anbieten */
+(function(){
+  const coarse=matchMedia("(pointer: coarse)").matches,mob=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  if(coarse&&mob){const l=$("#dinLbl");l.removeAttribute("for");l.setAttribute("role","button");l.tabIndex=0;
+    l.addEventListener("click",e=>{e.preventDefault();toast("Ordner am Telefon: in „Dateien“ komprimieren, dann die ZIP über „Dateien wählen“ einlegen");setTimeout(()=>$("#fin").click(),900)})}
+})();
+function renderDropSum(){
+  const n=S.files.length,s=S.files.some(f=>f.sample),c=S.files.filter(f=>f.kind==="c").length;
+  $("#dcount").textContent=n?`${s?"Beispiel · ":""}${n} Datei${n===1?"":"en"} · ${c} C · ${n-c} PaVaSt`:"noch nichts eingelegt";
+  if(!n)$("#dropBox").open=true;
 }
 $("#fin").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
 $("#din").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
 
 /* Drag & Drop: Dateien und ganze Ordner (rekursiv), überall auf der Seite */
-const SRC_RE=/\.(c|h|xml|pavast|pvs|txt)$/i, SKIP_DIR=/^(\.git|\.svn|node_modules)$/;
+const SRC_RE=/\.(c|h|xml|pavast|pvs|txt|arxml)$/i, SKIP_DIR=/^(\.git|\.svn|\.hg|node_modules|__MACOSX)$/;
 const readEntries=rd=>new Promise((res,rej)=>rd.readEntries(res,rej));
 async function walkEntry(en,base,out){
   if(en.isFile){
-    if(base&&!SRC_RE.test(en.name))return;
+    if(base&&!SRC_RE.test(en.name)&&!/\.zip$/i.test(en.name))return;
     const f=await new Promise((res,rej)=>en.file(res,rej));
     out.push({file:f,path:base+en.name});
   }else if(en.isDirectory){
@@ -5718,6 +5816,7 @@ function showPanel(t){
   try{localStorage.setItem("ap-tab",t)}catch(e){}
   if(t==="arch"&&S.cy){S.cy.resize();S.cy.fit(undefined,30)}
   if(t==="if"){if(S.wkCy){S.wkCy.resize();S.wkCy.fit(undefined,24)}else if(S.wk)drawWk()}
+  markX();
 }
 
 /* ---- Lauf ---- */
@@ -5766,7 +5865,7 @@ addEventListener("resize",closeHelp);addEventListener("scroll",()=>{if(hpBtn&&Da
   });
   const lead=document.querySelector(".hero .lead");
   if(lead){document.querySelector(".hero h1").appendChild(mkHelp("<p>"+lead.innerHTML+"</p><p><b>Begriffe:</b> Eine <b>FC</b> ist eine Funktion mit C-Datei und PaVaSt. Eine <b>Funktionalität</b> ist eine C-Funktion darin. Eine <b>Größe</b> ist eine Message. Ein <b>Cluster</b> fasst FCs mit gleichem Präfix zusammen.</p><p>Die Leiste unten wechselt die Ansicht: antippen oder die Kugel ziehen.</p>","Schaltplan"));lead.remove()}
-  $(".fb-in").appendChild(mkHelp("<p>Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner: eine FC, einen Cluster, eine Message oder eine Funktionalität.</p><p>Namen in Tabellen und Details lassen sich anklicken und setzen den Fokus direkt. Gelöst wird er mit dem Chip in der Kopfleiste.</p><p><b>Cluster</b> bündeln FCs. Standard ist <b>nach Präfix</b>: alle FCs mit gleichem Namensteil vor dem ersten Unterstrich bilden einen Cluster, <code>SCR_Dos</code> und <code>SCR_DosVlv</code> also <code>SCR</code>. Eine FC ohne Partner gleichen Präfixes bleibt einzeln. Alternativ nach Ordner (die Ebene, die tatsächlich trennt) oder automatisch nach Kopplung. Bei Kopplung landen FCs, die viele Messages und Aufrufe austauschen, im selben Cluster.</p><p>Eigene Cluster legst du im Graph an: „Auswählen“ einschalten, FCs antippen und zusammenfassen. Sie gelten in jeder Gruppierung und bleiben in diesem Browser gespeichert.</p>","Fokus und Cluster"));
+  $(".fb-in").appendChild(mkHelp("<p>Ohne Fokus zeigen alle Reiter alles. Mit Fokus nur das Gewählte und seine direkten Partner: eine FC, einen Cluster, eine Message oder eine Funktionalität.</p><p>Namen in Tabellen und Details lassen sich anklicken und setzen den Fokus direkt. Gelöst wird er mit dem Chip in der Kopfleiste.</p><p><b>Cluster</b> bündeln FCs. Standard ist <b>nach Präfix</b>: alle FCs mit gleichem Namensteil vor dem ersten Unterstrich bilden einen Cluster, <code>SCR_Dos</code> und <code>Scr_DosVlv</code> also <code>SCR</code>. Groß- und Kleinschreibung spielt dabei keine Rolle. Eine FC ohne Partner gleichen Präfixes bleibt einzeln. Alternativ nach Ordner (die Ebene, die tatsächlich trennt) oder automatisch nach Kopplung. Bei Kopplung landen FCs, die viele Messages und Aufrufe austauschen, im selben Cluster.</p><p>Eigene Cluster legst du im Graph an: „Auswählen“ einschalten, FCs antippen und zusammenfassen. Sie gelten in jeder Gruppierung und bleiben in diesem Browser gespeichert.</p>","Fokus und Cluster"));
   $(".cfg-btns").appendChild(mkHelp("<p><b>Alle Varianten</b> zeigt den Code aller Zweige zusammen. Bedingungen stehen trotzdem dabei: in der Spalte „Bedingung“, als „Variante“ und ◇ in der Exportliste und als „nur wenn …“.</p><p><b>Konkrete Konfiguration</b> wertet die Systemkonstanten aus. Abgeschaltete Zweige, Importe, Exporte und Aufrufe fehlen dann in allen Reitern. Ein geänderter Wert schaltet automatisch in diesen Modus.</p><p>Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code>, aus einer geladenen Wertedatei oder aus deiner Eingabe. Ohne Wert gilt eine Bedingung als „vielleicht“, der Code bleibt drin.</p><p><b>SyC-Muster</b> legt fest, woran Systemkonstanten erkannt werden, zum Beispiel <code>SY_*, *_SY, *_SC</code>. <code>*</code> steht für einen beliebigen Namensteil, Groß- und Kleinschreibung zählt.</p><p><b>Als A merken</b> hält die Werte fest, <b>Mit A vergleichen</b> zeigt, welche Schnittstellen, Exporte und Aufrufe sich unterscheiden.</p>","Konfiguration"));
 })();
 
@@ -5883,6 +5982,11 @@ function couplingGroups(comps){
 function computeGroups(){
   const mode=$("#grpBy").value,comps=[...S.model.comps.values()],g=new Map();
   const cpl=mode==="kopplung"?couplingGroups(comps):null;
+  /* Präfix ohne Rücksicht auf Groß-/Kleinschreibung: SCR_Dos und Scr_Vlv bilden einen Cluster.
+     Angezeigt wird die häufigste Schreibweise, bei Gleichstand die mit mehr Großbuchstaben. */
+  const preCnt=new Map();for(const c of comps){const p=prefixOf(c.name),k=p.toLowerCase();if(!preCnt.has(k))preCnt.set(k,new Map());const m=preCnt.get(k);m.set(p,(m.get(p)||0)+1)}
+  const upN=t=>(t.match(/[A-Z]/g)||[]).length,preName=new Map();
+  for(const [k,m] of preCnt)preName.set(k,[...m].sort((a,b)=>b[1]-a[1]||upN(b[0])-upN(a[0])||a[0].localeCompare(b[0]))[0][0]);
   let depth=-1;
   if(mode==="ordner"){
     const dirs=comps.map(dirParts),max=Math.max(0,...dirs.map(d=>d.length));
@@ -5892,7 +5996,7 @@ function computeGroups(){
   for(const c of comps){
     let k=null;
     if(mode==="ordner"){const d=dirParts(c);k=depth>=0?(d[depth]||"ohne Ordner"):"ohne Ordner"}
-    else if(mode==="praefix")k=prefixOf(c.name);
+    else if(mode==="praefix")k=preName.get(prefixOf(c.name).toLowerCase());
     else if(cpl)k=cpl.get(c.name)??null;
     if(S.manual.has(c.name))k="✎ "+S.manual.get(c.name);
     if(k==null)continue;if(!g.has(k))g.set(k,[]);g.get(k).push(c.name);
@@ -5901,7 +6005,15 @@ function computeGroups(){
 }
 const realGroups=()=>[...new Set(S.grpOf.values())];
 const multiGroups=()=>realGroups().filter(k=>(S.groups.get(k)||[]).length>1);
-function initCollapse(){S.collapsed=new Set();const mg=multiGroups();if(mg.length>=2&&S.model.comps.size>12)mg.forEach(g=>S.collapsed.add(g))}
+function initCollapse(){
+  S.collapsed=new Set();const mg=multiGroups();let lv=null;try{lv=localStorage.getItem("sp-lvl")}catch(e){}
+  if(lv!=="1"&&lv!=="2")lv=mg.length>=2&&S.model.comps.size>12?"1":"2";
+  if(lv==="1")mg.forEach(g=>S.collapsed.add(g));
+}
+function syncLvl(){
+  const sel=$("#lvl"),mg=multiGroups(),n=mg.filter(g=>S.collapsed.has(g)).length;
+  sel.hidden=!mg.length||!!S.focus;sel.value=n===0?"2":n===mg.length?"1":"mix";
+}
 $("#grpBy").addEventListener("change",()=>{S.grpTouched=true;try{localStorage.setItem("sp-grp2",$("#grpBy").value)}catch(e){}computeGroups();initCollapse();if(S.focus&&S.focus.type==="grp")S.focus=null;renderFocus();renderGraph();drawIf();drawExp();renderDyn()});
 
 function focusSets(){
@@ -5952,6 +6064,19 @@ document.addEventListener("click",e=>{
   const a=e.target.closest("[data-grp]");if(a){const g=a.dataset.grp;if(a.dataset.act==="open")S.collapsed.delete(g);else S.collapsed.add(g);renderGraph();showGroup(g,S.collapsed.has(g))}
 });
 const fbtn=(type,name,txt)=>`<button class="lnk" type="button" data-focus="${type}:${esc(name)}">${txt||esc(name)}</button>`;
+/* Label-Präfix: Namensteil bis zum ersten Unterstrich, Groß-/Kleinschreibung egal */
+const lpre=m=>{m=String(m).replace(/^ƒ\s*/,"");const i=m.indexOf("_");return i>0?m.slice(0,i):""};
+function byPrefix(list){
+  const by=new Map();for(const x of list){const p=lpre(x),k=p.toLowerCase();if(!by.has(k))by.set(k,{p,l:[]});by.get(k).l.push(x)}
+  return [...by.values()];
+}
+/* Chips mit gleichem Präfix wandern in eine aufklappbare Gruppe; Einzelne bleiben einzeln */
+function chipsG(list,render,openAll){
+  if(!list.length)return "";
+  const gs=byPrefix(list);if(gs.length===list.length)return list.map(render).join(" ");
+  const open=openAll??list.length<=8;
+  return gs.map(g=>g.l.length<2||!g.p?g.l.map(render).join(" "):`<details class="lg"${open?" open":""}><summary><span>${esc(g.p)}_…</span><span class="lgn">${g.l.length}</span></summary><div class="chips">${g.l.map(render).join(" ")}</div></details>`).join(" ");
+}
 
 /* ---- Graph ---- */
 function tok(){const cs=getComputedStyle(document.documentElement);const g=k=>cs.getPropertyValue(k).trim();return {surface:g("--surface-solid"),void:g("--void"),text:g("--text"),text2:g("--text-2"),text3:g("--text-3"),line:g("--line-strong"),amber:g("--amber"),free:g("--free"),over:g("--over"),info:g("--info"),red:g("--red-ink")}}
@@ -5995,8 +6120,7 @@ function renderGraph(){
     else els.push({data:{id,source:e.a,target:e.b,label:"ƒ "+new Set(e.items.flatMap(c=>[...c.fns])).size},classes:"call"});
   }
   if(S.cy){S.cy.destroy();S.cy=null}
-  const mg=multiGroups().length;$("#bCollapse").hidden=!mg||!!F;
-  $("#bCollapse").textContent=S.collapsed.size<mg?"Cluster zuklappen":"Cluster aufklappen";
+  syncLvl();
   if(!els.length){box.innerHTML='<p class="cyfail">'+(F?"Im Fokus gibt es keine Verbindungen.":"Lege C- und PaVaSt-Dateien ein oder lade das Beispiel.")+'</p>';return}
   box.innerHTML="";
   const font='"JetBrains Mono", ui-monospace, Menlo, monospace';
@@ -6034,13 +6158,13 @@ function renderGraph(){
 function fade(set){set=set.union(set.nodes().ancestors());S.cy.elements().addClass("faded");set.removeClass("faded")}
 /* Nachbarschaft: nur der Knoten und seine Partner bleiben kräftig */
 function hood(n){
-  const d=+$("#hood").value;const base=n.isParent()?n.union(n.descendants()):n;
-  let set=base.closedNeighborhood();if(d>1)set=set.union(set.nodes().closedNeighborhood());
-  fade(set.union(base));
+  const base=n.isParent()?n.union(n.descendants()):n;
+  fade(base.closedNeighborhood().union(base));
 }
 $("#calls").addEventListener("change",renderGraph);
 $("#bFit").onclick=()=>S.cy&&S.cy.fit(undefined,30);
-$("#bCollapse").onclick=()=>{const mg=multiGroups();if(S.collapsed.size<mg.length)mg.forEach(g=>S.collapsed.add(g));else S.collapsed.clear();renderGraph()};
+$("#lvl").addEventListener("change",e=>{const v=e.target.value;if(v==="mix")return;try{localStorage.setItem("sp-lvl",v)}catch(x){}
+  S.collapsed=new Set();if(v==="1")multiGroups().forEach(g=>S.collapsed.add(g));renderGraph();$("#detail").innerHTML='<p class="empty"></p>';toast(v==="1"?"Stufe 1: Cluster zugeklappt":"Stufe 2: Cluster aufgeklappt")});
 const reTheme=()=>{if(S.model){renderGraph();if(S.wkCy)drawWk()}};
 try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",reTheme)}catch(e){}
 new MutationObserver(reTheme).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
@@ -6056,9 +6180,9 @@ function showEdge(it){
   }
   const items=[...it.items].sort((x,y)=>x.m.localeCompare(y.m)),agg=it.a.startsWith("G:")||it.b.startsWith("G:");
   $("#detail").innerHTML=`<h3>${esc(lab(it.a))} → ${esc(lab(it.b))}</h3><p class="sub">${items.length} Message${items.length>1?"s":""}${agg?" über die Clustergrenze":""}</p><ul class="msgl">`+
-   items.map(f=>{const w=procsOf(S.model.procW,f.m,f.from),r=procsOf(S.model.procR,f.m,f.to);
+   msgGroups(items,f=>f.m,f=>{const w=procsOf(S.model.procW,f.m,f.from),r=procsOf(S.model.procR,f.m,f.to);
     return `<li><div>${fbtn("msg",f.m)} ${pill(f.st)}${f.multi?' <span class="st multi">mehrere Producer</span>':""}</div>
-     <div class="sub">${agg?esc(lab(f.from))+" → "+esc(f.to)+"<br>":""}${f.icond||f.econd?`<span class="syc">${f.econd?"Export nur wenn "+esc(f.econd):""}${f.econd&&f.icond?" · ":""}${f.icond?"Import nur wenn "+esc(f.icond):""}</span><br>`:""}${w.length?"geschrieben in "+w.map(esc).join(", "):f.from===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`}).join("")+"</ul>";
+     <div class="sub">${agg?esc(lab(f.from))+" → "+esc(f.to)+"<br>":""}${f.icond||f.econd?`<span class="syc">${f.econd?"Export nur wenn "+esc(f.econd):""}${f.econd&&f.icond?" · ":""}${f.icond?"Import nur wenn "+esc(f.icond):""}</span><br>`:""}${w.length?"geschrieben in "+w.map(esc).join(", "):f.from===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`})+"</ul>";
 }
 function picked(){return S.cy?S.cy.nodes(":selected").filter(n=>{const i=n.id();return !i.startsWith("G:")&&!i.startsWith("P:")&&i!==ENV}).map(n=>n.id()):[]}
 function showPick(){
@@ -6086,19 +6210,25 @@ function showGroup(g,isClosed){
   if(own)$("#clDrop").onclick=()=>{const nm=g.slice(2);for(const [k,v] of [...S.manual])if(v===nm)S.manual.delete(k);saveManual();if(S.focus&&S.focus.name===g)S.focus=null;computeGroups();renderFocus();renderGraph();drawSysIf();drawExp();renderDyn();$("#detail").innerHTML='<p class="empty"></p>';toast("Cluster „"+nm+"“ aufgelöst")};
 }
 function showComp(n){
-  if(n===ENV){const ms=S.model.flows.filter(f=>f.from===ENV);$("#detail").innerHTML=`<h3>Umgebung</h3><p class="sub">Messages, die importiert oder gelesen werden, aber von keiner geladenen FC stammen.</p><div class="chips">${[...new Set(ms.map(f=>f.m))].map(m=>fbtn("msg",m,`<span class="chip">${esc(m)}</span>`)).join("")}</div>`;return}
+  if(n===ENV){const ms=S.model.flows.filter(f=>f.from===ENV);$("#detail").innerHTML=`<h3>Umgebung</h3><p class="sub">Messages, die importiert oder gelesen werden, aber von keiner geladenen FC stammen.</p><div class="chips">${chipsG([...new Set(ms.map(f=>f.m))].sort(),m=>fbtn("msg",m,`<span class="chip">${esc(m)}</span>`))}</div>`;return}
   const c=S.model.comps.get(n);if(!c)return;
   const out=S.model.flows.filter(f=>f.from===n),inn=S.model.flows.filter(f=>f.to===n);
   const iss=S.model.issues.filter(i=>i.comp===n),g=S.grpOf.get(n);
   $("#detail").innerHTML=`${g!=null?`<span class="t-idx">Cluster ${esc(g)}</span>`:""}<h3>${esc(n)}</h3>
    <dl class="kv"><dt>PaVaSt</dt><dd>${c.pvFiles.map(esc).join(", ")||"—"}</dd><dt>C</dt><dd>${c.cFiles.map(esc).join(", ")||"—"}</dd>
    <dt>Prozesse</dt><dd>${c.procs.map(p=>esc(p.name)).join(", ")||"—"}</dd></dl>
-   <h3>Exporte</h3><div class="chips">${[...new Set([...c.exp,...out.map(f=>f.m)])].sort().map(m=>fbtn("msg",m,`<span class="chip w">${esc(m)}</span>`)).join("")||'<span class="sub">keine</span>'}</div>
-   <h3>Importe</h3><ul class="msgl">${inn.sort((x,y)=>x.m.localeCompare(y.m)).map(f=>`<li>${fbtn("msg",f.m)} <span class="sub">von ${esc(lab(f.from))}</span> ${pill(f.st)}</li>`).join("")||'<li class="sub">keine</li>'}</ul>
-   <h3>Applikationsparameter</h3><div class="chips">${[...c.cal].sort().map(x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`).join("")||'<span class="sub">keine erkannt</span>'}</div>
+   <h3>Exporte</h3><div class="chips">${chipsG([...new Set([...c.exp,...out.map(f=>f.m)])].sort(),m=>fbtn("msg",m,`<span class="chip w">${esc(m)}</span>`))||'<span class="sub">keine</span>'}</div>
+   <h3>Importe</h3><ul class="msgl">${msgGroups(inn.sort((x,y)=>x.m.localeCompare(y.m)),f=>f.m,f=>`<li>${fbtn("msg",f.m)} <span class="sub">von ${esc(lab(f.from))}</span> ${pill(f.st)}</li>`)||'<li class="sub">keine</li>'}</ul>
+   <h3>Applikationsparameter</h3><div class="chips">${chipsG([...c.cal].sort(),x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`)||'<span class="sub">keine erkannt</span>'}</div>
    <h3>Diagnose</h3><div class="chips">${[...(c.dfc||[])].sort().map(d=>`<button class="lnk" type="button" data-wk="${esc(d)}"><span class="chip dfc">${esc(d)}</span></button>`).join("")||'<span class="sub">kein DFC gesetzt</span>'}</div>
    ${iss.length?`<h3>Auffällig</h3><ul class="msgl">${iss.map(i=>`<li class="mono">${esc(i.m)} <span class="sub">${esc(i.kind)}</span></li>`).join("")}</ul>`:""}
    <div class="btns" style="margin-top:12px">${fbtn("comp",n,"Fokus auf FC").replace('class="lnk"','class="pill"')}<button class="pill" type="button" onclick="gotoDyn('${esc(n).replace(/'/g,"\\'")}')">Aufrufketten</button></div>`;
+}
+/* Listen (ul.msgl) mit Zwischenzeile je Präfix, sobald zwei Einträge ihn teilen */
+function msgGroups(items,key,render){
+  const gs=byPrefix(items.map(key));if(gs.length===items.length)return items.map(render).join("");
+  const by=new Map(items.map(i=>[key(i),[]]));items.forEach(i=>by.get(key(i)).push(i));
+  return gs.map(g=>{const u=[...new Set(g.l)],rows=u.flatMap(k=>by.get(k)).map(render).join("");return u.length>1&&g.p?`<li class="lgh">${esc(g.p)}_… · ${u.length}</li>`+rows:rows}).join("");
 }
 function calTip(x){const o=S.model.cals.get(x);if(!o)return "";const p=o.props||{};return [p.lang,p.kat,p.einheit,o.owner.length?"definiert in "+o.owner.join(", "):"",o.users.length?"genutzt in "+o.users.join(", "):""].filter(Boolean).join(" · ")}
 function gotoDyn(n){openTab("dyn");const el=document.getElementById("dyn-"+n);if(el){el.open=true;el.scrollIntoView({behavior:"smooth",block:"start"})}}
@@ -6135,16 +6265,21 @@ function drawIf(){drawSysIf();
   }
   const filt=rows.filter(r=>(!q||r.m.toLowerCase().includes(q))&&(!F||(F.msg?r.m===F.msg:F.fn?F.core.has(r.c.name):(F.core.has(r.c.name)||r.partner.some(p=>F.core.has(p))))));
   const yn=(b,has)=>!has?'<span class="no">n/a</span>':b?'<span class="yes">✓</span>':'<span class="no">–</span>';
+  const grp=$("#ifGrp").checked;
+  if(grp){const k=r=>r.c.name+"\u0000"+lpre(r.m).toLowerCase()+"\u0000"+r.m.toLowerCase()+"\u0000"+r.dir;filt.sort((a,b)=>k(a)<k(b)?-1:k(a)>k(b)?1:0)}
   const vis=filt.slice(0,S.ifLimit);
+  const gcnt=new Map();if(grp)filt.forEach(r=>{const g=r.c.name+"|"+lpre(r.m).toLowerCase();gcnt.set(g,(gcnt.get(g)||0)+1)});
+  let lastG=null;
   $("#ifTbl").innerHTML=filt.length?`<table><thead><tr><th>FC</th><th>Message</th><th>Richtung</th><th>PaVaSt</th><th>C-Code</th><th>Bedingung</th><th>Partner</th><th>Status</th></tr></thead><tbody>`+
-   vis.map(r=>{const st=r.dir==="Import"?r.st:(r.c.hasPV&&!r.pv?"undecl":r.c.hasC&&!r.cd?"unused":"ok");
+   vis.map(r=>{let head="";
+    if(grp){const p=lpre(r.m),g=r.c.name+"|"+p.toLowerCase(),n=gcnt.get(g);if(g!==lastG){lastG=g;if(p&&n>1)head=`<tr class="lgr"><td class="lgh" colspan="8">${esc(r.c.name)} · ${esc(p)}_… · ${n}</td></tr>`}}const st=r.dir==="Import"?r.st:(r.c.hasPV&&!r.pv?"undecl":r.c.hasC&&!r.cd?"unused":"ok");
     const ccs=[...new Set(r.cc.map(normCond))],mis=r.pc!==undefined&&r.cc.length&&(ccs.length>1||ccs[0]!==normCond(r.pc));
     const bed=(r.pc?`<span class="syc">PaVaSt: ${esc(r.pc)}</span>`:"")+(r.cc.some(x=>x)?`${r.pc?"<br>":""}<span class="syc">C: ${r.cc.map(x=>esc(x||"immer")).join(" | ")}</span>`:"");
-    return `<tr><td>${esc(r.c.name)}</td><td class="mono">${fbtn("msg",r.m)}</td><td>${r.dir}</td><td class="c">${yn(r.pv,r.c.hasPV)}</td><td class="c">${yn(r.cd,r.c.hasC)}</td><td class="bedc">${bed||'<span class="no">immer</span>'}${mis?' <span class="st undecl">abweichend</span>':""}</td><td class="mono">${r.partner.map(p=>esc(p===ENV?"Umgebung":p)).join(", ")||"—"}</td><td>${st?pill(st):""}</td></tr>`}).join("")+"</tbody></table>"+more(filt.length-vis.length,"ifMore")
+    return head+`<tr><td>${esc(r.c.name)}</td><td class="mono">${fbtn("msg",r.m)}</td><td>${r.dir}</td><td class="c">${yn(r.pv,r.c.hasPV)}</td><td class="c">${yn(r.cd,r.c.hasC)}</td><td class="bedc">${bed||'<span class="no">immer</span>'}${mis?' <span class="st undecl">abweichend</span>':""}</td><td class="mono">${r.partner.map(p=>esc(p===ENV?"Umgebung":p)).join(", ")||"—"}</td><td>${st?pill(st):""}</td></tr>`}).join("")+"</tbody></table>"+more(filt.length-vis.length,"ifMore")
    :'<p class="sub">Keine Schnittstellen gefunden.</p>';
-  const mb=$("#ifMore");if(mb)mb.onclick=()=>{S.ifLimit+=300;drawIf()};
+  const mb=$("#ifMore");if(mb)mb.onclick=()=>{S.ifLimit+=300;drawIf()};markX();
 }
-$("#ifQ").addEventListener("input",()=>{S.ifLimit=300;drawIf()});$("#ifComp").addEventListener("change",()=>{S.ifLimit=300;drawIf()});
+$("#ifQ").addEventListener("input",()=>{S.ifLimit=300;drawIf()});$("#ifGrp").addEventListener("change",drawIf);$("#ifComp").addEventListener("change",()=>{S.ifLimit=300;drawIf()});
 
 /* ---- Systemschnittstellen: Ausgänge eines Clusters und alles, was sie beeinflusst ---- */
 const retOf=f=>!/^(?:[\w\s]*\s)?void\s+[A-Za-z_]\w*\s*\(/.test(f.sig||"");
@@ -6223,11 +6358,11 @@ function drawSysIf(){
   if(F&&S.focus.type==="grp")all=all.filter(c=>c.cl===S.focus.name);
   else if(F)all=all.filter(c=>c.members.some(n=>F.view.has(n)));
   if(!all.length){box.innerHTML='<p class="sub">Kein Cluster hat Schnittstellen nach außen.</p>';return}
-  const ch=(l,cls)=>l.length?l.map(x=>x.startsWith("ƒ ")?fbtn("fn",x.slice(2).replace(/\(\)$/,""),`<span class="chip">${esc(x)}</span>`):fbtn("msg",x,`<span class="chip${cls?" "+cls:""}">${esc(x)}</span>`)).join(" "):'<span class="sub">—</span>';
+  const ch=(l,cls)=>l.length?chipsG(l,x=>x.startsWith("ƒ ")?fbtn("fn",x.slice(2).replace(/\(\)$/,""),`<span class="chip">${esc(x)}</span>`):fbtn("msg",x,`<span class="chip${cls?" "+cls:""}">${esc(x)}</span>`)):'<span class="sub">—</span>';
   const open=all.length<=3;
   box.innerHTML=all.map(c=>`<details class="sheet dcomp" ${open?"open":""}><summary><h3>${esc(c.cl)}</h3><span class="sub">${c.members.length} FC${c.members.length===1?"":"s"} · ${c.rows.filter(r=>r.kind!=="DFC").length} Ausgang${c.rows.filter(r=>r.kind!=="DFC").length===1?"":"e"}${c.rows.some(r=>r.kind==="DFC")?" · "+c.rows.filter(r=>r.kind==="DFC").length+" DFC":""} · ${c.inputs.length} Eingang${c.inputs.length===1?"":"e"}</span></summary>
-    ${c.rows.length?`<div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Ausgang</th><th>Abnehmer</th><th>beeinflusst von (Eingänge)</th><th>intern beteiligt</th><th>Applikation</th><th>Funktionalitäten</th></tr></thead><tbody>${c.rows.map(r=>`<tr><td class="mono" style="white-space:nowrap">${r.kind==="Message"?fbtn("msg",r.name):r.kind==="DFC"?esc(r.name):fbtn("fn",r.name.replace(/\(\)$/,""),esc(r.name))}${r.kind==="DFC"?`<span class="chip dfc" style="margin-left:4px">DFC</span>`:""}${r.cond?`<br><span class="syc">nur wenn ${esc(r.cond)}</span>`:""}${r.kind!=="Funktion"?`<br><button class="lnk sub" type="button" data-wk="${esc(r.name)}">Wirkkette ›</button>`:""}</td><td>${r.to.map(esc).join(", ")}</td><td><div class="chips">${ch(r.inputs)}</div></td><td><div class="chips">${ch(r.inner,"w")}</div></td><td><div class="chips">${r.cal.length?r.cal.map(x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`).join(" "):'<span class="sub">—</span>'}</div></td><td class="mono sub">${r.fns.map(esc).join(", ")||"—"}</td></tr>`).join("")}</tbody></table></div>`:'<p class="sub" style="margin-top:8px">Dieser Cluster liefert nichts nach außen.</p>'}
-    ${c.idle.length?`<p class="sub" style="margin-top:8px">Eingänge ohne erkennbare Wirkung auf einen Ausgang: ${c.idle.map(esc).join(", ")}</p>`:""}</details>`).join("");
+    ${c.rows.length?`<div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Ausgang</th><th>Abnehmer</th><th>beeinflusst von (Eingänge)</th><th>intern beteiligt</th><th>Applikation</th><th>Funktionalitäten</th></tr></thead><tbody>${c.rows.map(r=>`<tr><td class="mono" style="white-space:nowrap">${r.kind==="Message"?fbtn("msg",r.name):r.kind==="DFC"?esc(r.name):fbtn("fn",r.name.replace(/\(\)$/,""),esc(r.name))}${r.kind==="DFC"?`<span class="chip dfc" style="margin-left:4px">DFC</span>`:""}${r.cond?`<br><span class="syc">nur wenn ${esc(r.cond)}</span>`:""}${r.kind!=="Funktion"?`<br><button class="lnk sub" type="button" data-wk="${esc(r.name)}">Wirkkette ›</button>`:""}</td><td>${r.to.map(esc).join(", ")}</td><td><div class="chips">${ch(r.inputs)}</div></td><td><div class="chips">${ch(r.inner,"w")}</div></td><td><div class="chips">${r.cal.length?chipsG(r.cal,x=>`<span class="chip" title="${esc(calTip(x))}">${esc(x)}</span>`):'<span class="sub">—</span>'}</div></td><td class="mono sub">${r.fns.map(esc).join(", ")||"—"}</td></tr>`).join("")}</tbody></table></div>`:'<p class="sub" style="margin-top:8px">Dieser Cluster liefert nichts nach außen.</p>'}
+    ${c.idle.length?`<div class="sub" style="margin-top:8px">Eingänge ohne erkennbare Wirkung auf einen Ausgang:<div class="chips">${chipsG(c.idle,x=>`<span class="chip">${esc(x)}</span>`,false)}</div></div>`:""}</details>`).join("");markX();
 }
 $("#bSysCsv").onclick=()=>{
   const q=v=>/[;"\n]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v,rows=[["Cluster","Art","Ausgang","Abnehmer","Eingänge","Intern beteiligt","Applikationsparameter","Funktionalitäten"]];
@@ -6397,6 +6532,7 @@ $("#wkQ").addEventListener("change",e=>{const v=e.target.value.trim();if(!v)retu
 $("#wkQ").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.target.dispatchEvent(new Event("change"))}});
 ["wkDir","wkAll","wkCal","wkEval"].forEach(id=>$("#"+id).addEventListener("change",drawWk));
 $("#wkFit").onclick=()=>S.wkCy&&S.wkCy.fit(undefined,24);
+document.querySelectorAll(".ifn").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();const t=document.querySelector(a.getAttribute("href"));if(t)t.scrollIntoView({behavior:"smooth",block:"start"})}));
 document.addEventListener("click",e=>{const b=e.target.closest("[data-wk]");if(!b)return;e.preventDefault();openTab("if");setWk(b.dataset.wk);$("#wksheet").scrollIntoView({behavior:"smooth",block:"start"})});
 
 /* ---- Exportliste: kompakte Tabelle, Zeile klappt auf ---- */
@@ -6443,15 +6579,17 @@ function expDetail(e){
 function drawExp(){
   const rows=expRows(),box=$("#exList");
   if(!rows.length){box.innerHTML='<p class="sub">'+(S.model.exportsList.length?"Kein Export passt zum Filter.":"Noch keine Exporte gefunden. Lege C- und PaVaSt-Dateien ein.")+'</p>';return}
-  const grp=$("#exGroup").checked,{k,dir}=S.expSort;
+  const gm=$("#exGroup").value,grp=!!gm,{k,dir}=S.expSort;
+  const gk=e=>gm==="pre"?(lpre(e.name).toLowerCase()||"\uffff"):e.comp;
+  const gname=new Map();rows.forEach(e=>{const g=gk(e);if(!gname.has(g))gname.set(g,gm==="pre"?(lpre(e.name)?lpre(e.name)+"_…":"ohne Präfix"):e.comp)});
   const cols=[["name","Name"],["comp","FC"],["kind","Art"],["pv","PaVaSt"],["raster","Erzeugt"],["cons","Abnehmer"],["hint","Hinweise"]];
   const th=cols.map(([c,t])=>`<th aria-sort="${k===c?(dir>0?"ascending":"descending"):"none"}"><button class="sortb" type="button" data-sort="${c}">${t}${k===c?(dir>0?" ↑":" ↓"):""}</button></th>`).join("");
   let html=`<table class="xt"><thead><tr><th class="cv"></th>${th}</tr></thead><tbody>`,shown=0;
-  const order=grp?[...new Set(rows.map(e=>e.comp))].sort():[null];
+  const order=grp?[...new Set(rows.map(gk))].sort():[null];
   for(const g of order){
-    const part=g==null?rows:rows.filter(e=>e.comp===g);
+    const part=g==null?rows:rows.filter(e=>gk(e)===g);
     if(g!=null){const shut=S.expShut.has(g),w=part.filter(e=>sev(e)>=2).length;
-      html+=`<tr class="xg"><td colspan="8"><button type="button" class="xgb" data-shut="${esc(g)}" aria-expanded="${!shut}"><span class="cv">${shut?"▸":"▾"}</span>${esc(g)}<span class="acc">${part.length} Export${part.length===1?"":"e"}${w?" · "+w+" mit Hinweis":""}</span></button></td></tr>`;
+      html+=`<tr class="xg"><td colspan="8"><button type="button" class="xgb" data-shut="${esc(g)}" aria-expanded="${!shut}"><span class="cv">${shut?"▸":"▾"}</span>${esc(gname.get(g))}<span class="acc">${part.length} Export${part.length===1?"":"e"}${w?" · "+w+" mit Hinweis":""}</span></button></td></tr>`;
       if(shut)continue}
     for(const e of part){
       if(shown>=S.expLimit)break;shown++;
@@ -6464,9 +6602,9 @@ function drawExp(){
       if(open)html+=`<tr class="xd"><td></td><td colspan="7">${expDetail(e)}</td></tr>`;
     }
   }
-  html+="</tbody></table>"+more(rows.filter(e=>!grp||!S.expShut.has(e.comp)).length-shown,"exMore");
+  html+="</tbody></table>"+more(rows.filter(e=>!grp||!S.expShut.has(gk(e))).length-shown,"exMore");
   box.innerHTML=`<div class="tbl-wrap">${html}</div>`;
-  const mb=$("#exMore");if(mb)mb.onclick=()=>{S.expLimit+=200;drawExp()};
+  const mb=$("#exMore");if(mb)mb.onclick=()=>{S.expLimit+=200;drawExp()};markX();
 }
 $("#exList").addEventListener("click",e=>{
   if(e.target.closest("[data-focus]"))return;
@@ -6475,7 +6613,7 @@ $("#exList").addEventListener("click",e=>{
   const r=e.target.closest("tr.xr");if(r){const k=r.dataset.k;S.expOpen.has(k)?S.expOpen.delete(k):S.expOpen.add(k);drawExp();const n=document.querySelector(`tr.xr[data-k="${CSS.escape(k)}"]`);if(n)n.focus()}
 });
 $("#exList").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("tr.xr")){e.preventDefault();e.target.click()}});
-$("#exQ").addEventListener("input",()=>{S.expLimit=200;drawExp()});$("#exComp").addEventListener("change",()=>{S.expLimit=200;drawExp()});$("#exHint").addEventListener("change",drawExp);$("#exGroup").addEventListener("change",drawExp);
+$("#exQ").addEventListener("input",()=>{S.expLimit=200;drawExp()});$("#exComp").addEventListener("change",()=>{S.expLimit=200;drawExp()});$("#exHint").addEventListener("change",drawExp);$("#exGroup").addEventListener("change",()=>{S.expShut.clear();drawExp()});
 $("#exAll").onclick=()=>{const rows=expRows();const allOpen=rows.every(e=>S.expOpen.has(ekey(e)));if(allOpen)S.expOpen.clear();else rows.slice(0,S.expLimit).forEach(e=>S.expOpen.add(ekey(e)));S.expShut.clear();drawExp()};
 function expTable(){
   const H=["FC","Art","Name","Langname","PaVaSt","Typ C","Typ PaVaSt","Einheit","Min","Max","Definiert","Initialwert","Abnehmer","Erzeugt in (Raster)","Schreibstellen","Gelesen in (Raster)","Hinweise"];
@@ -6513,8 +6651,8 @@ function renderDyn(){
       if(!c.hasC)return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"><summary><h3>${esc(c.name)}</h3><span class="sub">nur PaVaSt</span></summary><p class="sub">Kein C-Code geladen. Aufrufketten brauchen die .c-Dateien.</p></details>`;
       const ps=c.procs.filter(procOk),treesOpen=ps.length<=3;
       const procs=ps.map(p=>`<div class="proc"><div class="row"><h3 class="mono" style="font-size:14px">${esc(p.name)}()</h3><span class="sub">${esc(rasterOf(p.name).txt)} · ${esc(p.file)}:${p.line}</span></div>${p.syc?`<p class="syc" style="margin:2px 0 0">nur wenn ${esc(p.syc)}</p>`:""}
-        <div class="cols2" style="margin-top:6px"><div><div class="sub">schreibt (über ganze Kette)</div><div class="chips">${p.W.map(m=>`<span class="chip w${F&&F.msg===m?" hl":""}">${esc(m)}</span>`).join("")||'<span class="sub">nichts</span>'}</div></div>
-        <div><div class="sub">liest</div><div class="chips">${p.R.map(m=>`<span class="chip${F&&F.msg===m?" hl":""}" title="Producer: ${esc(srcOf(m))}">${esc(m)} <span class="acc">← ${esc(srcOf(m))}</span></span>`).join("")||'<span class="sub">nichts</span>'}</div></div></div>
+        <div class="cols2" style="margin-top:6px"><div><div class="sub">schreibt (über ganze Kette)</div><div class="chips">${chipsG(p.W,m=>`<span class="chip w${F&&F.msg===m?" hl":""}">${esc(m)}</span>`)||'<span class="sub">nichts</span>'}</div></div>
+        <div><div class="sub">liest</div><div class="chips">${chipsG(p.R,m=>`<span class="chip${F&&F.msg===m?" hl":""}" title="Producer: ${esc(srcOf(m))}">${esc(m)} <span class="acc">← ${esc(srcOf(m))}</span></span>`)||'<span class="sub">nichts</span>'}</div></div></div>
         <details style="margin-top:8px"${treesOpen?" open":""}><summary class="sub">Aufrufbaum</summary><ul class="tree">${treeHtml(p.tree)}</ul>
         ${p.tree.extCalls&&p.tree.extCalls.length?`<p class="sub">Externe Aufrufe direkt: ${p.tree.extCalls.map(esc).join(", ")}</p>`:""}</details></div>`).join("");
       return `<details class="sheet dcomp" id="dyn-${esc(c.name)}"${many?"":" open"}><summary><h3>${esc(c.name)}</h3><span class="sub">${c.funcs.length} Funktionalitäten · ${ps.length}${ps.length!==c.procs.length?" von "+c.procs.length:""} Prozesse</span></summary><div style="margin-top:8px">${procs||'<p class="sub">Keine Prozesse erkannt.</p>'}</div></details>`;
@@ -6524,10 +6662,28 @@ function renderDyn(){
 
 /* ---- Dateien ---- */
 function renderFiles(){
-  const fc=S.model.fileComp;
+  const fc=S.model.fileComp;renderDropSum();
   $("#flist").innerHTML=S.files.length?S.files.map((f,i)=>`<li><span class="kind ${f.kind}">${f.kind==="pv"?"PAVAST":"C"}</span><span class="mono">${esc(f.name)}${f.err?` <span style="color:var(--over)">${esc(f.err)}</span>`:""}</span><span class="sub">${esc(fc[f.name]||"—")}</span><button class="x" type="button" aria-label="${esc(f.name)} entfernen" data-i="${i}">×</button></li>`).join(""):'<li class="sub">Keine Dateien.</li>';
   document.querySelectorAll("#flist .x").forEach(b=>b.onclick=()=>{S.files.splice(+b.dataset.i,1);run()});
 }
+
+/* Tabellen, die breiter sind als die Tafel: Rollbalken sichtbar, mit der Maus ziehbar */
+function markX(){requestAnimationFrame(()=>document.querySelectorAll(".tbl-wrap").forEach(w=>w.classList.toggle("can-x",w.scrollWidth>w.clientWidth+2)))}
+addEventListener("resize",markX);
+(function(){
+  let d=null;
+  document.addEventListener("pointerdown",e=>{
+    if(e.pointerType!=="mouse"||e.button!==0)return;const w=e.target.closest(".tbl-wrap");if(!w||w.scrollWidth<=w.clientWidth+2)return;
+    if(e.target.closest("button,a,input,select,textarea,summary,label,details.lg"))return;
+    d={w,x:e.clientX,l:w.scrollLeft,moved:false};
+  });
+  document.addEventListener("pointermove",e=>{if(!d)return;const dx=e.clientX-d.x;if(!d.moved&&Math.abs(dx)<6)return;
+    if(!d.moved){d.moved=true;d.w.classList.add("dragging");getSelection&&getSelection().removeAllRanges()}d.w.scrollLeft=d.l-dx;e.preventDefault()});
+  const end=()=>{if(!d)return;const was=d.moved;d.w.classList.remove("dragging");d=null;
+    if(was)document.addEventListener("click",ev=>{ev.stopPropagation();ev.preventDefault()},{capture:true,once:true})};
+  document.addEventListener("pointerup",end);document.addEventListener("pointercancel",end);
+  /* Mausrad: über einer breiten Tabelle mit Umschalt seitlich – Browser machen das selbst; senkrecht bleibt Seite rollen */
+})();
 
 let tt;function toast(t){let el=$(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=t;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,2400)}
 
