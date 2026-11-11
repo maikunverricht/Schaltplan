@@ -588,7 +588,7 @@ footer.foot a:hover{color:var(--text)}
           <select id="wkDir" class="filter" aria-label="Richtung"><option value="back">rückwärts (woher)</option><option value="fwd">vorwärts (wohin)</option></select>
           <select id="wkEval" class="filter" aria-label="Bewertung"><option value="">ohne Bewertung</option><option value="back">Bewertung rückwärts: was prüfen</option><option value="fwd">Bewertung vorwärts: was impacted</option></select>
           <select id="wkOrd" class="filter" aria-label="Ordnung der Kette" title="1. Ordnung: nur der eigene Cluster. Jeder weitere Cluster, über den die Kette läuft, erhöht die Ordnung um 1." style="max-width:230px"><option value="1">1. Ordnung · eigener Cluster</option><option value="2">bis 2. Ordnung</option><option value="3">bis 3. Ordnung</option><option value="4">bis 4. Ordnung</option><option value="5">bis 5. Ordnung</option><option value="99">alle Ordnungen</option></select>
-          <label class="toggle"><input type="checkbox" id="wkCal" checked> Applikation</label>
+          <label class="toggle" title="Applikationsparameter (_C, _MAP …) sind keine Signale. Eingeschaltet werden sie als Zusatzinfo an die Funktionalitäten gehängt."><input type="checkbox" id="wkCal"> Applikation</label>
           <label class="toggle" title="Kanten, die die Kette zu sich selbst zurückführen (Loops, Selbstbezüge), weglassen. Ausgeschaltet werden sie rot gestrichelt gezeigt."><input type="checkbox" id="wkLoop" checked> Loops ausblenden</label>
           <button class="pill" type="button" id="wkFit">Einpassen</button>
         </div>
