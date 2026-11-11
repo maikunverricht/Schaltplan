@@ -482,7 +482,7 @@ footer.foot a:hover{color:var(--text)}
       <div><strong>Dateien oder Ordner hier ablegen</strong><small><code>.c</code> <code>.h</code> und PaVaSt (<code>.xml</code>, <code>.pavast</code>) · ganze Ordner inkl. Unterordner · <code>.zip</code> · oder irgendwo auf die Seite ziehen</small></div>
       <div class="btns">
         <label class="pill primary" for="fin">Dateien wählen</label>
-        <label class="pill" for="din" id="dinLbl">Ordner</label>
+        <label class="pill" for="din" id="dinLbl" title="Sucht im Ordner alle .c- und _pavast.xml-Dateien, kopiert sie in den Unterordner „Schaltplan“ und legt sie von dort ein">Ordner</label>
         <button class="pill" id="bSample" type="button">Beispiel</button>
         <button class="pill" id="bClear" type="button">Leeren</button>
       </div>
@@ -5653,7 +5653,7 @@ async function unzip(file){
   }
   return out;
 }
-async function addFiles(list){
+async function addFiles(list,note=""){
   if(!list.length){toast("Keine Dateien gewählt");return}
   /* Vor dem Lesen nach Endung sortieren: große Ordner enthalten viel, was nicht gebraucht wird */
   const items=[];let skipped=0,zips=0;
@@ -5673,7 +5673,7 @@ async function addFiles(list){
   if(!added){toast("Keine C-/PaVaSt-Dateien gefunden"+(skipped?` (${skipped} übersprungen)`:""));return}
   if(S.files.some(f=>f.sample))S.files=[];
   const names=new Set(add.map(f=>f.name));S.files=S.files.filter(f=>!names.has(f.name)).concat(add);
-  run();$("#dropBox").open=false;toast(`${added} Dateien eingelegt`+(zips?` aus ${zips} ZIP`:"")+(skipped?`, ${skipped} übersprungen`:""));
+  run();$("#dropBox").open=false;toast(`${added} Dateien eingelegt`+(zips?` aus ${zips} ZIP`:"")+(skipped?`, ${skipped} übersprungen`:"")+note);
 }
 /* Ordnerwahl gibt es am Telefon nicht: dort ZIP anbieten */
 (function(){
@@ -5688,6 +5688,53 @@ function renderDropSum(){
 }
 $("#fin").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
 $("#din").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
+
+/* Ordner wählen (Chrome/Edge): Ordner rekursiv durchsuchen, alle .c und *_pavast.xml
+   in den Unterordner „Schaltplan“ kopieren und von dort einlegen.
+   Ohne File System Access API bleibt es beim reinen Einlesen über #din. */
+const STAGE_DIR="Schaltplan",STAGE_RE=/(\.c|_pavast\.xml)$/i;
+async function collectStage(dir,base,out){
+  for await(const [name,h] of dir.entries()){
+    if(h.kind==="directory"){if(SKIP_DIR.test(name)||(!base&&name===STAGE_DIR))continue;await collectStage(h,base+name+"/",out)}
+    else if(STAGE_RE.test(name))out.push({h,name,path:base+name});
+  }
+  return out;
+}
+async function stageFolder(){
+  let root;
+  try{root=await window.showDirectoryPicker({id:"schaltplan",mode:"readwrite"})}
+  catch(e){if(e.name==="AbortError")return;toast("Ordner kann hier nicht beschrieben werden, lese ihn nur ein");$("#din").click();return}
+  try{
+    toast("Analysiere Ordner …");
+    const found=await collectStage(root,"",[]);
+    if(!found.length){toast("Keine .c- oder _pavast.xml-Dateien im Ordner");return}
+    found.sort((a,b)=>a.path.split("/").length-b.path.split("/").length||a.path.localeCompare(b.path));
+    const stage=await root.getDirectoryHandle(STAGE_DIR,{create:true});
+    const seen=new Map(),out=[];let same=0,big=0;
+    const td=new TextDecoder();
+    for(const f of found){
+      const file=await f.h.getFile();
+      if(file.size>8e6){big++;continue}
+      const buf=await file.arrayBuffer(),txt=td.decode(buf),key=f.name.toLowerCase();
+      let dir=stage,rel=f.name;
+      if(seen.has(key)){
+        if(seen.get(key)===txt){same++;continue}
+        /* gleicher Name, anderer Inhalt: in Unterordner nach Herkunft legen, Dateiname bleibt für die FC-Zuordnung */
+        const sub=f.path.split("/").slice(0,-1).join("_")||"_";
+        dir=await stage.getDirectoryHandle(sub,{create:true});rel=sub+"/"+f.name;
+      }else seen.set(key,txt);
+      const w=await (await dir.getFileHandle(f.name,{create:true})).createWritable();
+      await w.write(buf);await w.close();
+      out.push({file:new File([buf],f.name),path:root.name+"/"+STAGE_DIR+"/"+rel});
+    }
+    if(!out.length){toast("Nichts zu kopieren"+(big?` (${big} zu groß)`:""));return}
+    await addFiles(out,` · nach „${STAGE_DIR}“ kopiert`+(same?`, ${same} doppelt`:"")+(big?`, ${big} zu groß`:""));
+  }catch(e){toast("Fehler beim Kopieren: "+(e.message||e))}
+}
+$("#dinLbl").addEventListener("click",e=>{
+  if(e.defaultPrevented||typeof window.showDirectoryPicker!=="function")return;
+  e.preventDefault();stageFolder();
+});
 
 /* Drag & Drop: Dateien und ganze Ordner (rekursiv), überall auf der Seite */
 const SRC_RE=/\.(c|h|xml|pavast|pvs|txt|arxml)$/i, SKIP_DIR=/^(\.git|\.svn|\.hg|node_modules|__MACOSX)$/;
