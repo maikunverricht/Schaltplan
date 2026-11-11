@@ -5288,7 +5288,9 @@ function analyze(files,cfg){
   const C=n=>{if(!comps.has(n))comps.set(n,{name:n,pvFiles:[],cFiles:[],hasPV:false,hasC:false,imp:new Set(),exp:new Set(),impCond:new Map(),expCond:new Map(),defs:new Set(),ext:new Set(),reads:new Set(),writes:new Set(),funcs:[],procs:[]});return comps.get(n)};
   const calInfo=new Map(),calT=calTest(cfg);
   for(const p of pv){for(const [k,v] of (p.cals||[]))calInfo.set(k,Object.assign(calInfo.get(k)||{},v));for(const ft of p.features){ft.calImp.forEach(x=>{if(!calInfo.has(x))calInfo.set(x,{})});ft.calExp.forEach(x=>{if(!calInfo.has(x))calInfo.set(x,{})})}}
-  const isCal=x=>calInfo.has(x)||(calT(x)&&!pre(x)),isDfc=x=>/^DFC_\w+$/.test(x),noMsg=x=>isCal(x)||isDfc(x);
+  const isCal=x=>calInfo.has(x)||(calT(x)&&!pre(x)),isDfc=x=>/^DFC_\w+$/.test(x),
+    /* Systemkonstanten (SY_*, *_SY, *_SC …) sind Konfiguration, keine Austauschgrößen: sie wirken nur über die Variantenauswertung */
+    isSyc=x=>pre(x),noMsg=x=>isCal(x)||isDfc(x)||isSyc(x);
   for(const p of pv)for(const ft of p.features){const c=C(ft.name);c.hasPV=true;c.pvFiles.push(p.file);
     c.calOwn=c.calOwn||new Set();c.calDecl=c.calDecl||new Set();ft.calExp.forEach(x=>c.calOwn.add(x));ft.calImp.forEach(x=>c.calDecl.add(x));
     if(p.features.length===1&&p.cals)for(const k of p.cals.keys())c.calOwn.add(k);
@@ -5308,7 +5310,7 @@ function analyze(files,cfg){
   }
   for(const c of comps.values()){
     for(const x of [...c.defs])if(noMsg(x))c.defs.delete(x);for(const x of [...c.ext])if(noMsg(x))c.ext.delete(x);
-    for(const x of [...c.exp])if(isDfc(x))c.exp.delete(x);for(const x of [...c.imp])if(isDfc(x))c.imp.delete(x);
+    for(const x of [...c.exp])if(isDfc(x)||isSyc(x))c.exp.delete(x);for(const x of [...c.imp])if(isDfc(x)||isSyc(x))c.imp.delete(x);
     if(c.defInfo)for(const x of [...c.defInfo.keys()])if(noMsg(x))c.defInfo.delete(x);
     if(c.macroDecl)for(const [k,v] of c.macroDecl)if(c.exp.has(k)&&!(c.defInfo&&c.defInfo.has(k))){c.defInfo=c.defInfo||new Map();c.defInfo.set(k,v);c.defs.add(k)}
     c.ext=new Set([...c.ext].filter(x=>!c.defs.has(x)));
