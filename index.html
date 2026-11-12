@@ -594,7 +594,7 @@ footer.foot a:hover{color:var(--text)}
         </div>
       </div>
       <p class="lede">Die Wirkkette zeigt, über welche Funktionalitäten (C-Funktionen) eine Größe entsteht oder wohin sie wirkt. Rückwärts: Wer schreibt die Größe, was liest diese Funktionalität, wer schreibt das wiederum. Aufgerufene Funktionalitäten liefern ihren Rückgabewert an den Aufrufer. Vorwärts: Wer liest die Größe, was schreibt diese Funktionalität, und so weiter. Ohne „über Clustergrenze“ endet die Kette am Rand des Clusters, die Größe dort ist ein Eingang bzw. Ausgang. Funktionalitäten sind nach ihrer FC gruppiert. ◇ markiert Zugriffe und Funktionalitäten, die nur unter einer <code>#if</code>-Bedingung mit Systemkonstante existieren; Antippen zeigt die Bedingung. Mit „Konkrete Konfiguration“ oben verschwinden abgeschaltete Pfade ganz.</p>
-      <div class="wkleg"><span class="evleg"><i style="border-color:var(--info);border-width:3px"></i>Bewertungspunkt</span><span class="evleg"><i style="border-color:var(--red-ink);border-width:2.5px"></i>prüfen / impacted</span><span class="evleg"><i style="border-color:var(--free)"></i>in der Kette, ohne Impact</span><span><i style="border-color:var(--amber);border-width:2.5px"></i>Ausgangsgröße</span><span><i style="border-radius:8px"></i>Größe (Message)</span><span><i style="border-style:dashed"></i>Größe am Clusterrand</span><span><i style="background:var(--film)"></i>Funktionalität, in ihrer FC</span><span><i style="transform:rotate(45deg) scale(.8)"></i>Applikationsparameter</span><span><i style="border-color:var(--over)"></i>DFC (Fehlerpfad)</span><span>gepunktet: Aufruf, Rückgabewert</span><span style="color:var(--amber)">◇ gestrichelt: nur in bestimmten Varianten (SyC)</span></div>
+      <div class="wkleg"><span class="evleg"><i style="border-color:var(--info);border-width:3px"></i>Bewertungspunkt</span><span class="evleg"><i style="border-color:var(--red-ink);border-width:2.5px"></i>prüfen / impacted</span><span class="evleg"><i style="border-color:var(--free)"></i>in der Kette, ohne Impact</span><span><i style="border-color:var(--amber);border-width:2.5px"></i>Ausgangsgröße</span><span><i style="border-radius:8px"></i>Größe (Message)</span><span><i style="border-style:dashed"></i>Größe am Clusterrand</span><span><i style="background:var(--film);border-style:dashed"></i>FC, im Cluster</span><span><i style="transform:rotate(45deg) scale(.8)"></i>Applikationsparameter</span><span><i style="border-color:var(--over)"></i>DFC (Fehlerpfad)</span><span style="color:var(--amber)">◇ gestrichelt: nur in bestimmten Varianten (SyC)</span></div>
       <div id="wk"><p class="cyfail">Größe wählen oder in den Systemschnittstellen auf „Wirkkette“ tippen.</p></div>
       <p class="sub" id="wkInfo" style="margin-top:6px"></p>
       <div class="sub" id="wkEvalInfo" style="margin-top:6px"></div>
@@ -6748,6 +6748,45 @@ function wkLoops(G,target,dir,hide){
   G.edgeIn=G.edgeIn.filter(m=>ids.has("M:"+m));
   return {n:back.size,hide,gone:before-nodes.length};
 }
+/* Wirkkette nur aus Signalen: Funktionalitäten und Prozesse werden zu direkten Kanten Größe → Größe
+   zusammengefasst. Je Anweisung (findLoops) wird geprüft, ob die gelesene Größe wirklich in die
+   geschriebene fließt. Größen liegen in der FC, die sie schreibt, FCs im Cluster. */
+function wkCollapse(G){
+  const FL=S.loops&&S.loops.flow,isE=e=>e.data.source!=null,clOf=n=>S.grpOf.get(n)??n;
+  const nodes=G.els.filter(e=>!isE(e)),edges=G.els.filter(isE),byId=new Map(nodes.map(n=>[n.data.id,n]));
+  const out=new Map();for(const e of edges){const a=e.data.source;if(!out.has(a))out.set(a,[]);out.get(a).push(e)}
+  const has=(cls,c)=>new RegExp("\\b"+c+"\\b").test(cls||"");
+  const fName=id=>{const f=G.fnOf.get(id);return f?f.comp+"."+f.name+"()":id.slice(2)};
+  const ok=(fid,w,r)=>{const f=G.fnOf.get(fid),d=FL&&f&&FL.wd.get(f);if(!d)return true;const st=d.get(w);return !st||st.has(r)};
+  const NE=new Map(),addE=(a,b,via,conds,loop,cal)=>{if(a===b)return;const k=a+"|"+b;let e=NE.get(k);
+    if(!e){e={a,b,via:new Set(),conds:new Set(),loop:false,cal};NE.set(k,e)}via.forEach(x=>e.via.add(x));conds.forEach(x=>e.conds.add(x));if(loop)e.loop=true};
+  /* Heimat: die FC, deren Funktionalität die Größe schreibt (bzw. die den Parameter nutzt) */
+  const home=new Map();
+  for(const e of edges){const a=e.data.source,b=e.data.target;
+    if(a.startsWith("F:")&&b.startsWith("M:")&&!home.has(b))home.set(b,byId.get(a)&&byId.get(a).data.parent);
+    if(a.startsWith("C:")&&b.startsWith("F:")&&!home.has(a))home.set(a,byId.get(b)&&byId.get(b).data.parent)}
+  for(const n of nodes){const id=n.data.id,cal=id.startsWith("C:");if(!cal&&!id.startsWith("M:"))continue;
+    const r=cal?"§"+id.slice(2):id.slice(2),seen=new Set(),q=[];
+    for(const e of (out.get(id)||[]))if(e.data.target.startsWith("F:"))q.push({f:e.data.target,via:[fName(e.data.target)],conds:e.data.cond?[e.data.cond]:[],loop:has(e.classes,"loopback")});
+    while(q.length){const it=q.shift();if(seen.has(it.f))continue;seen.add(it.f);
+      for(const e of (out.get(it.f)||[])){const t=e.data.target,cd=e.data.cond?[...it.conds,e.data.cond]:it.conds,lp=it.loop||has(e.classes,"loopback");
+        if(t.startsWith("M:")){if(ok(it.f,t.slice(2),r))addE(id,t,it.via,cd,lp,cal)}
+        else if(t.startsWith("F:"))q.push({f:t,via:[...it.via,fName(t)],conds:cd,loop:lp})}}
+  }
+  const keep=nodes.filter(n=>/^[MC]:/.test(n.data.id)).map(n=>{const c={data:Object.assign({},n.data),classes:n.classes};
+    let h=home.get(n.data.id);if(!h&&n.data.id.startsWith("M:")){const pv=(S.model.prov.get(n.data.id.slice(2))||[]).find(x=>byId.has("P:"+x));if(pv)h="P:"+pv}
+    if(h&&byId.has(h))c.data.parent=h;else delete c.data.parent;return c});
+  const used=new Set(keep.map(n=>n.data.parent).filter(Boolean)),frames=[],cls=new Map();
+  for(const n of nodes){const id=n.data.id;if(!id.startsWith("P:")||!used.has(id))continue;const comp=id.slice(2),fr={data:Object.assign({},n.data),classes:n.classes};
+    fr.data.label=comp+(n.data.ord?"  ·  "+n.data.ord+". Ordnung":"");
+    if(S.grpOf.has(comp)){const cl=clOf(comp),gid="G:"+cl;fr.data.parent=gid;
+      if(!cls.has(gid))cls.set(gid,{data:{id:gid,label:"Cluster "+cl},classes:"cl"+(G.scope&&cl!==G.scope?" foreign":"")})}
+    frames.push(fr)}
+  let i=0;const ne=[...NE.values()].map(e=>{const cond=e.conds.size?[...e.conds].map(x=>e.conds.size>1?"("+x+")":x).join(" && "):null;
+    return {data:{id:"y"+(i++),source:e.a,target:e.b,label:(cond?"◇":"")+(e.loop?(cond?" ":"")+"⟲":""),cond,via:[...e.via].join(", ")},classes:(e.cal?"cal":"w")+(cond?" cond":"")+(e.loop?" loopback":"")}});
+  G.els=[...cls.values(),...frames,...keep,...ne];G.nFC=frames.length;G.nCl=cls.size;
+  G.nM=keep.filter(n=>n.data.id.startsWith("M:")).length;G.nC=keep.filter(n=>n.data.id.startsWith("C:")).length;
+}
 function drawWk(){
   const box=$("#wk"),info=$("#wkInfo");
   if(S.wkCy){S.wkCy.destroy();S.wkCy=null}
@@ -6757,7 +6796,7 @@ function drawWk(){
   const ev=$("#wkEval").value;$("#wkDir").disabled=!!ev;$(".wkleg").classList.toggle("ev",!!ev);if(!ev)$("#wkEvalInfo").innerHTML="";
   /* Mit Bewertung ist die Kette immer das Feature: alles, was die Ausgangsgröße rückwärts berechnet */
   const dir=ev?"back":$("#wkDir").value,G=wkGraph(S.wk,dir,$("#wkOrd").value,$("#wkCal").checked),T=tok();
-  const LB=wkLoops(G,S.wk,dir,$("#wkLoop").checked);
+  const LB=wkLoops(G,S.wk,dir,$("#wkLoop").checked);wkCollapse(G);
   box.innerHTML="";const font='"JetBrains Mono", ui-monospace, Menlo, monospace';
   const opts={container:box,elements:G.els,wheelSensitivity:.25,minZoom:.1,maxZoom:3,
     style:[
@@ -6772,6 +6811,8 @@ function drawWk(){
       {selector:"node.cal",style:{shape:"tag","font-size":10,color:T.text2,"border-color":T.info,"background-opacity":.6,padding:"6px"}},
       {selector:"node.fc",style:{"background-opacity":.22,"border-style":"dashed","text-valign":"top","text-halign":"center","text-margin-y":-5,color:T.text2,"font-weight":600,padding:"12px"}},
       {selector:"node.fc.foreign",style:{"background-opacity":.08,color:T.text3}},
+      {selector:"node.cl",style:{"background-opacity":.06,"border-style":"solid","border-color":T.line,"text-valign":"top","text-halign":"left","text-margin-y":-5,color:T.text,"font-weight":700,padding:"16px"}},
+      {selector:"node.cl.foreign",style:{color:T.text3,"background-opacity":.03}},
       {selector:"edge",style:{"curve-style":"bezier","target-arrow-shape":"triangle",width:1.5,"line-color":T.free,"target-arrow-color":T.free,"arrow-scale":.9,label:"data(label)","font-size":10,color:T.info,"text-background-color":T.void,"text-background-opacity":1,"text-background-padding":"2px"}},
       {selector:"edge.r",style:{"line-color":T.text3,"target-arrow-color":T.text3}},
       {selector:"edge.call",style:{"line-style":"dotted","line-color":T.info,"target-arrow-color":T.info,"target-arrow-shape":"vee"}},
@@ -6799,7 +6840,7 @@ function drawWk(){
   wkEvalApply();
   const ein=G.edgeIn.filter(m=>m!==S.wk);
   const lbTxt=LB.n?` <span class="${LB.hide?"":"warnt"}">⟲ ${LB.n} Rückführung${LB.n===1?"":"en"} ${LB.hide?"ausgeblendet"+(LB.gone?`, dadurch ${LB.gone} Element${LB.gone===1?"":"e"} weniger`:""):"rot gestrichelt"}.</span>`:"";
-  info.innerHTML=`${dir==="back"?"Rückwärts":"Vorwärts"} ab <b class="mono">${esc(S.wk)}</b>${G.scope?($("#wkOrd").value==="1"?" im Cluster "+esc(G.scope)+" (1. Ordnung)":" ab Cluster "+esc(G.scope)+($("#wkOrd").value==="99"?", alle Ordnungen":", bis "+$("#wkOrd").value+". Ordnung")):""}: ${G.nF} Funktionalitäten, ${G.nM} Größen${$("#wkCal").checked?", "+G.nC+" Applikationsparameter":""}.`+
+  info.innerHTML=`${dir==="back"?"Rückwärts":"Vorwärts"} ab <b class="mono">${esc(S.wk)}</b>${G.scope?($("#wkOrd").value==="1"?" im Cluster "+esc(G.scope)+" (1. Ordnung)":" ab Cluster "+esc(G.scope)+($("#wkOrd").value==="99"?", alle Ordnungen":", bis "+$("#wkOrd").value+". Ordnung")):""}: ${G.nM} Größen in ${G.nFC} FC${G.nFC===1?"":"s"}${G.nCl?" aus "+G.nCl+" Cluster"+(G.nCl===1?"":"n"):""}${$("#wkCal").checked?", "+G.nC+" Applikationsparameter":""}.`+
     (ein.length?` ${dir==="back"?"Eingänge":"Ausgänge"} am Rand: ${ein.map(esc).join(", ")}.`:"")+lbTxt+(G.sycs.length?` <span class="syc">Variantenabhängig über ${G.sycs.map(esc).join(", ")} (${G.nCond} Stelle${G.nCond===1?"":"n"} ◇).</span>`:" Keine Variantenabhängigkeit.")+(S.cfg.mode==="cfg"?" Konkrete Konfiguration aktiv: abgeschaltete Zweige fehlen bereits.":"")+(G.cut?" <b class=\"warnt\">Gekürzt auf 320 Knoten.</b>":"")+(ev?" Mit Bewertung ist die Kette das Feature zur Ausgangsgröße. Größe antippen setzt den Bewertungspunkt.":" Doppeltippen auf eine Größe macht sie zum neuen Startpunkt.");
 }
 /* ---- Bewertung im Feature: rot = vom Bewertungspunkt in Richtung erreichbar, grün = Rest der Kette ---- */
@@ -6811,9 +6852,9 @@ function wkEvalApply(){
   let p=S.wkP?cy.getElementById("M:"+S.wkP):cy.collection();
   if(p.empty()){S.wkP=S.wk;p=cy.getElementById("M:"+S.wk)}
   const cone=ev==="back"?p.predecessors():p.successors();
-  cy.elements().not("node.fc").addClass("ev-green");
+  cy.elements().not("node.fc, node.cl").addClass("ev-green");
   cone.removeClass("ev-green").addClass("ev-red");p.removeClass("ev-green").addClass("ev-pt");
-  const all=cy.elements().not("node.fc").nodes().not(p),red=cone.nodes().not("node.fc").not(p);
+  const all=cy.elements().not("node.fc, node.cl").nodes().not(p),red=cone.nodes().not("node.fc, node.cl").not(p);
   const nm=n=>n.id().slice(2),mono=l=>l.map(x=>`<span class="mono">${esc(x)}</span>`).join(", "),cap=(l,k=40)=>mono(l.slice(0,k))+(l.length>k?` und ${l.length-k} weitere`:"");
   const lines=[["Bewertungspunkt",S.wkP,"",ev==="back"?"rückwärts":"vorwärts"]];
   let h=`<b>${red.length}</b> von ${all.length} Elementen der Kette rot (${ev==="back"?"rückwärts":"vorwärts"} ab <b class="mono">${esc(S.wkP)}</b>). `;
@@ -6839,6 +6880,10 @@ function wkEvalApply(){
 function wkSelTxt(t){
   const lab=x=>x.isNode()?(x.id().startsWith("F:")?x.id().slice(2).split(".").slice(1).join(".")+"()":x.id().slice(2)):"";
   const c=t.data("cond");
+  if(t.isEdge()&&t.data("via")!=null){const a=t.source().id().slice(2),b=t.target().id().slice(2);
+    return `<b class="mono">${esc(a)}</b> ${t.hasClass("cal")?"geht ein in":"fließt in"} <b class="mono">${esc(b)}</b>${t.data("via")?` <span class="sub">über ${esc(t.data("via"))}</span>`:""}: `+(t.data("cond")?`<span class="syc">nur wenn ${esc(t.data("cond"))}</span>`:"in allen Varianten")}
+  if(t.isNode()&&t.id().startsWith("G:"))return `Cluster <b class="mono">${esc(t.id().slice(2))}</b>`;
+  if(t.isNode()&&t.id().startsWith("P:"))return `FC <b class="mono">${esc(t.id().slice(2))}</b>`+(t.data("ord")?`, ${t.data("ord")}. Ordnung`:"");
   if(t.isEdge()){const a=lab(t.source()),b=lab(t.target()),k=t.hasClass("call")?"ruft, Rückgabewert an":t.hasClass("cal")?"Applikationsparameter in":t.source().id().startsWith("M:")?"wird gelesen in":"schreibt";
     return `<b class="mono">${esc(a)}</b> ${k} <b class="mono">${esc(b)}</b>: `+(c?`<span class="syc">nur wenn ${esc(c)}</span>`:"in allen Varianten")}
   const id=t.id();
