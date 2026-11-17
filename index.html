@@ -323,6 +323,19 @@ select.filter{max-width:220px}
 
 /* Aufrufketten */
 .proc{border:1px solid var(--line);border-radius:13px;padding:11px 13px;background:var(--film)}
+/* Funktionen (Feinentwurf) */
+.fn{border:1px solid var(--line);border-radius:13px;padding:11px 13px;background:var(--film);margin-top:8px}
+.fn .row h3{font-size:14px}
+.fn dl{display:grid;grid-template-columns:130px minmax(0,1fr);gap:6px 12px;margin:8px 0 0}
+.fn dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);padding-top:4px}
+.fn dd{margin:0}
+.fn dd .chips{margin-top:0}
+.fn .chip.cal{border-style:dashed}
+.fn .chip.lnk{cursor:pointer}
+.fn .chip.lnk:hover{border-color:var(--line-hi)}
+.fn .stat{font-family:var(--mono);font-size:10px;padding:1px 7px;border-radius:100px;border:1px solid var(--line);color:var(--text-3)}
+@media (max-width:620px){.fn dl{grid-template-columns:1fr;gap:2px}.fn dt{padding-top:8px}}
+
 .proc + .proc{margin-top:10px}
 .tree,.tree ul{list-style:none;margin:0;padding-left:16px;font-family:var(--mono);font-size:12px}
 .tree{padding-left:0;margin-top:6px}
@@ -648,6 +661,18 @@ footer.foot a:hover{color:var(--text)}
     <div id="dyn" class="panel"></div>
   </section>
 
+  <section class="panel" id="p-fn" role="tabpanel" aria-labelledby="t-fn" hidden>
+    <div class="sheet"><span class="t-idx">Feinentwurf · SWE.3</span><h2>Funktionen</h2>
+      <p class="sub intro">Je Funktion, was sie liest und schreibt, welche Applikationsparameter sie nutzt, wen sie aufruft und von wem sie aufgerufen wird – und in welchem Raster sie läuft.</p>
+      <div class="btns" style="margin-top:10px">
+        <input id="fnQ" class="filter" placeholder="Funktion, Message oder Parameter suchen" aria-label="Funktionen filtern">
+        <label class="toggle"><input type="checkbox" id="fnExt"> nur extern sichtbare</label>
+        <label class="toggle"><input type="checkbox" id="fnCal"> nur mit Parametern</label>
+      </div>
+    </div>
+    <div id="fnList"></div>
+  </section>
+
   <section class="panel" id="p-files" role="tabpanel" aria-labelledby="t-files" hidden>
     <div class="sheet">
       <span class="t-idx">Eingelegt</span><h2>Dateien</h2>
@@ -687,12 +712,14 @@ footer.foot a:hover{color:var(--text)}
       <svg viewBox="0 0 24 24"><path d="M4 6h11M4 11h11M4 16h6"/><path d="M13.5 19h7M17.5 16l3 3-3 3"/></svg></button>
     <button class="dock-btn" type="button" data-tab="dyn" data-label="Aufrufketten" data-acc="#8FB8E8" aria-label="Aufrufketten" aria-pressed="false">
       <svg viewBox="0 0 24 24"><path d="M6 3.5v17M6 8.5h6.5M6 15.5h6.5"/><circle cx="15.5" cy="8.5" r="2.6"/><circle cx="15.5" cy="15.5" r="2.6"/></svg></button>
+    <button class="dock-btn" type="button" data-tab="fn" data-label="Funktionen" data-acc="#B79CF0" aria-label="Funktionen" aria-pressed="false">
+      <svg viewBox="0 0 24 24"><path d="M9 4.5c-2 0-2.5 1.2-2.5 3v2.2c0 1.3-.7 2.3-2 2.3 1.3 0 2 1 2 2.3v2.2c0 1.8.5 3 2.5 3"/><path d="M15 4.5c2 0 2.5 1.2 2.5 3v2.2c0 1.3.7 2.3 2 2.3-1.3 0-2 1-2 2.3v2.2c0 1.8-.5 3-2.5 3"/></svg></button>
     <button class="dock-btn" type="button" data-tab="files" data-label="Dateien" data-acc="#C7CE6E" aria-label="Dateien" aria-pressed="false">
       <svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V20a.6.6 0 0 1-.6.6H7a.6.6 0 0 1-.6-.6V4.1a.6.6 0 0 1 .6-.6z"/><path d="M14 3.5V8h4M9.5 12.5h5M9.5 16h5"/></svg></button>
   </div>
   <div class="dock-name" id="dockName">Architektur</div>
   <div class="dock-bead" id="bead" role="slider" tabindex="0" aria-label="Ansicht, mit den Pfeiltasten wechseln"
-       aria-valuemin="1" aria-valuemax="5" aria-valuenow="1" aria-valuetext="Architektur"></div>
+       aria-valuemin="1" aria-valuemax="6" aria-valuenow="1" aria-valuetext="Architektur"></div>
   <p class="dock-hint" id="dhint">Tippen – oder die Kugel ziehen</p>
 </nav>
 
@@ -5703,6 +5730,7 @@ WBTor({
     "Eigene C-Dateien und PaVaSt einlesen – auch ganze Ordner",
     "Imports und Exports statisch abgleichen",
     "Aufrufketten je Prozess verfolgen",
+    "Funktionen im Feinentwurf: Ein-/Ausgänge, Parameter, Raster",
     "Wirkkette an den TestcaseManager weitergeben"
   ],
   "nach": "main .hero",
@@ -6633,7 +6661,7 @@ const DOCK=(function(){
 })();
 function openTab(t){showPanel(t);DOCK.go(t)}
 function showPanel(t){
-  ["arch","if","exp","dyn","files"].forEach(k=>$("#p-"+k).hidden=k!==t);
+  ["arch","if","exp","dyn","fn","files"].forEach(k=>$("#p-"+k).hidden=k!==t);
   try{localStorage.setItem("ap-tab",t)}catch(e){}
   if(t==="arch"&&S.cy){S.cy.resize();S.cy.fit(undefined,30)}
   if(t==="if"){if(S.wkCy){S.wkCy.resize();S.wkCy.fit(undefined,24)}else if(S.wk)drawWk()}
@@ -6648,7 +6676,7 @@ function run(){
   computeGroups();initCollapse();S.expOpen.clear();S.expShut.clear();S.expLimit=200;S.ifLimit=300;
   if(S.focus&&!focusOptions().some(o=>o.type===S.focus.type&&o.name===S.focus.name))S.focus=null;
   try{S.loops=findLoops()}catch(err){console.warn(err);S.loops={loops:[],selfs:[]}}$("#gLoopsL").hidden=!S.loops.loops.length;if(!S.loops.loops.length)$("#gLoops").checked=false;
-  renderStats();renderCfg();renderFocus();renderGraph();renderIf();drawSysIf();if(S.wkCy){S.wkCy.destroy();S.wkCy=null}renderWkList();renderExp();renderDyn();renderFiles();
+  renderStats();renderCfg();renderFocus();renderGraph();renderIf();drawSysIf();if(S.wkCy){S.wkCy.destroy();S.wkCy=null}renderWkList();renderExp();renderDyn();renderFn();renderFiles();
   try{spiegeln()}catch(err){console.warn(err)}
   $("#detail").innerHTML='<p class="empty"></p>';
 }
@@ -6870,7 +6898,7 @@ function syncLvl(){
   const sel=$("#lvl"),mg=multiGroups(),n=mg.filter(g=>S.collapsed.has(g)).length;
   sel.hidden=!mg.length||!!S.focus;sel.value=n===0?"2":n===mg.length?"1":"mix";
 }
-$("#grpBy").addEventListener("change",()=>{S.grpTouched=true;try{localStorage.setItem("sp-grp2",$("#grpBy").value)}catch(e){}computeGroups();initCollapse();if(S.focus&&S.focus.type==="grp")S.focus=null;renderFocus();renderGraph();drawIf();drawExp();renderDyn()});
+$("#grpBy").addEventListener("change",()=>{S.grpTouched=true;try{localStorage.setItem("sp-grp2",$("#grpBy").value)}catch(e){}computeGroups();initCollapse();if(S.focus&&S.focus.type==="grp")S.focus=null;renderFocus();renderGraph();drawIf();drawExp();renderDyn();renderFn()});
 
 function focusSets(){
   const f=S.focus;if(!f||!S.model)return null;const M=S.model,core=new Set();let msg=null,fn=null;
@@ -6902,7 +6930,7 @@ function renderFocus(){
   const nb=[...F.view].filter(n=>!F.core.has(n)).length;
   $("#fqInfo").textContent=`Fokus auf ${KIND[S.focus.type]} ${S.focus.name}: ${F.core.size} FC${F.core.size===1?"":"s"} im Kern`+(nb?`, ${nb} direkte${nb===1?"r":""} Partner`:"")+".";
 }
-function setFocus(f){S.focus=f;if(!f)$("#fq").value="";S.expOpen.clear();S.expLimit=200;S.ifLimit=300;renderFocus();renderGraph();drawIf();drawExp();renderDyn();if(f)toast("Fokus: "+f.name)}
+function setFocus(f){S.focus=f;if(!f)$("#fq").value="";S.expOpen.clear();S.expLimit=200;S.ifLimit=300;renderFocus();renderGraph();drawIf();drawExp();renderDyn();renderFn();if(f)toast("Fokus: "+f.name)}
 function parseFocus(v){
   v=v.trim();if(!v)return null;
   const m=v.match(/^(FC|Komponente|Cluster|Subsystem|Message|Funktionalität|Funktion):\s*(.+)$/);
@@ -7801,6 +7829,54 @@ function renderDyn(){
     }).join("");
   }).join("");
 }
+
+/* ---- Funktionen (Feinentwurf, seit 17.11.2026) ----
+   Je Funktion: Eingänge, Ausgänge, Applikationsparameter, Fehlerpfade,
+   Aufrufe in beide Richtungen und das Raster der Prozesse, die sie erreichen. */
+S.fnOpen=new Set();
+function renderFn(){
+  const M=S.model,el=$("#fnList");if(!el)return;
+  if(!M||!M.comps.size){el.innerHTML='<div class="sheet sub">Noch keine Dateien eingelegt.</div>';return}
+  const q=($("#fnQ").value||"").trim().toLowerCase(),nurExt=$("#fnExt").checked,nurCal=$("#fnCal").checked,F=focusSets();
+  const caller=new Map();for(const c of M.comps.values())for(const f of c.funcs)for(const k of f.calls){if(!caller.has(k))caller.set(k,new Set());caller.get(k).add(f.name)}
+  const fnSet=new Set();for(const c of M.comps.values())for(const f of c.funcs)fnSet.add(f.name);
+  const passt=f=>{
+    if(nurExt&&f.isStatic)return false;
+    if(nurCal&&!(f.CAL&&f.CAL.length))return false;
+    if(F&&F.fn&&f.name!==F.fn&&!f.calls.has(F.fn)&&!(caller.get(f.name)||new Set()).has(F.fn))return false;
+    if(F&&F.msg&&!(f.R.has(F.msg)||f.W.has(F.msg)))return false;
+    if(!q)return true;
+    return f.name.toLowerCase().includes(q)||[...f.R,...f.W,...(f.CAL||[])].some(x=>x.toLowerCase().includes(q));
+  };
+  const comps=[...M.comps.values()].filter(c=>c.hasC&&(!F||!F.core||F.msg||F.fn||F.core.has(c.name))).sort((a,b)=>a.name.localeCompare(b.name));
+  let html="";
+  for(const c of comps){
+    const fs=[...new Map(c.funcs.filter(passt).map(f=>[f.name,f])).values()].sort((a,b)=>a.line-b.line);
+    if(!fs.length)continue;
+    const auf=q||F||S.fnOpen.has(c.name)||comps.length<=3;
+    html+=`<details class="sheet dcomp" data-fnc="${esc(c.name)}"${auf?" open":""}><summary><h3>${esc(c.name)}</h3><span class="sub">${fs.length} Funktion${fs.length===1?"":"en"}</span></summary>`+
+      fs.map(f=>{
+        const ra=[...new Map((M.reach.get(f.name)||[]).map(x=>[x.proc,x])).values()];
+        const ruft=[...f.calls].filter(k=>fnSet.has(k)).sort(),ext=[...f.calls].filter(k=>!fnSet.has(k)&&!/^(Msg_|MSG_|GET_MSG|SET_MSG|Rte_)/.test(k)).sort();
+        const von=[...(caller.get(f.name)||[])].sort();
+        const chipsM=(L,w)=>L.length?`<div class="chips">${L.map(m=>`<span class="chip${w?" w":""} lnk" data-fmsg="${esc(m)}" title="${w?"":"Producer: "+esc(srcOf(m))}">${esc(m)}</span>`).join("")}</div>`:'<span class="sub">—</span>';
+        const chipsF=L=>L.length?`<div class="chips">${L.map(n=>`<span class="chip lnk" data-ffn="${esc(n)}">${esc(n)}()</span>`).join("")}</div>`:'<span class="sub">—</span>';
+        return `<div class="fn" id="fn-${esc(f.name)}"><div class="row"><h3 class="mono">${esc(f.name)}()</h3><span class="sub">${f.isStatic?'<span class="stat">static</span> ':""}${esc(f.file)}:${f.line}</span></div>`+
+          (f.syc?`<p class="syc" style="margin:2px 0 0">nur wenn ${esc(f.syc)}</p>`:"")+
+          `<dl><dt>Raster</dt><dd>${ra.length?ra.map(x=>`<span class="chip">${esc(x.r.txt)} · ${esc(x.proc)}</span>`).join(" "):'<span class="sub">von keinem Prozess erreicht</span>'}</dd>`+
+          `<dt>Liest</dt><dd>${chipsM([...f.R].sort(),false)}</dd><dt>Schreibt</dt><dd>${chipsM([...f.W].sort(),true)}</dd>`+
+          `<dt>Parameter</dt><dd>${f.CAL&&f.CAL.length?`<div class="chips">${f.CAL.map(x=>`<span class="chip cal" title="${esc(calTip(x))}">${esc(x)}</span>`).join("")}</div>`:'<span class="sub">—</span>'}</dd>`+
+          (f.DFC&&f.DFC.length?`<dt>Fehlerpfade</dt><dd><div class="chips">${f.DFC.map(x=>`<span class="chip">${esc(x)}</span>`).join("")}</div></dd>`:"")+
+          `<dt>Ruft auf</dt><dd>${chipsF(ruft)}${ext.length?`<p class="sub" style="margin:4px 0 0">extern: ${ext.map(esc).join(", ")}</p>`:""}</dd><dt>Aufgerufen von</dt><dd>${chipsF(von)}</dd></dl></div>`;
+      }).join("")+`</details>`;
+  }
+  el.innerHTML=html||`<div class="sheet sub">${q||nurExt||nurCal||F?"Keine Funktion passt zum Filter.":"Keine Funktionen im C-Code gefunden."}</div>`;
+  el.querySelectorAll("details[data-fnc]").forEach(d=>d.addEventListener("toggle",()=>{d.open?S.fnOpen.add(d.dataset.fnc):S.fnOpen.delete(d.dataset.fnc)}));
+  el.querySelectorAll("[data-ffn]").forEach(x=>x.addEventListener("click",()=>{const t=document.getElementById("fn-"+x.dataset.ffn);
+    if(t){const d=t.closest("details");if(d)d.open=true;t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"})}}));
+  el.querySelectorAll("[data-fmsg]").forEach(x=>x.addEventListener("click",()=>{$("#fnQ").value=x.dataset.fmsg;renderFn()}));
+}
+["fnQ","fnExt","fnCal"].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener(id==="fnQ"?"input":"change",renderFn)});
 
 /* ---- Dateien ---- */
 function renderFiles(){
