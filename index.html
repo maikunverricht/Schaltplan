@@ -5907,7 +5907,40 @@ function run(){
   if(S.focus&&!focusOptions().some(o=>o.type===S.focus.type&&o.name===S.focus.name))S.focus=null;
   try{S.loops=findLoops()}catch(err){console.warn(err);S.loops={loops:[],selfs:[]}}$("#gLoopsL").hidden=!S.loops.loops.length;if(!S.loops.loops.length)$("#gLoops").checked=false;
   renderStats();renderCfg();renderFocus();renderGraph();renderIf();drawSysIf();if(S.wkCy){S.wkCy.destroy();S.wkCy=null}renderWkList();renderExp();renderDyn();renderFiles();
+  try{spiegeln()}catch(err){console.warn(err)}
   $("#detail").innerHTML='<p class="empty"></p>';
+}
+/* ===== Lesekopie für den TestcaseManager (seit 17.11.2026) =====
+   Nach jeder Analyse eigener Dateien steht die Wirkkette kompakt unter
+   wb-schaltplan-data: Komponenten mit Cluster, Prozessen und deren Lese-/
+   Schreibgrößen. Aufrufe über Komponentengrenzen werden als „Name()“ geführt –
+   so, wie der TestcaseManager sie kennt. Das eingebaute Beispiel wird nicht
+   gespiegelt; geschrieben wird nirgends sonst hin. */
+function spiegeln(){
+  if(!S.model||!S.files.length||S.files.every(f=>f.sample))return;
+  const m=S.model,comps=[...m.comps.values()].filter(c=>c.procs.length);
+  if(!comps.length)return;
+  const fnProcs=new Map();
+  const out=comps.map(c=>{
+    const procs=c.procs.map(p=>{
+      const R=new Set(p.R),W=new Set(p.W);
+      (function walk(n){for(const k of n.kids){if(k.comp&&k.comp!==c.name){R.add(k.name+"()");
+        if(!fnProcs.has(k.comp))fnProcs.set(k.comp,new Map());fnProcs.get(k.comp).set(k.name,{p:k.name,fn:true,R:[...new Set(k.R)].sort(),W:[k.name+"()"]})}
+        else walk(k)}})(p.tree);
+      return {p:p.name,R:[...R].sort(),W:[...W].sort(),ms:(rasterOf(p.name)||{}).ms??null};
+    });
+    const g=S.grpOf&&S.grpOf.get(c.name);
+    return {n:c.name,cl:g?String(g).replace(/^✎ /,""):prefixOf(c.name),procs};
+  });
+  for(const c of out){const f=fnProcs.get(c.n);if(f)for(const x of f.values())if(!c.procs.some(p=>p.p===x.p))c.procs.push(x)}
+  const cond={};
+  for(const f of m.flows){const cd=f.icond||f.econd;if(cd&&f.from!==ENV)cond[f.m+">"+f.to]=cd}
+  const kopie={app:"werkbank-schaltplan",version:1,updated:new Date().toISOString(),
+    quelle:{dateien:S.files.filter(f=>!f.sample).length,c:S.files.filter(f=>!f.sample&&f.kind==="c").length,pv:S.files.filter(f=>!f.sample&&f.kind==="pv").length,
+      konfiguration:m.cfg&&m.cfg.mode==="cfg"?"Variante":"alle Varianten"},
+    anzahl:{komponenten:out.length,prozesse:out.reduce((s,c)=>s+c.procs.length,0),messages:m.M.size,fluesse:m.flows.length},
+    comps:out,cond};
+  try{localStorage.setItem("wb-schaltplan-data",JSON.stringify(kopie))}catch(e){console.warn("Lesekopie zu groß",e)}
 }
 function renderStats(){
   const m=S.model,nc=[...m.comps.values()].length,np=[...m.comps.values()].reduce((a,c)=>a+c.procs.length,0);
