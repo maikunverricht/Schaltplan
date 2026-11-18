@@ -308,6 +308,21 @@ html.dock-side .toast{bottom:calc(20px + env(safe-area-inset-bottom,0px))}
 .st.ok{color:var(--free-ink)}.st.unused{color:var(--text-3);border-style:dashed}.st.undecl{color:var(--over)}.st.multi{color:var(--red-ink)}
 .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .chip{font-family:var(--mono);font-size:11.5px;padding:1px 9px;border-radius:100px;background:var(--film);border:1px solid var(--line)}
+.sif{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,2fr);gap:14px;margin-top:10px;align-items:start}
+@media (max-width:760px){.sif{grid-template-columns:1fr}}
+.sif-pool,.sif-k{border:1px solid var(--line);border-radius:13px;background:var(--film);padding:10px 12px}
+.sif-pool h4,.sif-k h4{margin:0 0 6px;font-size:12px;font-weight:600;color:var(--text-2)}
+.sif-chips{display:flex;flex-wrap:wrap;gap:5px;min-height:26px}
+.sif-sig{cursor:grab;user-select:none;touch-action:manipulation}
+.sif-sig.an{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 18%,transparent)}
+.sif-sig button{all:unset;cursor:pointer;margin-left:5px;color:var(--text-3)}
+.sif-liste{display:grid;gap:10px}
+.sif-k.ziel,.sif-neu.ziel{border-color:var(--amber);border-style:dashed}
+.sif-k .kopf{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.sif-k .kopf code{font-size:11px;color:var(--amber)}
+.sif-k .kopf input{flex:1;min-width:0;font:600 13.5px/1.3 inherit;background:transparent;border:1px solid transparent;border-radius:8px;padding:3px 6px;color:var(--text)}
+.sif-k .kopf input:focus{border-color:var(--line);outline:none;background:var(--glass)}
+.sif-neu{border:1px dashed var(--line);border-radius:13px;padding:14px;text-align:center;color:var(--text-3);font-size:12.5px;cursor:copy}
 .chip.w{border-color:var(--line-hi)}
 
 /* Tabelle */
@@ -576,11 +591,21 @@ footer.foot a:hover{color:var(--text)}
 
   <section class="panel" id="p-if" role="tabpanel" aria-labelledby="t-if" hidden>
     <nav class="ifnav" aria-label="Bereiche dieses Reiters">
+      <a class="ifn" href="#sifsheet"><span class="t-idx">0 · Gruppen</span><b>SystemInterfaces</b><small>Grenzsignale per Drag &amp; Drop zu Interfaces gruppieren und benennen</small></a>
       <a class="ifn" href="#sysif"><span class="t-idx">1 · je Cluster</span><b>Systemschnittstellen</b><small>Welche Variablen verlassen den Cluster, und von welchen Eingängen hängen sie ab</small></a>
       <a class="ifn" href="#wksheet"><span class="t-idx">2 · je Größe</span><b>Wirkkette</b><small>Eine Größe rückwärts (woher) oder vorwärts (wohin) verfolgen</small></a>
       <a class="ifn" href="#loopsheet"><span class="t-idx">3 · Rückkopplung</span><b>Loops</b><small>Variablen, die über eine Kette wieder auf sich selbst wirken</small></a>
       <a class="ifn" href="#ifsheet"><span class="t-idx">4 · je FC</span><b>Imports und Exports</b><small>PaVaSt-Deklaration gegen tatsächliche Zugriffe im C-Code</small></a>
     </nav>
+    <div class="sheet" id="sifsheet">
+      <div class="row">
+        <div><span class="t-idx">Grenzsignale gruppieren</span><h2>SystemInterfaces</h2></div>
+        <div class="btns"><select id="sifGrenze" class="filter" aria-label="Grenze"></select>
+          <button class="pill" type="button" id="sifNeu">+ Interface</button></div>
+      </div>
+      <p class="sub intro">Ein SystemInterface fasst Ein- oder Ausgänge mit gleicher Physik und gleichen systemischen Anforderungen zusammen – an der Systemgrenze (Steuergerät) oder an einer Clustergrenze. <b>Eingehende</b> Interfaces erscheinen im FC-Graph als Quelle statt „Umgebung“. <b>Ausgehende</b> werden hier gruppiert und benannt und im Anforderungsbuch beschrieben. Signale ziehen – oder antippen und dann das Interface antippen.</p>
+      <div class="sif" id="sifBody"></div>
+    </div>
     <div class="sheet" id="sysif">
       <div class="row">
         <div><span class="t-idx">Aus dem C-Code</span><h2>Systemschnittstellen je Cluster</h2></div>
@@ -6676,7 +6701,7 @@ function run(){
   computeGroups();initCollapse();S.expOpen.clear();S.expShut.clear();S.expLimit=200;S.ifLimit=300;
   if(S.focus&&!focusOptions().some(o=>o.type===S.focus.type&&o.name===S.focus.name))S.focus=null;
   try{S.loops=findLoops()}catch(err){console.warn(err);S.loops={loops:[],selfs:[]}}$("#gLoopsL").hidden=!S.loops.loops.length;if(!S.loops.loops.length)$("#gLoops").checked=false;
-  renderStats();renderCfg();renderFocus();renderGraph();renderIf();drawSysIf();if(S.wkCy){S.wkCy.destroy();S.wkCy=null}renderWkList();renderExp();renderDyn();renderFn();renderFiles();
+  renderStats();renderCfg();renderFocus();renderGraph();renderIf();sifRender();drawSysIf();if(S.wkCy){S.wkCy.destroy();S.wkCy=null}renderWkList();renderExp();renderDyn();renderFn();renderFiles();
   try{spiegeln()}catch(err){console.warn(err)}
   $("#detail").innerHTML='<p class="empty"></p>';
 }
@@ -6709,7 +6734,9 @@ function spiegeln(){
     quelle:{dateien:S.files.filter(f=>!f.sample).length,c:S.files.filter(f=>!f.sample&&f.kind==="c").length,pv:S.files.filter(f=>!f.sample&&f.kind==="pv").length,
       konfiguration:m.cfg&&m.cfg.mode==="cfg"?"Variante":"alle Varianten"},
     anzahl:{komponenten:out.length,prozesse:out.reduce((s,c)=>s+c.procs.length,0),messages:m.M.size,fluesse:m.flows.length},
-    comps:out,cond};
+    comps:out,cond,
+    /* SystemInterfaces (seit 18.11.2026): Gruppierung und Name gehören dem Schaltplan; beschrieben werden sie im Anforderungsbuch */
+    interfaces:sifListe().map(f=>({id:f.id,name:f.name,ebene:f.ebene,richtung:f.richtung,cluster:f.cluster||"",signale:f.signale.slice()}))};
   try{localStorage.setItem("wb-schaltplan-data",JSON.stringify(kopie))}catch(e){console.warn("Lesekopie zu groß",e)}
 }
 function renderStats(){
@@ -6994,7 +7021,13 @@ function renderGraph(){
   for(const g of parents)els.push({data:{id:"P:"+g,label:g},classes:"grpbox"});
   const agg=new Map(),intern=new Map();
   const add=(kind,a,b,item)=>{const k=kind+"|"+a+"|"+b;if(!agg.has(k))agg.set(k,{kind,a,b,items:[]});agg.get(k).items.push(item)};
-  for(const x of flows){const a=nid(x.from),b=nid(x.to);if(a===b){intern.set(a,(intern.get(a)||0)+1);continue}add("f",a,b,x)}
+  /* Eingehende SystemInterfaces (Systemgrenze) ersetzen „Umgebung“ als Quelle ihrer Signale */
+  const sifEin=new Map();for(const f of sifListe())if(f.ebene==="system"&&f.richtung==="ein")for(const m of f.signale)sifEin.set(m,f);
+  const sifNodes=new Map();
+  for(const x of flows){let a=nid(x.from);const b=nid(x.to);
+    if(x.from===ENV&&sifEin.has(x.m)){const f=sifEin.get(x.m);a="IF:"+f.id;sifNodes.set(a,f)}
+    if(a===b){intern.set(a,(intern.get(a)||0)+1);continue}add("f",a,b,x)}
+  for(const [id,f] of sifNodes)els.push({data:{id,label:f.name+"\n"+f.id+" · SystemInterface"},classes:"sysif"});
   for(const c of calls){const a=nid(c.from),b=nid(c.to);if(a!==b)add("c",a,b,c)}
   for(const [g,n] of closed){const i=intern.get("G:"+g)||0;els.push({data:{id:"G:"+g,label:g+"\n"+n+" FC"+(n>1?"s":"")+(i?" · "+i+" intern":"")},classes:"grp"+(LP&&(S.groups.get(g)||[]).some(x=>LP.comps.has(x))?" loop":"")})}
   if([...agg.values()].some(e=>e.a===ENV))els.push({data:{id:ENV,label:"Umgebung\n(Producer fehlt)"},classes:"env"});
@@ -7014,6 +7047,7 @@ function renderGraph(){
       {selector:"node",style:{shape:"round-rectangle","background-color":T.surface,"border-width":1.5,"border-color":T.line,label:"data(label)","text-wrap":"wrap","text-valign":"center","text-halign":"center",color:T.text,"font-family":font,"font-size":12,width:"label",height:"label",padding:"14px","line-height":1.45}},
       {selector:"node.pvonly",style:{"border-style":"dashed",color:T.text2}},
       {selector:"node.env",style:{"border-style":"dashed","background-opacity":.4,color:T.text3}},
+      {selector:"node.sysif",style:{"border-style":"double","border-width":3,"background-opacity":.55,color:T.text}},
       {selector:"node.grpbox",style:{"background-opacity":.28,"border-style":"dashed","border-color":T.line,"text-valign":"top","text-halign":"center","text-margin-y":-6,color:T.text2,"font-size":12,"font-weight":600,padding:"16px"}},
       {selector:"node.grp",style:{"border-width":4,"border-style":"double","border-color":T.text2,"font-weight":600}},
       {selector:"node.core",style:{"border-color":T.amber,"border-width":2.5}},
@@ -7032,7 +7066,7 @@ function renderGraph(){
   S.cy.on("tap",e=>{
     const t=e.target;
     if(t===S.cy){S.cy.elements().removeClass("faded");$("#detail").innerHTML='<p class="empty"></p>';return}
-    const id=t.isNode()?t.id():"",pickable=t.isNode()&&!id.startsWith("G:")&&!id.startsWith("P:")&&id!==ENV;
+    const id=t.isNode()?t.id():"",pickable=t.isNode()&&!id.startsWith("G:")&&!id.startsWith("P:")&&!id.startsWith("IF:")&&id!==ENV;
     if(S.pick||(e.originalEvent&&(e.originalEvent.shiftKey||e.originalEvent.ctrlKey||e.originalEvent.metaKey))){if(pickable)setTimeout(showPick,0);else if(S.pick)setTimeout(()=>t.unselect(),0);return}
     setTimeout(()=>{S.cy.elements().not(t).unselect()},0);
     if(t.isNode()){hood(t);if(id.startsWith("G:"))showGroup(id.slice(2),true);else if(id.startsWith("P:"))showGroup(id.slice(2),false);else showComp(id)}
@@ -7071,7 +7105,7 @@ function showEdge(it){
     return `<li><div>${fbtn("msg",f.m)} ${pill(f.st)}${f.multi?' <span class="st multi">mehrere Producer</span>':""}</div>
      <div class="sub">${agg?esc(lab(f.from))+" → "+esc(f.to)+"<br>":""}${f.icond||f.econd?`<span class="syc">${f.econd?"Export nur wenn "+esc(f.econd):""}${f.econd&&f.icond?" · ":""}${f.icond?"Import nur wenn "+esc(f.icond):""}</span><br>`:""}${w.length?"geschrieben in "+w.map(esc).join(", "):f.from===ENV?"kein Producer geladen":"Schreibstelle nicht in einem Prozess gefunden"}<br>${r.length?"gelesen in "+r.map(esc).join(", "):"im Code nicht gelesen"}</div></li>`})+"</ul>";
 }
-function picked(){return S.cy?S.cy.nodes(":selected").filter(n=>{const i=n.id();return !i.startsWith("G:")&&!i.startsWith("P:")&&i!==ENV}).map(n=>n.id()):[]}
+function picked(){return S.cy?S.cy.nodes(":selected").filter(n=>{const i=n.id();return !i.startsWith("G:")&&!i.startsWith("P:")&&!i.startsWith("IF:")&&i!==ENV}).map(n=>n.id()):[]}
 function showPick(){
   const l=picked();if(!l.length){if(S.pick)$("#detail").innerHTML='<p class="sub">FCs antippen, um sie auszuwählen.</p>';return}
   let i=1;const ex=new Set([...S.manual.values()]);while(ex.has("Cluster "+i))i++;
@@ -7097,6 +7131,8 @@ function showGroup(g,isClosed){
   if(own)$("#clDrop").onclick=()=>{const nm=g.slice(2);for(const [k,v] of [...S.manual])if(v===nm)S.manual.delete(k);saveManual();if(S.focus&&S.focus.name===g)S.focus=null;computeGroups();renderFocus();renderGraph();drawSysIf();drawExp();renderDyn();$("#detail").innerHTML='<p class="empty"></p>';toast("Cluster „"+nm+"“ aufgelöst")};
 }
 function showComp(n){
+  if(n.startsWith("IF:")){const f=sifListe().find(x=>"IF:"+x.id===n);if(!f)return;
+    $("#detail").innerHTML=`<h3>${esc(f.name)}</h3><p class="sub">${esc(f.id)} · SystemInterface · ${f.ebene==="system"?"Systemgrenze":"Cluster "+esc(f.cluster)} · ${f.richtung==="ein"?"Eingänge":"Ausgänge"}</p><div class="chips">${f.signale.map(m=>fbtn("msg",m,`<span class="chip">${esc(m)}</span>`)).join("")}</div><p class="sub" style="margin-top:10px">Gruppiert im Reiter Schnittstellen · beschrieben im Anforderungsbuch.</p>`;return}
   if(n===ENV){const ms=S.model.flows.filter(f=>f.from===ENV);$("#detail").innerHTML=`<h3>Umgebung</h3><p class="sub">Messages, die importiert oder gelesen werden, aber von keiner geladenen FC stammen.</p><div class="chips">${chipsG([...new Set(ms.map(f=>f.m))].sort(),m=>fbtn("msg",m,`<span class="chip">${esc(m)}</span>`))}</div>`;return}
   const c=S.model.comps.get(n);if(!c)return;
   const out=S.model.flows.filter(f=>f.from===n),inn=S.model.flows.filter(f=>f.to===n);
@@ -7288,6 +7324,77 @@ function drawSysIf(){
     ${idle.length?`<div class="sub" style="margin-top:8px">Eingänge ohne erkennbare Wirkung auf einen Ausgang:<div class="chips">${chipsG(idle,x=>`<span class="chip">${esc(x)}</span>`,false)}</div></div>`:""}</details>`}).join("");
   markX();
 }
+/* ===== SystemInterfaces gruppieren (seit 18.11.2026) =====
+   sp-sysif: [{id,name,ebene:"system"|"cluster",richtung:"ein"|"aus",cluster,signale:[]}]
+   Grenzsignale aus dem Modell: Systemeingang = gelesen, von keiner FC geliefert; Systemausgang = geliefert,
+   von keiner FC gelesen; Clustergrenze = Lieferant und Leser in verschiedenen Clustern. */
+const SIF_LS="sp-sysif";
+const sifQA=(sel,root)=>[...(root||document).querySelectorAll(sel)];
+function sifListe(){if(!S.sif){let v=null;try{v=JSON.parse(localStorage.getItem(SIF_LS)||"null")}catch(e){}S.sif=Array.isArray(v)?v.filter(f=>f&&f.id&&Array.isArray(f.signale)):[]}return S.sif}
+function sifSpeichern(){try{localStorage.setItem(SIF_LS,JSON.stringify(S.sif||[]))}catch(e){}try{spiegeln()}catch(e){}sifRender();renderGraph()}
+function sifCl(n){const g=S.grpOf&&S.grpOf.get(n);return g?String(g).replace(/^✎ /,""):prefixOf(n)}
+function sifGrenzen(){
+  const M=S.model,G=new Map();if(!M)return G;
+  const key=(eb,ri,cl)=>eb+"|"+ri+"|"+(cl||"");
+  const add=(eb,ri,cl,m)=>{const k=key(eb,ri,cl);if(!G.has(k))G.set(k,{eb,ri,cl:cl||"",sig:new Set()});G.get(k).sig.add(m)};
+  const gelesen=new Set();
+  for(const f of M.flows){
+    if(f.from===ENV){add("system","ein","",f.m);continue}
+    gelesen.add(f.m);
+    const a=sifCl(f.from),b=sifCl(f.to);if(a!==b){add("cluster","ein",b,f.m);add("cluster","aus",a,f.m)}
+  }
+  for(const [m,ps] of M.prov)if(ps&&ps.length&&!gelesen.has(m))add("system","aus","",m);
+  return G;
+}
+function sifGrenzName(eb,ri,cl){return (eb==="system"?"Systemgrenze":"Cluster "+cl)+" · "+(ri==="ein"?"Eingänge":"Ausgänge")}
+function sifNeueId(){const ids=new Set(sifListe().map(f=>f.id));let n=1;while(ids.has("IF-"+String(n).padStart(3,"0")))n++;return "IF-"+String(n).padStart(3,"0")}
+function sifRender(){
+  const box=$("#sifBody"),sel=$("#sifGrenze");if(!box)return;
+  if(!S.model||!S.model.comps.size){box.innerHTML='<p class="sub">Noch keine Dateien eingelegt.</p>';sel.innerHTML="";return}
+  const G=sifGrenzen(),L=sifListe();
+  const keys=[...G.keys()].sort((a,b)=>{const A=G.get(a),B=G.get(b);return (A.eb===B.eb?0:A.eb==="system"?-1:1)||A.cl.localeCompare(B.cl)||A.ri.localeCompare(B.ri)});
+  if(!keys.length){box.innerHTML='<p class="sub">Keine Grenzsignale gefunden.</p>';sel.innerHTML="";return}
+  if(!S.sifWahl||!G.has(S.sifWahl))S.sifWahl=keys[0];
+  const inG=(f,g)=>f.ebene===g.eb&&f.richtung===g.ri&&(g.eb==="system"||f.cluster===g.cl);
+  sel.innerHTML=keys.map(k=>{const g=G.get(k),frei=[...g.sig].filter(m=>!L.some(f=>inG(f,g)&&f.signale.includes(m))).length;
+    return `<option value="${esc(k)}"${k===S.sifWahl?" selected":""}>${esc(sifGrenzName(g.eb,g.ri,g.cl))}${frei?" · "+frei+" offen":" ✓"}</option>`}).join("");
+  const g=G.get(S.sifWahl),hier=L.filter(f=>inG(f,g));
+  /* eine Clustergrenze hat zwei Seiten: schon auf der Gegenseite gruppiert? */
+  const gegen=m=>g.eb==="cluster"?L.find(f=>f.ebene==="cluster"&&f.richtung!==g.ri&&f.signale.includes(m)):null;
+  const frei=[...g.sig].filter(m=>!hier.some(f=>f.signale.includes(m))).sort();
+  const chip=(m,ifid)=>`<span class="chip sif-sig${S.sifSel===m?" an":""}" draggable="true" data-sif-m="${esc(m)}"${ifid?` data-sif-von="${esc(ifid)}"`:""} title="${esc(gegen(m)&&!ifid?"auf der Gegenseite in "+gegen(m).id:m)}">${esc(m)}${gegen(m)&&!ifid?" ↔":""}${ifid?`<button type="button" data-sif-weg="${esc(ifid)}|${esc(m)}" aria-label="${esc(m)} entfernen">✕</button>`:""}</span>`;
+  const weg=hier.flatMap(f=>f.signale.filter(m=>!g.sig.has(m)).map(m=>m));
+  box.innerHTML=`<div class="sif-pool" data-sif-pool="1"><h4>Ohne Interface · ${frei.length}</h4><div class="sif-chips">${frei.map(m=>chip(m)).join("")||'<span class="sub">alle Signale gruppiert</span>'}</div></div>
+    <div class="sif-liste">${hier.map(f=>`<div class="sif-k" data-sif-if="${esc(f.id)}"><div class="kopf"><code>${esc(f.id)}</code><input value="${esc(f.name)}" data-sif-name="${esc(f.id)}" aria-label="Name von ${esc(f.id)}" spellcheck="false"><button class="pill" type="button" data-sif-del="${esc(f.id)}" style="height:26px;padding:0 10px">Löschen</button></div>
+      <div class="sif-chips">${f.signale.map(m=>chip(m,f.id)).join("")||'<span class="sub">Signale hierher ziehen</span>'}</div>${f.signale.some(m=>!g.sig.has(m))?'<p class="sub" style="margin-top:6px">Kursiv: nicht mehr an dieser Grenze.</p>':""}</div>`).join("")}
+      <div class="sif-neu" data-sif-neu="1">Signal hierher ziehen oder antippen: neues Interface an der ${esc(sifGrenzName(g.eb,g.ri,g.cl))}</div></div>`;
+  sifQA(".sif-k .sif-sig",box).forEach(c=>{if(!g.sig.has(c.dataset.sifM))c.style.fontStyle="italic"});
+  const zuord=(m,ziel,von)=>{
+    const L=sifListe();
+    if(von){const v=L.find(f=>f.id===von);if(v)v.signale=v.signale.filter(x=>x!==m)}
+    if(ziel==="neu"){L.push({id:sifNeueId(),name:"Neues Interface",ebene:g.eb,richtung:g.ri,cluster:g.cl,signale:[m]})}
+    else if(ziel){const z=L.find(f=>f.id===ziel);if(z&&!z.signale.includes(m))z.signale.push(m)}
+    S.sifSel=null;sifSpeichern();
+    if(ziel==="neu")setTimeout(()=>{const i=sifQA("[data-sif-name]",box).pop();if(i){i.focus();i.select()}},30)};
+  sifQA("[data-sif-m]",box).forEach(c=>{
+    c.addEventListener("dragstart",e=>{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain","sif:"+c.dataset.sifM+"|"+(c.dataset.sifVon||""))});
+    c.addEventListener("click",e=>{if(e.target.closest("[data-sif-weg]"))return;e.stopPropagation();S.sifSel=S.sifSel===c.dataset.sifM?null:c.dataset.sifM;S.sifSelVon=c.dataset.sifVon||"";sifRender()})});
+  const ziel=(el,id)=>{
+    el.addEventListener("dragover",e=>{e.preventDefault();el.classList.add("ziel")});
+    el.addEventListener("dragleave",()=>el.classList.remove("ziel"));
+    el.addEventListener("drop",e=>{e.preventDefault();el.classList.remove("ziel");const t=e.dataTransfer.getData("text/plain")||"";if(t.indexOf("sif:")!==0)return;
+      const [m,von]=t.slice(4).split("|");if(von===id)return;zuord(m,id,von)});
+    el.addEventListener("click",e=>{if(!S.sifSel||e.target.closest("input,button,[data-sif-m]"))return;if(S.sifSelVon===id)return;zuord(S.sifSel,id,S.sifSelVon)})};
+  sifQA("[data-sif-if]",box).forEach(el=>ziel(el,el.dataset.sifIf));
+  ziel(box.querySelector("[data-sif-neu]"),"neu");
+  ziel(box.querySelector("[data-sif-pool]"),"");
+  sifQA("[data-sif-weg]",box).forEach(b=>b.onclick=e=>{e.stopPropagation();const [id,m]=b.dataset.sifWeg.split("|");zuord(m,"",id)});
+  sifQA("[data-sif-name]",box).forEach(i=>i.onchange=()=>{const f=sifListe().find(x=>x.id===i.dataset.sifName);if(f){f.name=i.value.trim()||f.id;sifSpeichern()}});
+  sifQA("[data-sif-del]",box).forEach(b=>b.onclick=()=>{const id=b.dataset.sifDel;S.sif=sifListe().filter(f=>f.id!==id);sifSpeichern();toast(id+" gelöscht – Signale wieder frei")});
+}
+$("#sifGrenze").addEventListener("change",e=>{S.sifWahl=e.target.value;S.sifSel=null;sifRender()});
+$("#sifNeu").onclick=()=>{const G=sifGrenzen(),g=G.get(S.sifWahl);if(!g)return;sifListe().push({id:sifNeueId(),name:"Neues Interface",ebene:g.eb,richtung:g.ri,cluster:g.cl,signale:[]});sifSpeichern();
+  setTimeout(()=>{const i=sifQA("[data-sif-name]",document.getElementById("sifBody")).pop();if(i){i.focus();i.select()}},30)};
 $("#sysOrd").addEventListener("change",drawSysIf);$("#sysMore").addEventListener("change",drawSysIf);
 $("#bSysCsv").onclick=()=>{
   const q=v=>/[;"\n]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v,more=$("#sysMore").checked,maxO=+$("#sysOrd").value||1,FN=sysFns(),full=sysIfaces();
