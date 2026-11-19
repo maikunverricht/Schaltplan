@@ -7,6 +7,15 @@ button{min-width:24px}
 
 /* Design-Check 19.11.2026: Akzentfarben als Text im hellen Modus dunkler */
 html[data-theme="light"]{--amber-text:#8A5A00;--teal-text:#0F6E5E}
+
+/* Design-Check 19.11.2026: eingeklappter Block unter dem Graphen */
+.sp-einst{margin-top:16px;padding:0}
+.sp-einst>summary{cursor:pointer;list-style:none;padding:14px 18px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.sp-einst>summary::-webkit-details-marker{display:none}
+.sp-einst>summary::before{content:"▸";color:var(--text-3)}
+.sp-einst[open]>summary::before{content:"▾"}
+.sp-einst .sp-einst-k{font-size:12px;color:var(--text-3)}
+.sp-einst>.dropbox,.sp-einst>.cfgbar{margin:0 14px 14px}
 </style></head><body>
 <title>Schaltplan · Kontor</title>
 <!-- Schriften eingebettet: keine Anfrage an Google Fonts -->
@@ -510,21 +519,6 @@ footer.foot a:hover{color:var(--text)}
     <div class="stats" id="stats"></div>
   </section>
 
-  <details class="dropbox" id="dropBox">
-    <summary class="dropsum"><span class="dsym" aria-hidden="true"></span><span class="dlab">Dateien &amp; Ordner einlegen</span><span class="dcount" id="dcount"></span></summary>
-    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Dateien oder Ordner hierher ziehen oder klicken, um sie auszuwählen">
-      <svg class="drop-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
-      <div><strong>Dateien oder Ordner hier ablegen</strong><small><code>.c</code> <code>.h</code> und PaVaSt (<code>.xml</code>, <code>.pavast</code>) · ganze Ordner inkl. Unterordner · <code>.zip</code> · oder irgendwo auf die Seite ziehen</small></div>
-      <div class="btns">
-        <label class="pill primary" for="fin">Dateien wählen</label>
-        <label class="pill" for="din" id="dinLbl" title="Sucht im Ordner alle .c- und _pavast.xml-Dateien, kopiert sie in den Unterordner „Schaltplan“ und legt sie von dort ein">Ordner</label>
-        <button class="pill" id="bSample" type="button">Beispiel</button>
-        <button class="pill" id="bClear" type="button">Leeren</button>
-      </div>
-      <input type="file" id="fin" multiple hidden accept=".c,.h,.xml,.pavast,.pvs,.txt,.zip">
-      <input type="file" id="din" multiple hidden webkitdirectory>
-    </div>
-  </details>
 
   <section class="card focusbar" aria-label="Fokus und Gruppierung">
     <div class="fb-row">
@@ -538,27 +532,6 @@ footer.foot a:hover{color:var(--text)}
     <p class="sub" id="fqInfo"></p>
   </section>
 
-  <section class="card cfgbar" aria-label="Konfiguration">
-    <div class="fb-row">
-      <div class="fb-g"><label class="t-idx" for="cfgMode">Konfiguration</label>
-        <select id="cfgMode" class="filter"><option value="all">Alle Varianten</option><option value="cfg">Konkrete Konfiguration</option></select></div>
-      <div class="fb-g fb-pre"><label class="t-idx" for="sycPre">SyC-Muster</label><input id="sycPre" class="filter" value="SY_*, Sy_*, *_SY, *_SC" spellcheck="false" autocomplete="off" title="Namensmuster der Systemkonstanten, mit Komma getrennt. * steht für einen beliebigen Namensteil."></div>
-      <div class="fb-g fb-pre"><label class="t-idx" for="calPre">Applikations-Muster</label><input id="calPre" class="filter" value="*_C, *_CUR, *_MAP, *_CA, *_AX, *_GAX" spellcheck="false" autocomplete="off" title="Namensmuster der Applikationsparameter (Kennwert, Kennlinie, Kennfeld …). Zusätzlich zählt alles, was eine PaVaSt als SW-CALPRM führt."></div>
-      <div class="btns cfg-btns">
-        <label class="pill" for="cfgFile">Werte laden</label><input type="file" id="cfgFile" hidden accept=".h,.txt,.csv,.syc,.cfg,.ini,.xml">
-        <button class="pill" id="cfgReset" type="button">Vorgaben</button>
-        <button class="pill" id="cfgA" type="button">Als A merken</button>
-        <button class="pill" id="cfgCmp" type="button" hidden>Mit A vergleichen</button>
-      </div>
-    </div>
-    <p class="sub" id="cfgInfo"></p>
-    <ul class="hints" id="cfgFind" hidden></ul>
-    <details id="sycBox" hidden><summary class="sub" id="sycSum">Systemkonstanten</summary>
-      <div class="btns" style="margin:10px 0 8px"><input id="sycQ" class="filter" placeholder="SyC filtern" aria-label="SyC filtern"><label class="toggle"><input type="checkbox" id="sycUnk"> nur ohne Wert</label></div>
-      <div class="sycl" id="sycList"></div>
-    </details>
-    <div id="cfgDiff"></div>
-  </section>
 
   <div class="tabcount" aria-hidden="true"><span id="c-arch"></span><span id="c-if"></span><span id="c-exp"></span><span id="c-dyn"></span><span id="c-files"></span></div>
 
@@ -716,6 +689,46 @@ footer.foot a:hover{color:var(--text)}
       <p>Systemkonstanten: Bedingungen aus <code>#if</code>, <code>#elif</code>, <code>#ifdef</code>, aus Abfragen wie <code>if (SY_X == SY_ON)</code> und aus <code>SW-SYSCOND</code> in der PaVaSt. Werte kommen aus <code>#define</code> in eingelegten Headern, aus <code>SW-SYSTEMCONST</code> oder aus deiner Eingabe. Unbekannte Werte gelten als „vielleicht“, der Code bleibt dann drin.</p>
       <p>Exportliste: Aus PaVaSt kommen Langname, Typ, Umrechnung, Einheit und Grenzen aus <code>SW-VARIABLE</code>. Das Raster wird aus dem Prozessnamen gelesen (<code>…10ms</code>, <code>_Ini</code>). Eine Schreibstelle gilt als bedingt, wenn sie in einem <code>if</code>-, <code>else</code>- oder <code>switch</code>-Zweig oder hinter <code>?:</code> liegt.</p></template>
   </section>
+  <!-- Design-Check 19.11.2026: Graph zuerst; Dateien und Konfiguration eingeklappt darunter -->
+  <details class="card sp-einst" id="spEinst">
+    <summary><b>Dateien und Einstellungen</b> <span class="sp-einst-k">Dateien einlegen · Konfiguration · Muster</span></summary>
+  <details class="dropbox" id="dropBox">
+    <summary class="dropsum"><span class="dsym" aria-hidden="true"></span><span class="dlab">Dateien &amp; Ordner einlegen</span><span class="dcount" id="dcount"></span></summary>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Dateien oder Ordner hierher ziehen oder klicken, um sie auszuwählen">
+      <svg class="drop-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+      <div><strong>Dateien oder Ordner hier ablegen</strong><small><code>.c</code> <code>.h</code> und PaVaSt (<code>.xml</code>, <code>.pavast</code>) · ganze Ordner inkl. Unterordner · <code>.zip</code> · oder irgendwo auf die Seite ziehen</small></div>
+      <div class="btns">
+        <label class="pill primary" for="fin">Dateien wählen</label>
+        <label class="pill" for="din" id="dinLbl" title="Sucht im Ordner alle .c- und _pavast.xml-Dateien, kopiert sie in den Unterordner „Schaltplan“ und legt sie von dort ein">Ordner</label>
+        <button class="pill" id="bSample" type="button">Beispiel</button>
+        <button class="pill" id="bClear" type="button">Leeren</button>
+      </div>
+      <input type="file" id="fin" multiple hidden accept=".c,.h,.xml,.pavast,.pvs,.txt,.zip">
+      <input type="file" id="din" multiple hidden webkitdirectory>
+    </div>
+  </details>
+  <section class="card cfgbar" aria-label="Konfiguration">
+    <div class="fb-row">
+      <div class="fb-g"><label class="t-idx" for="cfgMode">Konfiguration</label>
+        <select id="cfgMode" class="filter"><option value="all">Alle Varianten</option><option value="cfg">Konkrete Konfiguration</option></select></div>
+      <div class="fb-g fb-pre"><label class="t-idx" for="sycPre">SyC-Muster</label><input id="sycPre" class="filter" value="SY_*, Sy_*, *_SY, *_SC" spellcheck="false" autocomplete="off" title="Namensmuster der Systemkonstanten, mit Komma getrennt. * steht für einen beliebigen Namensteil."></div>
+      <div class="fb-g fb-pre"><label class="t-idx" for="calPre">Applikations-Muster</label><input id="calPre" class="filter" value="*_C, *_CUR, *_MAP, *_CA, *_AX, *_GAX" spellcheck="false" autocomplete="off" title="Namensmuster der Applikationsparameter (Kennwert, Kennlinie, Kennfeld …). Zusätzlich zählt alles, was eine PaVaSt als SW-CALPRM führt."></div>
+      <div class="btns cfg-btns">
+        <label class="pill" for="cfgFile">Werte laden</label><input type="file" id="cfgFile" hidden accept=".h,.txt,.csv,.syc,.cfg,.ini,.xml">
+        <button class="pill" id="cfgReset" type="button">Vorgaben</button>
+        <button class="pill" id="cfgA" type="button">Als A merken</button>
+        <button class="pill" id="cfgCmp" type="button" hidden>Mit A vergleichen</button>
+      </div>
+    </div>
+    <p class="sub" id="cfgInfo"></p>
+    <ul class="hints" id="cfgFind" hidden></ul>
+    <details id="sycBox" hidden><summary class="sub" id="sycSum">Systemkonstanten</summary>
+      <div class="btns" style="margin:10px 0 8px"><input id="sycQ" class="filter" placeholder="SyC filtern" aria-label="SyC filtern"><label class="toggle"><input type="checkbox" id="sycUnk"> nur ohne Wert</label></div>
+      <div class="sycl" id="sycList"></div>
+    </details>
+    <div id="cfgDiff"></div>
+  </section>
+  </details>
 </main>
 
 <nav class="dock" id="dock" aria-label="Ansichten">
@@ -6488,7 +6501,7 @@ async function addFiles(list,note=""){
 function renderDropSum(){
   const n=S.files.length,s=S.files.some(f=>f.sample),c=S.files.filter(f=>f.kind==="c").length;
   $("#dcount").textContent=n?`${s?"Beispiel · ":""}${n} Datei${n===1?"":"en"} · ${c} C · ${n-c} PaVaSt`:"noch nichts eingelegt";
-  if(!n)$("#dropBox").open=true;
+  if(!n){$("#dropBox").open=true;var se=document.getElementById("spEinst");if(se)se.open=true;}
 }
 $("#fin").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
 $("#din").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
@@ -8122,4 +8135,7 @@ try{const t=localStorage.getItem("ap-tab");if(t&&t!=="arch")openTab(t)}catch(e){
 })();
 WBMarke.start({ziel:'main.wrap',schritt:function(){var f=document.getElementById('p-fn');return f&&!f.hidden?'4':'2';}});
 /* ═══ WBMarke-Ende */</script>
+<script>/* Design-Check 19.11.2026: Klappzustand merken */
+(function(){var d=document.getElementById('spEinst');if(!d)return;try{if(localStorage.getItem('sp-einst')==='1')d.open=true;}catch(e){}
+d.addEventListener('toggle',function(){try{localStorage.setItem('sp-einst',d.open?'1':'0');}catch(e){}});})();</script>
 </body></html>
