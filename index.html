@@ -579,7 +579,7 @@ footer.foot a:hover{color:var(--text)}
         </div>
         <p class="lede">Pfeile laufen vom Producer zum Consumer, die Zahl ist die Anzahl Messages. Antippen hebt die direkten Partner hervor und zeigt Details. Stufe 1 zeigt nur die Cluster, Stufe 2 klappt alle Cluster auf und zeigt die FCs darin. Doppeltippen klappt einen einzelnen Cluster auf oder zu.</p>
         <div class="cywrap">
-          <div id="cy" aria-label="FC-Graph"></div>
+          <div id="cy" role="img" aria-label="FC-Graph"></div>
           <aside class="dpanel" id="dpanel" hidden aria-label="Details"><button class="pill icon-btn dclose" id="dclose" type="button" aria-label="Details schließen">✕</button><div id="detail"><p class="empty"></p></div></aside>
         </div>
         <template id="h-legend"><div class="legend">
@@ -8103,6 +8103,7 @@ try{const t=localStorage.getItem("ap-tab");if(t&&t!=="arch")openTab(t)}catch(e){
       if (ak && ak.id && kp && Array.isArray(kp.auftraege)) au = kp.auftraege.filter(function(a){ return a.id === ak.id; })[0] || null;
       if (au && s.kp && au.schritte && au.schritte[s.kp]) st = au.schritte[s.kp].status || '';
       var w = WEITER[k] && S[WEITER[k]], f = FARBE[st];
+      el.setAttribute('aria-label', 'Prozessschritt ' + marke(s));
       var key = [k, ak && ak.id, ak && ak.titel, st, w && w.name].join('|'); if (key === letzt) return; letzt = key;
       var href = w && w.id && REPO[w.id] ? '../' + REPO[w.id] + '/' + (w.id === 'anforderungsbuch' && w.tab ? '#' + w.tab : '') : '';
       el.innerHTML =
